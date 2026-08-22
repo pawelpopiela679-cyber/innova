@@ -1,7 +1,18 @@
+import { LeafSprig } from "@/components/decor";
+
 export function Footer() {
   return (
-    <footer className="border-t border-[var(--border)] bg-[var(--surface)]">
-      <div className="mx-auto max-w-6xl px-4 py-8 text-sm">
+    <footer className="relative overflow-hidden border-t border-[var(--border)] bg-[var(--surface)]">
+      <LeafSprig
+        className="pointer-events-none absolute -bottom-6 left-6 h-24 w-10 rotate-[20deg] opacity-50"
+        color="var(--sage)"
+      />
+      <LeafSprig
+        className="pointer-events-none absolute -bottom-8 right-8 h-28 w-12 -rotate-[15deg] opacity-40"
+        color="var(--coral)"
+      />
+
+      <div className="relative mx-auto max-w-6xl px-4 py-8 text-sm">
         <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-center text-[var(--foreground)]">
           <span className="flex items-center gap-1.5">
             <span aria-hidden>📍</span> ul. Kolejowa, Czechowice-Dziedzice

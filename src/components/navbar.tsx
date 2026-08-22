@@ -7,9 +7,12 @@ export async function Navbar() {
   const isStaff = session?.role === "ADMIN" || session?.role === "INSTRUCTOR";
 
   return (
-    <header className="border-b border-[var(--border)] bg-[var(--surface)]">
+    <header className="sticky top-0 z-30 border-b border-[var(--border)] bg-[var(--surface)]/85 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
-        <Link href="/" className="flex items-baseline gap-2 font-heading text-2xl font-bold tracking-tight">
+        <Link
+          href="/"
+          className="flex items-baseline gap-2 font-heading text-2xl font-bold tracking-tight transition-transform hover:scale-105"
+        >
           <span className="text-[var(--sage)]">IN</span>
           <span className="text-[var(--coral)]">NOVA</span>
         </Link>
@@ -45,7 +48,7 @@ export async function Navbar() {
               <form action={logoutAction}>
                 <button
                   type="submit"
-                  className="rounded-full border border-[var(--border)] px-3 py-1.5 hover:bg-[var(--background)]"
+                  className="rounded-full border border-[var(--border)] px-3 py-1.5 transition-colors hover:bg-[var(--background)]"
                 >
                   Wyloguj
                 </button>
@@ -55,13 +58,13 @@ export async function Navbar() {
             <>
               <Link
                 href="/logowanie"
-                className="rounded-full border border-[var(--border)] px-3 py-1.5 hover:bg-[var(--background)]"
+                className="rounded-full border border-[var(--border)] px-3 py-1.5 transition-colors hover:bg-[var(--background)]"
               >
                 Zaloguj się
               </Link>
               <Link
                 href="/rejestracja"
-                className="rounded-full bg-[var(--primary)] px-3 py-1.5 text-[var(--primary-foreground)] hover:opacity-90"
+                className="rounded-full bg-[var(--primary)] px-3 py-1.5 text-[var(--primary-foreground)] shadow-sm transition-transform hover:scale-105 hover:opacity-90"
               >
                 Załóż konto
               </Link>

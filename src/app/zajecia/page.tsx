@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { classTypeIcon } from "@/lib/class-type-icons";
+import { DashedDivider } from "@/components/decor";
 
 export default async function ClassesPage() {
   const classTypes = await prisma.classType.findMany({
@@ -13,7 +14,8 @@ export default async function ClassesPage() {
       <h1 className="text-center font-heading text-3xl font-extrabold">
         Oferta <span className="text-[var(--coral)]">i cennik</span>
       </h1>
-      <p className="mx-auto mt-2 max-w-xl text-center text-[var(--muted)]">
+      <DashedDivider className="mx-auto mt-4 w-40" />
+      <p className="mx-auto mt-4 max-w-xl text-center text-[var(--muted)]">
         Zajęcia odbywają się 1x w tygodniu. Pełny terminarz i wolne miejsca znajdziesz w{" "}
         <Link href="/kalendarz" className="text-[var(--coral)] underline">
           kalendarzu
@@ -22,15 +24,26 @@ export default async function ClassesPage() {
       </p>
 
       <div className="mt-8 space-y-6">
-        {classTypes.map((ct) => (
+        {classTypes.map((ct, i) => (
           <section
             key={ct.id}
             id={ct.key}
-            className="scroll-mt-20 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6"
+            className="relative scroll-mt-20 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 pt-8 shadow-sm transition-shadow hover:shadow-md"
             style={{ borderTopWidth: 4, borderTopColor: ct.color }}
           >
-            <div className="flex items-center gap-2">
-              <span className="text-2xl" aria-hidden>
+            <span
+              className="absolute -top-4 left-6 flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold text-white shadow-sm"
+              style={{ backgroundColor: ct.color }}
+              aria-hidden
+            >
+              {i + 1}
+            </span>
+            <div className="flex items-center gap-3">
+              <span
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-2xl"
+                style={{ backgroundColor: `${ct.color}22` }}
+                aria-hidden
+              >
                 {classTypeIcon(ct.key)}
               </span>
               <h2 className="font-heading text-xl font-bold">{ct.name}</h2>
@@ -76,7 +89,7 @@ export default async function ClassesPage() {
             </p>
             <Link
               href={`/kalendarz?classType=${ct.id}`}
-              className="mt-4 inline-block rounded-full bg-[var(--sage)] px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
+              className="mt-4 inline-block rounded-full bg-[var(--sage)] px-4 py-2 text-sm font-semibold text-white shadow-sm transition-transform hover:scale-105 hover:opacity-90"
             >
               Zobacz terminy
             </Link>
