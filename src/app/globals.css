@@ -1,14 +1,17 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fdfbf7;
-  --foreground: #241b3a;
-  --surface: #ffffff;
-  --border: #e7e0f5;
-  --primary: #6d28d9;
+  --background: #faf3e6;
+  --foreground: #33402c;
+  --surface: #fffbf3;
+  --border: #ece0cc;
+  --primary: #5f7350;
   --primary-foreground: #ffffff;
-  --accent: #f59e0b;
-  --muted: #6b7280;
+  --sage: #5f7350;
+  --sage-light: #a8b78e;
+  --coral: #dd8177;
+  --mustard: #d9a441;
+  --muted: #85795f;
 }
 
 @theme inline {
@@ -18,23 +21,30 @@
   --color-border: var(--border);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
-  --color-accent: var(--accent);
+  --color-sage: var(--sage);
+  --color-sage-light: var(--sage-light);
+  --color-coral: var(--coral);
+  --color-mustard: var(--mustard);
   --color-muted: var(--muted);
-  --font-sans:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+  --font-sans: var(--font-body), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     sans-serif;
+  --font-heading: var(--font-heading), var(--font-sans);
+  --font-script: var(--font-script), cursive;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #171225;
-    --foreground: #f3effc;
-    --surface: #211a35;
-    --border: #362a54;
-    --primary: #a78bfa;
-    --primary-foreground: #1e1533;
-    --accent: #fbbf24;
-    --muted: #a89fc2;
+    --background: #22271d;
+    --foreground: #f3efe2;
+    --surface: #2c3323;
+    --border: #414a34;
+    --primary: #a8b78e;
+    --primary-foreground: #22271d;
+    --sage: #a8b78e;
+    --sage-light: #8a9a6f;
+    --coral: #f0a89e;
+    --mustard: #f0c266;
+    --muted: #b7ae97;
   }
 }
 

@@ -1,7 +1,9 @@
-# Pracownia Innova — system zapisów na zajęcia dla dzieci
+# INNOVA — system zapisów na zajęcia dla dzieci
 
-Aplikacja webowa do zarządzania zapisami dzieci na zajęcia online w kreatywnej
-pracowni. Zbudowana w Next.js (App Router) + TypeScript + Prisma + SQLite.
+Aplikacja webowa do zarządzania zapisami dzieci na zajęcia online dla
+pracowni kreatywno-edukacyjnej INNOVA (Czechowice-Dziedzice). Zbudowana w
+Next.js (App Router) + TypeScript + Prisma + SQLite. Kolorystyka, czcionki i
+treść oferty dopasowane do materiałów promocyjnych pracowni.
 
 ## Funkcje
 
@@ -21,9 +23,23 @@ pracowni. Zbudowana w Next.js (App Router) + TypeScript + Prisma + SQLite.
 - **Lista rezerwowa** — gdy grupa jest pełna, zapis trafia na listę
   rezerwową i automatycznie awansuje na potwierdzony, jeśli zwolni się
   miejsce (np. po anulowaniu przez innego rodzica).
-- Cztery rodzaje zajęć na start: **robotyka**, **zajęcia kreatywne**,
-  **zajęcia teatralne**, **język angielski** — łatwe do rozszerzenia o
-  kolejne (patrz niżej).
+- **Cennik na stronie ofertowej** (`/zajecia`) — warianty wiekowe, czas
+  trwania i cena miesięczna dla każdego rodzaju zajęć (dane informacyjne,
+  aplikacja nie obsługuje płatności).
+- Sześć rodzajów zajęć na start: **angielski**, **zajęcia sceniczne**,
+  **robotyka**, **zajęcia kreatywne**, **matematyka**, **eksperymentatorium**
+  — łatwe do rozszerzenia o kolejne (patrz niżej).
+
+## Dane kontaktowe pracowni
+
+Adres, telefon i linki do social media (widoczne w stopce strony) są wpisane
+na stałe w `src/components/footer.tsx` — jeśli się zmienią, zaktualizuj je
+tam:
+
+- ul. Kolejowa, Czechowice-Dziedzice
+- tel. 570 250 363
+- Facebook: `/innova.pracownia`, Instagram: `/innova_pracownia`
+- www.innova-pracownia.pl
 
 ## Stos technologiczny
 
@@ -35,6 +51,9 @@ pracowni. Zbudowana w Next.js (App Router) + TypeScript + Prisma + SQLite.
 - [nodemailer](https://nodemailer.com/) do wysyłki e-maili (z trybem
   deweloperskim logującym treść do konsoli, gdy SMTP nie jest skonfigurowane)
 - Sesje logowania: JWT w bezpiecznym ciasteczku httpOnly ([jose](https://github.com/panva/jose))
+- Czcionki (Google Fonts, ładowane przez `next/font/google`): **Fredoka**
+  (nagłówki/logo), **Caveat** (odręczny akcent, np. "Miejsce rozwoju"),
+  **Nunito** (tekst)
 
 ## Szybki start (lokalnie)
 
@@ -44,7 +63,7 @@ Wymagany Node.js 20+.
 npm install
 cp .env.example .env      # i uzupełnij wartości, patrz niżej
 npm run db:migrate         # utworzy bazę SQLite i tabele
-npm run db:seed            # doda 4 rodzaje zajęć, konto admina i przykładowe terminy
+npm run db:seed            # doda 6 rodzajów zajęć, cennik, konto admina i przykładowe terminy
 npm run dev
 ```
 
@@ -55,7 +74,7 @@ Aplikacja wystartuje na [http://localhost:3000](http://localhost:3000).
 | Rola | E-mail | Hasło |
 | --- | --- | --- |
 | Administrator / właściciel pracowni | `admin@innova-pracownia.pl` (lub wartość `SEED_ADMIN_EMAIL`) | `ZmienMnie123!` (lub `SEED_ADMIN_PASSWORD`) |
-| Prowadzący (4 konta, po jednym na rodzaj zajęć) | np. `marek@innova-pracownia.pl` | `Prowadzacy123!` |
+| Prowadzący (6 kont, po jednym na rodzaj zajęć) | np. `marek@innova-pracownia.pl` | `Prowadzacy123!` |
 | Przykładowy rodzic | `rodzic@example.com` | `Haslo123!` |
 
 **Koniecznie zmień te hasła / usuń konta demo przed wdrożeniem na
@@ -82,10 +101,10 @@ Zobacz `.env.example` — najważniejsze zmienne:
 
 ```
 prisma/schema.prisma       modele bazy danych (User, Child, ClassType,
-                            ClassSession, Enrollment)
-prisma/seed.ts              dane startowe: 4 rodzaje zajęć, konto admina,
-                            prowadzący, przykładowe terminy na najbliższe
-                            tygodnie
+                            PricingTier, ClassSession, Enrollment)
+prisma/seed.ts              dane startowe: 6 rodzajów zajęć + cennik, konto
+                            admina, prowadzący, przykładowe terminy na
+                            najbliższe tygodnie
 src/lib/auth.ts             hasła (bcrypt), sesje (JWT w ciasteczku)
 src/lib/mailer.ts           wysyłka e-maili (potwierdzenie + powiadomienie
                             studia)
@@ -100,11 +119,13 @@ src/app/admin                panel prowadzącego/administratora (dostępność
 
 ## Dodawanie kolejnych rodzajów zajęć
 
-Rodzaje zajęć (`ClassType`) są danymi w bazie, nie są zaszyte na sztywno w
-kodzie — nowy rodzaj można dodać bezpośrednio w bazie (np. przez
-`npx prisma studio`) lub rozszerzając `prisma/seed.ts` o kolejny wpis.
-Panel administratora (`/admin/zajecia/nowe`) pozwala dodawać nowe terminy do
-istniejących rodzajów zajęć bez ingerencji w kod.
+Rodzaje zajęć (`ClassType`) i pozycje cennika (`PricingTier`) są danymi w
+bazie, nie są zaszyte na sztywno w kodzie — nowy rodzaj (razem z wariantami
+cenowymi) można dodać bezpośrednio w bazie (np. przez `npx prisma studio`)
+lub rozszerzając `prisma/seed.ts` o kolejny wpis, a potem uruchamiając
+ponownie `npm run db:seed`. Panel administratora (`/admin/zajecia/nowe`)
+pozwala dodawać nowe terminy do istniejących rodzajów zajęć bez ingerencji w
+kod.
 
 ## Przydatne komendy
 

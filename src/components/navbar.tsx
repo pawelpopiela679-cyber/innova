@@ -9,20 +9,20 @@ export async function Navbar() {
   return (
     <header className="border-b border-[var(--border)] bg-[var(--surface)]">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
-        <Link href="/" className="flex items-center gap-2 font-bold text-lg text-[var(--primary)]">
-          <span aria-hidden>🎨</span>
-          Pracownia Innova
+        <Link href="/" className="flex items-baseline gap-2 font-heading text-2xl font-bold tracking-tight">
+          <span className="text-[var(--sage)]">IN</span>
+          <span className="text-[var(--coral)]">NOVA</span>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-5 text-sm font-medium">
-          <Link href="/zajecia" className="hover:text-[var(--primary)]">
-            Zajęcia
+        <nav className="hidden md:flex items-center gap-5 text-sm font-semibold">
+          <Link href="/zajecia" className="hover:text-[var(--coral)]">
+            Zajęcia i cennik
           </Link>
-          <Link href="/kalendarz" className="hover:text-[var(--primary)]">
+          <Link href="/kalendarz" className="hover:text-[var(--coral)]">
             Kalendarz
           </Link>
           {isStaff && (
-            <Link href="/admin" className="hover:text-[var(--primary)]">
+            <Link href="/admin" className="hover:text-[var(--coral)]">
               Panel prowadzącego
             </Link>
           )}

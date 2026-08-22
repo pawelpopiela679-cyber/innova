@@ -1,22 +1,43 @@
 import type { Metadata } from "next";
+import { Fredoka, Caveat, Nunito } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/navbar";
+import { Footer } from "@/components/footer";
+
+const fredoka = Fredoka({
+  subsets: ["latin-ext"],
+  weight: ["500", "600", "700"],
+  variable: "--font-heading",
+});
+
+const caveat = Caveat({
+  subsets: ["latin-ext"],
+  weight: ["600", "700"],
+  variable: "--font-script",
+});
+
+const nunito = Nunito({
+  subsets: ["latin-ext"],
+  weight: ["400", "600", "700", "800"],
+  variable: "--font-body",
+});
 
 export const metadata: Metadata = {
-  title: "Pracownia Innova — zajęcia dla dzieci",
+  title: "INNOVA — Pracownia kreatywno-edukacyjna",
   description:
-    "Zapisy na zajęcia online dla dzieci: robotyka, zajęcia kreatywne, teatralne i język angielski.",
+    "Miejsce rozwoju dla Twojego dziecka. Zajęcia z angielskiego, scenicznych, robotyki, kreatywne, matematyki i eksperymentatorium w Czechowicach-Dziedzicach i online.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="pl" className="h-full antialiased">
+    <html
+      lang="pl"
+      className={`${fredoka.variable} ${caveat.variable} ${nunito.variable} h-full antialiased`}
+    >
       <body className="min-h-full flex flex-col">
         <Navbar />
         <main className="flex-1">{children}</main>
-        <footer className="border-t border-[var(--border)] py-6 text-center text-sm text-[var(--muted)]">
-          © {new Date().getFullYear()} Pracownia Innova — zajęcia kreatywne dla dzieci
-        </footer>
+        <Footer />
       </body>
     </html>
   );

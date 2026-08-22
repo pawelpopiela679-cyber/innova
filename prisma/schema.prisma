@@ -54,7 +54,26 @@ model ClassType {
   ageMax      Int      @default(12)
   createdAt   DateTime @default(now())
 
-  sessions ClassSession[]
+  sessions     ClassSession[]
+  pricingTiers PricingTier[]
+}
+
+/// Marketing/pricing info shown on the public offer page (cennik) — one row
+/// per age group / variant of a class type, e.g. "Mix kreatywny, 5–7 lat,
+/// 50 min, 229 zł/mies.". Purely informational: independent of the bookable
+/// ClassSession schedule below (this app doesn't handle payments).
+model PricingTier {
+  id           String    @id @default(cuid())
+  classTypeId  String
+  classType    ClassType @relation(fields: [classTypeId], references: [id], onDelete: Cascade)
+  label        String // e.g. "Mix kreatywny" — blank-friendly, falls back to the class name in the UI
+  ageLabel     String // e.g. "5–7 lat"
+  durationMin  Int
+  priceMonthly Int // w złotych / miesiąc
+  oneTimeFee   Int? // np. pakiet startowy do szydełkowania
+  sortOrder    Int       @default(0)
+
+  @@index([classTypeId])
 }
 
 model Child {

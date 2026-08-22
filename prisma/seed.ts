@@ -10,6 +10,8 @@ import {
   nextTuesday,
   nextWednesday,
   nextThursday,
+  nextFriday,
+  nextSaturday,
   startOfDay,
 } from "date-fns";
 
@@ -37,6 +39,14 @@ function weeklyOccurrences(
   return out;
 }
 
+type PricingTierDef = {
+  label: string;
+  ageLabel: string;
+  durationMin: number;
+  priceMonthly: number;
+  oneTimeFee?: number;
+};
+
 async function main() {
   const today = startOfDay(new Date());
 
@@ -57,10 +67,12 @@ async function main() {
 
   // --- Instructors ---
   const instructorDefs = [
-    { email: "marek@innova-pracownia.pl", name: "Marek Kowalski" }, // robotyka
-    { email: "ania@innova-pracownia.pl", name: "Ania Nowak" }, // kreatywne
-    { email: "kasia@innova-pracownia.pl", name: "Kasia Wiśniewska" }, // teatralne
     { email: "ola@innova-pracownia.pl", name: "Ola Zielińska" }, // angielski
+    { email: "kasia@innova-pracownia.pl", name: "Kasia Wiśniewska" }, // zajęcia sceniczne
+    { email: "marek@innova-pracownia.pl", name: "Marek Kowalski" }, // robotyka
+    { email: "ania@innova-pracownia.pl", name: "Ania Nowak" }, // zajęcia kreatywne
+    { email: "beata@innova-pracownia.pl", name: "Beata Kowalczyk" }, // matematyka
+    { email: "tomek@innova-pracownia.pl", name: "Tomek Nowicki" }, // eksperymentatorium
   ];
   const instructorPassword = "Prowadzacy123!";
   const instructors = [];
@@ -79,59 +91,134 @@ async function main() {
   }
   console.log(`Prowadzący hasło (wszyscy): ${instructorPassword}`);
 
-  // --- Class types ---
+  // --- Class types (dopasowane do ulotki INNOVA — Oferta i cennik) ---
   const classTypeDefs = [
     {
+      key: "ENGLISH",
+      name: "Angielski",
+      description:
+        "Nauka angielskiego przez zabawę, piosenki, gry i krótkie dialogi — zajęcia prowadzone w małych grupach, dopasowane do wieku i poziomu dziecka.",
+      color: "#4f9bd1",
+      ageMin: 3,
+      ageMax: 7,
+      instructor: instructors[0],
+      weekly: () => weeklyOccurrences(nextMonday(today), 16, 30, 50, 10),
+      title: "Angielski — grupa online",
+      capacity: 8,
+      pricing: [
+        { label: "", ageLabel: "3–4 lata", durationMin: 35, priceMonthly: 149 },
+        { label: "", ageLabel: "5–7 lat", durationMin: 50, priceMonthly: 199 },
+      ] satisfies PricingTierDef[],
+    },
+    {
+      key: "THEATER",
+      name: "Zajęcia sceniczne",
+      description:
+        "Improwizacja, dykcja, praca z ciałem i głosem oraz przygotowywanie krótkich etiud — zajęcia budujące pewność siebie, wyobraźnię i swobodę wyrażania emocji.",
+      color: "#9b7fd4",
+      ageMin: 6,
+      ageMax: 15,
+      instructor: instructors[1],
+      weekly: () => weeklyOccurrences(nextThursday(today), 17, 30, 60, 10),
+      title: "Zajęcia sceniczne — grupa online",
+      capacity: 12,
+      pricing: [
+        { label: "Słowo na scenie", ageLabel: "9–15 lat", durationMin: 75, priceMonthly: 249 },
+        { label: "Scena dla każdego", ageLabel: "6–9 lat", durationMin: 60, priceMonthly: 199 },
+        { label: "Scena dla każdego", ageLabel: "10–15 lat", durationMin: 75, priceMonthly: 229 },
+      ] satisfies PricingTierDef[],
+    },
+    {
       key: "ROBOTICS",
-      name: "Zajęcia z robotyki",
+      name: "Robotyka",
       description:
         "Budowanie i programowanie prostych robotów oraz automatów — dzieci uczą się podstaw elektroniki, logicznego myślenia i programowania blokowego w przyjaznej, praktycznej formie.",
-      color: "#2563eb",
-      ageMin: 7,
-      ageMax: 13,
-      instructor: instructors[0],
+      color: "#3f8fa0",
+      ageMin: 5,
+      ageMax: 10,
+      instructor: instructors[2],
       weekly: () => weeklyOccurrences(nextWednesday(today), 17, 0, 60, 10),
       title: "Robotyka — grupa online",
       capacity: 8,
+      pricing: [
+        { label: "", ageLabel: "5–7 lat", durationMin: 60, priceMonthly: 249 },
+        { label: "", ageLabel: "8–10 lat", durationMin: 60, priceMonthly: 249 },
+      ] satisfies PricingTierDef[],
     },
     {
       key: "CREATIVE",
       name: "Zajęcia kreatywne",
       description:
         "Malarstwo, rękodzieło, prace plastyczne i eksperymenty z różnymi materiałami — rozwijamy wyobraźnię i zdolności manualne najmłodszych w luźnej, artystycznej atmosferze.",
-      color: "#db2777",
-      ageMin: 4,
-      ageMax: 10,
-      instructor: instructors[1],
+      color: "#e08a80",
+      ageMin: 5,
+      ageMax: 15,
+      instructor: instructors[3],
       weekly: () => weeklyOccurrences(nextTuesday(today), 16, 0, 60, 10),
       title: "Pracownia kreatywna — grupa online",
       capacity: 10,
+      pricing: [
+        { label: "Mix kreatywny", ageLabel: "5–7 lat", durationMin: 50, priceMonthly: 229 },
+        { label: "Mix kreatywny", ageLabel: "8–11 lat", durationMin: 60, priceMonthly: 229 },
+        {
+          label: "Szydełkowanie / haft",
+          ageLabel: "9–15 lat",
+          durationMin: 75,
+          priceMonthly: 229,
+          oneTimeFee: 79,
+        },
+      ] satisfies PricingTierDef[],
     },
     {
-      key: "THEATER",
-      name: "Zajęcia teatralne",
+      key: "MATH",
+      name: "Matematyka",
       description:
-        "Improwizacja, dykcja, praca z ciałem i głosem oraz przygotowywanie krótkich etiud — zajęcia budujące pewność siebie, wyobraźnię i swobodę wyrażania emocji.",
-      color: "#7c3aed",
-      ageMin: 6,
-      ageMax: 14,
-      instructor: instructors[2],
-      weekly: () => weeklyOccurrences(nextThursday(today), 17, 30, 60, 10),
-      title: "Koło teatralne — grupa online",
-      capacity: 12,
-    },
-    {
-      key: "ENGLISH",
-      name: "Zajęcia z języka angielskiego",
-      description:
-        "Nauka angielskiego przez zabawę, piosenki, gry i krótkie dialogi — zajęcia prowadzone w małych grupach, dopasowane do wieku i poziomu dziecka.",
-      color: "#059669",
-      ageMin: 5,
-      ageMax: 12,
-      instructor: instructors[3],
-      weekly: () => weeklyOccurrences(nextMonday(today), 16, 30, 45, 10),
-      title: "Angielski dla dzieci — grupa online",
+        "Matematyczne odkrycia przez zabawę, oswajanie z liczbami i logiczne myślenie dla najmłodszych, a dla starszych — pomoc szkolna, nadrabianie zaległości i przygotowanie do egzaminu ósmoklasisty.",
+      color: "#d9a441",
+      ageMin: 4,
+      ageMax: 15,
+      instructor: instructors[4],
+      weekly: () => weeklyOccurrences(nextFriday(today), 16, 0, 60, 10),
+      title: "Matematyka — grupa online",
       capacity: 8,
+      pricing: [
+        {
+          label: "Matematyczne odkrycia",
+          ageLabel: "4–5 lat",
+          durationMin: 35,
+          priceMonthly: 149,
+        },
+        {
+          label: "Matematyka bez stresu",
+          ageLabel: "6–8 lat",
+          durationMin: 50,
+          priceMonthly: 199,
+        },
+        {
+          label: "Logika + pomoc szkolna",
+          ageLabel: "klasy 1–3",
+          durationMin: 60,
+          priceMonthly: 199,
+        },
+        { label: "Kurs E8", ageLabel: "klasa 8", durationMin: 75, priceMonthly: 249 },
+      ] satisfies PricingTierDef[],
+    },
+    {
+      key: "SCIENCE",
+      name: "Eksperymentatorium",
+      description:
+        "Bezpieczne eksperymenty chemiczne i fizyczne, które tłumaczą, jak działa świat — dzieci samodzielnie odkrywają zjawiska naukowe pod okiem prowadzącego, ucząc się przez działanie.",
+      color: "#4fae8a",
+      ageMin: 6,
+      ageMax: 15,
+      instructor: instructors[5],
+      weekly: () => weeklyOccurrences(nextSaturday(today), 11, 0, 60, 10),
+      title: "Eksperymentatorium — grupa online",
+      capacity: 8,
+      pricing: [
+        { label: "", ageLabel: "6–9 lat", durationMin: 60, priceMonthly: 229 },
+        { label: "", ageLabel: "10–15 lat", durationMin: 75, priceMonthly: 249 },
+      ] satisfies PricingTierDef[],
     },
   ];
 
@@ -155,6 +242,21 @@ async function main() {
       },
     });
 
+    // Reload the pricing table from scratch each run so the seed stays the
+    // single source of truth for what's shown on the offer page.
+    await prisma.pricingTier.deleteMany({ where: { classTypeId: classType.id } });
+    await prisma.pricingTier.createMany({
+      data: def.pricing.map((tier, i) => ({
+        classTypeId: classType.id,
+        label: tier.label,
+        ageLabel: tier.ageLabel,
+        durationMin: tier.durationMin,
+        priceMonthly: tier.priceMonthly,
+        oneTimeFee: tier.oneTimeFee,
+        sortOrder: i,
+      })),
+    });
+
     const occurrences = def.weekly();
     for (const occ of occurrences) {
       const existing = await prisma.classSession.findFirst({
@@ -174,7 +276,7 @@ async function main() {
         },
       });
     }
-    console.log(`${def.name}: ${occurrences.length} terminów`);
+    console.log(`${def.name}: ${occurrences.length} terminów, ${def.pricing.length} wariantów cenowych`);
   }
 
   // --- A demo parent + child + a couple of enrollments, so the app has

@@ -38,7 +38,7 @@ function getTransporter(): nodemailer.Transporter | null {
 /** Sends an email, or logs it to the console when SMTP isn't configured. */
 export async function sendMail(input: MailInput): Promise<void> {
   const transporter = getTransporter();
-  const from = process.env.SMTP_FROM || "Pracownia Innova <no-reply@innova-pracownia.local>";
+  const from = process.env.SMTP_FROM || "INNOVA <no-reply@innova-pracownia.local>";
 
   if (!transporter) {
     // Dev fallback: nothing is actually sent, but the content is visible
@@ -109,7 +109,7 @@ Prowadzący: ${instructorName}
 ${meetingUrl && !waitlisted ? `Link do zajęć online: ${meetingUrl}\n` : ""}
 Do zobaczenia na zajęciach!
 
-Pracownia Innova`;
+INNOVA — Pracownia kreatywno-edukacyjna`;
 
   const html = `
     <div style="font-family: sans-serif; max-width: 480px;">
@@ -137,7 +137,7 @@ Pracownia Innova`;
         }
       </table>
       <p>Do zobaczenia na zajęciach!</p>
-      <p style="color:#999; font-size: 12px;">Pracownia Innova</p>
+      <p style="color:#999; font-size: 12px;">INNOVA — Pracownia kreatywno-edukacyjna</p>
     </div>`;
 
   await sendMail({ to: parentEmail, subject, html, text });
