@@ -1,0 +1,109 @@
+// Prisma schema for the Innova kids' creative studio registration system.
+// Default datasource is SQLite for a zero-config local/dev setup.
+// For production, switch `provider` to "postgresql" (or your DB of choice)
+// and point DATABASE_URL at a real database — the rest of the schema
+// works unchanged.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  PARENT
+  INSTRUCTOR
+  ADMIN
+}
+
+enum EnrollmentStatus {
+  CONFIRMED
+  WAITLIST
+  CANCELED
+}
+
+enum SessionStatus {
+  SCHEDULED
+  CANCELED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  phone        String?
+  role         Role     @default(PARENT)
+  createdAt    DateTime @default(now())
+
+  children         Child[]
+  enrollments      Enrollment[]
+  sessionsAsCoach  ClassSession[] @relation("InstructorSessions")
+}
+
+model ClassType {
+  id          String   @id @default(cuid())
+  key         String   @unique // e.g. ROBOTICS, CREATIVE, THEATER, ENGLISH
+  name        String
+  description String
+  color       String   @default("#6366f1")
+  ageMin      Int      @default(5)
+  ageMax      Int      @default(12)
+  createdAt   DateTime @default(now())
+
+  sessions ClassSession[]
+}
+
+model Child {
+  id        String   @id @default(cuid())
+  parentId  String
+  parent    User     @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  firstName String
+  lastName  String
+  birthDate DateTime
+  notes     String?
+  createdAt DateTime @default(now())
+
+  enrollments Enrollment[]
+}
+
+model ClassSession {
+  id             String        @id @default(cuid())
+  classTypeId    String
+  classType      ClassType     @relation(fields: [classTypeId], references: [id], onDelete: Cascade)
+  title          String
+  description    String? // optional override / extra info for this specific date
+  startsAt       DateTime
+  endsAt         DateTime
+  capacity       Int           @default(8)
+  meetingUrl     String? // online meeting link, shown to confirmed parents
+  instructorId   String?
+  instructor     User?         @relation("InstructorSessions", fields: [instructorId], references: [id])
+  instructorName String // free-text fallback so an instructor account isn't mandatory
+  status         SessionStatus @default(SCHEDULED)
+  createdAt      DateTime      @default(now())
+
+  enrollments Enrollment[]
+
+  @@index([startsAt])
+  @@index([classTypeId])
+}
+
+model Enrollment {
+  id          String           @id @default(cuid())
+  sessionId   String
+  session     ClassSession     @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  childId     String
+  child       Child            @relation(fields: [childId], references: [id], onDelete: Cascade)
+  parentId    String
+  parent      User             @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  status      EnrollmentStatus @default(CONFIRMED)
+  createdAt   DateTime         @default(now())
+  canceledAt  DateTime?
+
+  @@unique([sessionId, childId])
+  @@index([parentId])
+}
