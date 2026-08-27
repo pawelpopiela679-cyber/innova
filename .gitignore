@@ -50,3 +50,11 @@ next-env.d.ts
 # user-uploaded files (instructor photos, etc.) — not part of the source,
 # but public/logo.png is: see README.
 /public/uploads/
+
+# --- Wersja PHP (php/) — wdrożenie na home.pl bez Node.js ---
+/php/config.local.php
+/php/data.sqlite
+/php/storage/
+/php/uploads/instructors/*
+!/php/uploads/instructors/.gitkeep
+/php/logo.png

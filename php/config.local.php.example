@@ -1,0 +1,50 @@
+<?php
+/**
+ * Skopiuj ten plik jako "config.local.php" (w tym samym folderze) i uzupełnij
+ * prawdziwymi danymi. Plik "config.local.php" NIE jest w repozytorium git
+ * (patrz .gitignore) — Twoje hasła nigdy nie trafią do kodu źródłowego.
+ *
+ * Na home.pl: dane do bazy MySQL znajdziesz w Panelu klienta → Bazy danych.
+ * Dane SMTP: Panel klienta → Poczta (jeśli korzystasz ze skrzynki na domenie)
+ * albo z zewnętrznej usługi pocztowej.
+ */
+
+// --- Baza danych ---
+// Na home.pl zawsze "mysql". Zostaw "sqlite" tylko do szybkiego testowania
+// na własnym komputerze bez zakładania bazy MySQL (patrz README_PHP.md).
+define('DB_DRIVER', 'mysql'); // "mysql" albo "sqlite"
+
+// Dane do MySQL (używane, gdy DB_DRIVER = "mysql"):
+define('DB_HOST', 'localhost');
+define('DB_PORT', 3306);
+define('DB_NAME', 'nazwa_twojej_bazy');
+define('DB_USER', 'uzytkownik_bazy');
+define('DB_PASS', 'haslo_do_bazy');
+
+// Plik bazy SQLite (używany tylko, gdy DB_DRIVER = "sqlite"):
+define('SQLITE_PATH', __DIR__ . '/data.sqlite');
+
+// --- Adres strony (bez ukośnika na końcu) — używany w linkach w e-mailach ---
+define('APP_URL', 'https://twojadomena.pl');
+
+// --- Bezpieczeństwo sesji ---
+// Dowolny długi, losowy ciąg znaków — zmień na własny!
+// Wygenerujesz np. tu: https://1password.com/password-generator/ (64 znaki)
+define('AUTH_SECRET', 'ZMIEN-MNIE-NA-DLUGI-LOSOWY-CIAG-ZNAKOW-1234567890');
+
+// --- Poczta SMTP (jeśli puste, e-maile tylko zapisują się do logu
+//     w php/storage/mail.log zamiast być wysyłane — wygodne do testów) ---
+define('SMTP_HOST', ''); // np. "smtp.home.pl"
+define('SMTP_PORT', 587);
+define('SMTP_USER', ''); // np. "kontakt@twojadomena.pl"
+define('SMTP_PASS', '');
+define('SMTP_FROM_EMAIL', 'kontakt@twojadomena.pl');
+define('SMTP_FROM_NAME', 'INNOVA');
+
+// Adres(y), na które przychodzi powiadomienie o nowym zgłoszeniu (kilka
+// adresów oddziel przecinkiem).
+define('STUDIO_NOTIFY_EMAIL', 'kontakt@twojadomena.pl');
+
+// --- Konto master admina tworzone przez install.php ---
+define('SEED_ADMIN_EMAIL', 'admin@innova-pracownia.pl');
+define('SEED_ADMIN_PASSWORD', 'ZmienMnie123!');

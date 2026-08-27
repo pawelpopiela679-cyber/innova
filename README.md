@@ -5,6 +5,13 @@ pracowni kreatywno-edukacyjnej INNOVA (Czechowice-Dziedzice). Zbudowana w
 Next.js (App Router) + TypeScript + Prisma + SQLite. Kolorystyka, czcionki i
 treść oferty dopasowane do materiałów promocyjnych pracowni.
 
+> **Masz hosting home.pl bez pakietu Node.js?** W folderze [`php/`](./php)
+> jest **druga, w pełni samodzielna wersja tej samej aplikacji** napisana w
+> czystym PHP + MySQL — dokładnie ten sam wygląd i te same funkcje, ale
+> działa na zwykłym hostingu współdzielonym bez Node.js, SSH czy Composera.
+> Zacznij od [`php/README_PHP.md`](./php/README_PHP.md) i
+> [`php/DEPLOY_HOMEPL.md`](./php/DEPLOY_HOMEPL.md).
+
 ## Funkcje
 
 - **Konta rodziców** — rejestracja, logowanie, dodawanie wielu dzieci do
