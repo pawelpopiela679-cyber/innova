@@ -48,6 +48,19 @@ export const updateInstructorSchema = z.object({
     .or(z.literal("")),
 });
 
+export const updateOwnProfileSchema = z.object({
+  name: z.string().trim().min(2, "Podaj imię i nazwisko."),
+  email: z.string().trim().toLowerCase().email("Podaj poprawny adres e-mail."),
+  bio: z.string().trim().max(600, "Notka może mieć maksymalnie 600 znaków.").optional().or(z.literal("")),
+  currentPassword: z.string().min(1, "Podaj obecne hasło, żeby potwierdzić zmiany."),
+  newPassword: z
+    .string()
+    .trim()
+    .min(8, "Nowe hasło musi mieć co najmniej 8 znaków.")
+    .optional()
+    .or(z.literal("")),
+});
+
 export const pageSchema = z.object({
   title: z.string().trim().min(1, "Podaj tytuł strony."),
   slug: z

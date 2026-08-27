@@ -37,6 +37,10 @@ treść oferty dopasowane do materiałów promocyjnych pracowni.
     `/admin/wyglad` (kolory zapisują się w bazie i obowiązują natychmiast),
   - dodaje **własne podstrony** (np. „Regulamin”, „FAQ”) w `/admin/strony`
     — trafiają automatycznie do menu nawigacji.
+- **„Mój profil”** (`/admin/profil`) — każdy zalogowany prowadzący/admin sam
+  zmienia swoją nazwę wyświetlaną, e-mail, zdjęcie, notkę i hasło (wymaga
+  podania obecnego hasła). To tutaj właściciel pracowni zmienia domyślną,
+  wpisaną przez seed nazwę „Właściciel Pracowni” na swoje prawdziwe imię.
 - **Strona „Poznaj nas”** (`/poznaj-nas`) — zespół prowadzących ze
   zdjęciami i notkami, generowany automatycznie z kont prowadzących
   (edytujesz w `/admin/prowadzacy`, strona się sama aktualizuje).
@@ -112,6 +116,7 @@ Aplikacja wystartuje na [http://localhost:3000](http://localhost:3000).
 | Rola | E-mail | Hasło |
 | --- | --- | --- |
 | Administrator / właściciel pracowni | `admin@innova-pracownia.pl` (lub wartość `SEED_ADMIN_EMAIL`) | `ZmienMnie123!` (lub `SEED_ADMIN_PASSWORD`) |
+| ↳ to jedyne konto z rolą `ADMIN` — po zalogowaniu zmień w `/admin/profil` domyślną nazwę „Właściciel Pracowni” na swoje imię i nazwisko oraz hasło. | | |
 | Prowadzący (6 kont, po jednym na rodzaj zajęć) | np. `marek@innova-pracownia.pl` | `Prowadzacy123!` |
 | Przykładowy rodzic | `rodzic@example.com` | `Haslo123!` |
 

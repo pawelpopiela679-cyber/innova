@@ -29,6 +29,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         >
           + Nowe zajęcia
         </Link>
+        <Link
+          href="/admin/profil"
+          className="rounded-full px-4 py-1.5 hover:bg-[var(--background)]"
+        >
+          Mój profil
+        </Link>
         {isMasterAdmin && (
           <>
             <Link
