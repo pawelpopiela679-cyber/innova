@@ -57,10 +57,10 @@ export default async function HomePage() {
             </div>
 
             <div className="mx-auto mt-10 flex max-w-xl flex-wrap justify-center gap-3 lg:mx-0 lg:justify-start">
-              <span className="flex items-center gap-2 rounded-full bg-[var(--sage)] px-5 py-2.5 text-sm font-semibold text-white shadow-sm">
+              <span className="flex items-center gap-2 rounded-full bg-[var(--sage-soft)] px-5 py-2.5 text-sm font-semibold text-[var(--sage)]">
                 <span aria-hidden>📅</span> Start zajęć: 7.09.2026
               </span>
-              <span className="flex items-center gap-2 rounded-full bg-[var(--coral)] px-5 py-2.5 text-sm font-semibold text-white shadow-sm">
+              <span className="flex items-center gap-2 rounded-full bg-[var(--coral-soft)] px-5 py-2.5 text-sm font-semibold text-[var(--coral)]">
                 <span aria-hidden>⭐</span> Bezpłatne zajęcia pokazowe: 5.09.2026
               </span>
             </div>
@@ -130,7 +130,7 @@ export default async function HomePage() {
             <Reason icon="🤗" color="var(--coral)" title="Przyjazna atmosfera" text="Bezpieczna, ciepła przestrzeń, w której dzieci chętnie wracają." />
             <Reason icon="🎯" color="var(--mustard)" title="Nauka przez działanie" text="Wiedza i umiejętności zdobywane w praktyce, nie z podręcznika." />
           </div>
-          <div className="relative mx-auto mt-6 flex max-w-md items-center justify-center gap-2 rounded-xl bg-[var(--mustard)] px-5 py-3 text-center text-sm font-semibold text-white shadow-sm">
+          <div className="relative mx-auto mt-6 flex max-w-md items-center justify-center gap-2 rounded-xl bg-[var(--mustard-soft)] px-5 py-3 text-center text-sm font-semibold text-[var(--foreground)]">
             <span aria-hidden>💛</span> Materiały podstawowe w cenie zajęć
           </div>
         </div>

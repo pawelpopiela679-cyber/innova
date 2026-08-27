@@ -1,17 +1,20 @@
 @import "tailwindcss";
 
 :root {
-  --background: #faf3e6;
-  --foreground: #33402c;
-  --surface: #fffbf3;
-  --border: #ece0cc;
-  --primary: #5f7350;
+  --background: #fefcf6;
+  --foreground: #3c4630;
+  --surface: #ffffff;
+  --border: #efe6d2;
+  --primary: #6f8f57;
   --primary-foreground: #ffffff;
-  --sage: #5f7350;
-  --sage-light: #a8b78e;
-  --coral: #dd8177;
-  --mustard: #d9a441;
-  --muted: #85795f;
+  --sage: #6f8f57;
+  --sage-light: #bdcda6;
+  --sage-soft: #e6eeda;
+  --coral: #c96a5c;
+  --coral-soft: #f7ded8;
+  --mustard: #dba848;
+  --mustard-soft: #f8ead0;
+  --muted: #93886e;
 }
 
 @theme inline {
@@ -23,8 +26,11 @@
   --color-primary-foreground: var(--primary-foreground);
   --color-sage: var(--sage);
   --color-sage-light: var(--sage-light);
+  --color-sage-soft: var(--sage-soft);
   --color-coral: var(--coral);
+  --color-coral-soft: var(--coral-soft);
   --color-mustard: var(--mustard);
+  --color-mustard-soft: var(--mustard-soft);
   --color-muted: var(--muted);
   --font-sans: var(--font-body), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     sans-serif;
@@ -42,8 +48,11 @@
     --primary-foreground: #22271d;
     --sage: #a8b78e;
     --sage-light: #8a9a6f;
+    --sage-soft: #3a4530;
     --coral: #f0a89e;
+    --coral-soft: #4a332e;
     --mustard: #f0c266;
+    --mustard-soft: #4a3f26;
     --muted: #b7ae97;
   }
 }

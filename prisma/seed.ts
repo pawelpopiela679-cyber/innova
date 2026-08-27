@@ -98,7 +98,7 @@ async function main() {
       name: "Angielski",
       description:
         "Nauka angielskiego przez zabawę, piosenki, gry i krótkie dialogi — zajęcia prowadzone w małych grupach, dopasowane do wieku i poziomu dziecka.",
-      color: "#4f9bd1",
+      color: "#6badd9",
       ageMin: 3,
       ageMax: 7,
       instructor: instructors[0],
@@ -115,7 +115,7 @@ async function main() {
       name: "Zajęcia sceniczne",
       description:
         "Improwizacja, dykcja, praca z ciałem i głosem oraz przygotowywanie krótkich etiud — zajęcia budujące pewność siebie, wyobraźnię i swobodę wyrażania emocji.",
-      color: "#9b7fd4",
+      color: "#ab93dd",
       ageMin: 6,
       ageMax: 15,
       instructor: instructors[1],
@@ -133,7 +133,7 @@ async function main() {
       name: "Robotyka",
       description:
         "Budowanie i programowanie prostych robotów oraz automatów — dzieci uczą się podstaw elektroniki, logicznego myślenia i programowania blokowego w przyjaznej, praktycznej formie.",
-      color: "#3f8fa0",
+      color: "#57a3b3",
       ageMin: 5,
       ageMax: 10,
       instructor: instructors[2],
@@ -150,7 +150,7 @@ async function main() {
       name: "Zajęcia kreatywne",
       description:
         "Malarstwo, rękodzieło, prace plastyczne i eksperymenty z różnymi materiałami — rozwijamy wyobraźnię i zdolności manualne najmłodszych w luźnej, artystycznej atmosferze.",
-      color: "#e08a80",
+      color: "#e79d94",
       ageMin: 5,
       ageMax: 15,
       instructor: instructors[3],
@@ -174,7 +174,7 @@ async function main() {
       name: "Matematyka",
       description:
         "Matematyczne odkrycia przez zabawę, oswajanie z liczbami i logiczne myślenie dla najmłodszych, a dla starszych — pomoc szkolna, nadrabianie zaległości i przygotowanie do egzaminu ósmoklasisty.",
-      color: "#d9a441",
+      color: "#e0b463",
       ageMin: 4,
       ageMax: 15,
       instructor: instructors[4],
@@ -208,7 +208,7 @@ async function main() {
       name: "Eksperymentatorium",
       description:
         "Bezpieczne eksperymenty chemiczne i fizyczne, które tłumaczą, jak działa świat — dzieci samodzielnie odkrywają zjawiska naukowe pod okiem prowadzącego, ucząc się przez działanie.",
-      color: "#4fae8a",
+      color: "#64bd9c",
       ageMin: 6,
       ageMax: 15,
       instructor: instructors[5],
