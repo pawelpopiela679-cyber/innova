@@ -4,8 +4,8 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { addWeeks } from "date-fns";
 import { prisma } from "@/lib/db";
-import { getSession, hashPassword } from "@/lib/auth";
-import { createSessionSchema, createInstructorSchema } from "@/lib/validation";
+import { getSession } from "@/lib/auth";
+import { createSessionSchema } from "@/lib/validation";
 import {
   sendEnrollmentConfirmationEmail,
   sendEnrollmentDeclinedEmail,
@@ -18,51 +18,6 @@ async function requireStaff() {
     redirect("/logowanie?next=/admin");
   }
   return session!;
-}
-
-/** Only the studio owner ("master admin") manages staff accounts — instructors can't create other instructors. */
-async function requireAdmin() {
-  const session = await getSession();
-  if (!session || session.role !== "ADMIN") {
-    redirect("/logowanie?next=/admin/prowadzacy");
-  }
-  return session!;
-}
-
-export async function createInstructorAction(formData: FormData): Promise<void> {
-  await requireAdmin();
-
-  const parsed = createInstructorSchema.safeParse({
-    name: String(formData.get("name") ?? ""),
-    email: String(formData.get("email") ?? ""),
-    password: String(formData.get("password") ?? ""),
-  });
-  if (!parsed.success) {
-    redirect(
-      `/admin/prowadzacy?error=${encodeURIComponent(
-        parsed.error.issues[0]?.message ?? "Nieprawidłowe dane."
-      )}`
-    );
-  }
-
-  const existing = await prisma.user.findUnique({ where: { email: parsed.data.email } });
-  if (existing) {
-    redirect(
-      `/admin/prowadzacy?error=${encodeURIComponent("Konto z tym adresem e-mail już istnieje.")}`
-    );
-  }
-
-  await prisma.user.create({
-    data: {
-      name: parsed.data.name,
-      email: parsed.data.email,
-      passwordHash: await hashPassword(parsed.data.password),
-      role: "INSTRUCTOR",
-    },
-  });
-
-  revalidatePath("/admin/prowadzacy");
-  redirect("/admin/prowadzacy?added=1");
 }
 
 export async function createSessionAction(formData: FormData): Promise<void> {

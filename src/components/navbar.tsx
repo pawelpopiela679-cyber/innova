@@ -2,9 +2,17 @@ import Link from "next/link";
 import { getSession } from "@/lib/auth";
 import { logoutAction } from "@/lib/actions/auth-actions";
 import { Logo } from "@/components/logo";
+import { prisma } from "@/lib/db";
 
 export async function Navbar() {
-  const session = await getSession();
+  const [session, customPages] = await Promise.all([
+    getSession(),
+    prisma.page.findMany({
+      where: { showInNav: true },
+      orderBy: { sortOrder: "asc" },
+      select: { slug: true, title: true },
+    }),
+  ]);
   const isStaff = session?.role === "ADMIN" || session?.role === "INSTRUCTOR";
 
   return (
@@ -21,6 +29,14 @@ export async function Navbar() {
           <Link href="/kalendarz" className="hover:text-[var(--coral)]">
             Kalendarz
           </Link>
+          <Link href="/poznaj-nas" className="hover:text-[var(--coral)]">
+            Poznaj nas
+          </Link>
+          {customPages.map((p) => (
+            <Link key={p.slug} href={`/strony/${p.slug}`} className="hover:text-[var(--coral)]">
+              {p.title}
+            </Link>
+          ))}
           {isStaff && (
             <Link href="/admin" className="hover:text-[var(--coral)]">
               Panel prowadzącego

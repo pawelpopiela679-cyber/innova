@@ -173,10 +173,19 @@ opis kont jest w `README.md`.
 Gdy zmienisz coś w kodzie:
 
 1. Wgraj nowe pliki (nadpisz przez File Manager/FTP albo `git pull`, jeśli
-   masz SSH).
+   masz SSH) — **nie nadpisuj** folderu `public/uploads/` (patrz niżej).
 2. W terminalu: `npm ci` (jeśli zmieniły się zależności), `npx prisma
    migrate deploy` (jeśli zmienił się schemat bazy), `npm run build`.
 3. Zrestartuj aplikację w panelu Node.js.
+
+### Zdjęcia prowadzących (`public/uploads/`)
+
+Zdjęcia dodawane w `/admin/prowadzacy` zapisują się bezpośrednio na dysku
+serwera, w folderze `public/uploads/instructors/` — nie są częścią kodu z
+git. Przy aktualizacji plików na serwerze uważaj, żeby nie skasować/nadpisać
+tego folderu (np. przy rozpakowywaniu nowego ZIP-a wybierz opcję scalania,
+nie zastępowania całego katalogu). Warto też uwzględnić ten folder w swoich
+kopiach zapasowych, tak jak bazę danych.
 
 ## Rozwiązywanie problemów
 

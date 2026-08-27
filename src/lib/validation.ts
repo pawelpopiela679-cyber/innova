@@ -32,6 +32,32 @@ export const createInstructorSchema = z.object({
   name: z.string().trim().min(2, "Podaj imię i nazwisko."),
   email: z.string().trim().toLowerCase().email("Podaj poprawny adres e-mail."),
   password: z.string().min(8, "Hasło musi mieć co najmniej 8 znaków."),
+  bio: z.string().trim().max(600, "Notka może mieć maksymalnie 600 znaków.").optional().or(z.literal("")),
+});
+
+export const updateInstructorSchema = z.object({
+  userId: z.string().min(1),
+  name: z.string().trim().min(2, "Podaj imię i nazwisko."),
+  email: z.string().trim().toLowerCase().email("Podaj poprawny adres e-mail."),
+  bio: z.string().trim().max(600, "Notka może mieć maksymalnie 600 znaków.").optional().or(z.literal("")),
+  newPassword: z
+    .string()
+    .trim()
+    .min(8, "Nowe hasło musi mieć co najmniej 8 znaków.")
+    .optional()
+    .or(z.literal("")),
+});
+
+export const pageSchema = z.object({
+  title: z.string().trim().min(1, "Podaj tytuł strony."),
+  slug: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .min(1, "Podaj adres strony (slug).")
+    .regex(/^[a-z0-9-]+$/, "Adres może zawierać tylko małe litery, cyfry i myślniki."),
+  content: z.string().trim().min(1, "Podaj treść strony."),
+  showInNav: z.coerce.boolean().optional(),
 });
 
 export const createSessionSchema = z

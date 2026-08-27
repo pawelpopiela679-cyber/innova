@@ -30,8 +30,16 @@ treść oferty dopasowane do materiałów promocyjnych pracowni.
   cotygodniowy cykl) i limit miejsc. Prowadzący loguje się na swoje konto i
   widzi/zarządza tylko tym, co dodał.
 - **Master admin (właściciel pracowni)** — konto z rolą `ADMIN` widzi
-  wszystko co prowadzący, a dodatkowo zakłada konta kolejnym prowadzącym w
-  `/admin/prowadzacy` (ustawia im e-mail/hasło startowe).
+  wszystko co prowadzący, a dodatkowo:
+  - zakłada, **edytuje i usuwa** konta prowadzących w `/admin/prowadzacy`
+    (e-mail, hasło, **zdjęcie profilowe**, krótka notka),
+  - zmienia **kolorystykę całej strony** bez dotykania kodu w
+    `/admin/wyglad` (kolory zapisują się w bazie i obowiązują natychmiast),
+  - dodaje **własne podstrony** (np. „Regulamin”, „FAQ”) w `/admin/strony`
+    — trafiają automatycznie do menu nawigacji.
+- **Strona „Poznaj nas”** (`/poznaj-nas`) — zespół prowadzących ze
+  zdjęciami i notkami, generowany automatycznie z kont prowadzących
+  (edytujesz w `/admin/prowadzacy`, strona się sama aktualizuje).
 - **Panel prowadzącego / administratora** — podgląd dostępności (wolnych
   miejsc) w widoku dnia, tygodnia i miesiąca, filtrowanie po rodzaju zajęć,
   dodawanie nowych terminów i odwoływanie zajęć.

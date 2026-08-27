@@ -80,22 +80,47 @@ async function main() {
 
   // --- Instructors ---
   const instructorDefs = [
-    { email: "ola@innova-pracownia.pl", name: "Ola Zielińska" }, // angielski
-    { email: "kasia@innova-pracownia.pl", name: "Kasia Wiśniewska" }, // zajęcia sceniczne
-    { email: "marek@innova-pracownia.pl", name: "Marek Kowalski" }, // robotyka
-    { email: "ania@innova-pracownia.pl", name: "Ania Nowak" }, // zajęcia kreatywne
-    { email: "beata@innova-pracownia.pl", name: "Beata Kowalczyk" }, // matematyka
-    { email: "tomek@innova-pracownia.pl", name: "Tomek Nowicki" }, // eksperymentatorium
+    {
+      email: "ola@innova-pracownia.pl",
+      name: "Ola Zielińska",
+      bio: "Prowadzi zajęcia z angielskiego przez zabawę, piosenki i gry — uczy najmłodszych od lat.",
+    }, // angielski
+    {
+      email: "kasia@innova-pracownia.pl",
+      name: "Kasia Wiśniewska",
+      bio: "Instruktorka teatralna, pomaga dzieciom odkryć śmiałość na scenie.",
+    }, // zajęcia sceniczne
+    {
+      email: "marek@innova-pracownia.pl",
+      name: "Marek Kowalski",
+      bio: "Pasjonat robotyki i programowania — uczy budować i programować pierwsze roboty.",
+    }, // robotyka
+    {
+      email: "ania@innova-pracownia.pl",
+      name: "Ania Nowak",
+      bio: "Prowadzi zajęcia plastyczne i rękodzielnicze w luźnej, twórczej atmosferze.",
+    }, // zajęcia kreatywne
+    {
+      email: "beata@innova-pracownia.pl",
+      name: "Beata Kowalczyk",
+      bio: "Uczy matematyki przez zabawę — od pierwszych liczb po przygotowanie do egzaminu ósmoklasisty.",
+    }, // matematyka
+    {
+      email: "tomek@innova-pracownia.pl",
+      name: "Tomek Nowicki",
+      bio: "Prowadzi bezpieczne eksperymenty naukowe, które pokazują dzieciom, jak działa świat.",
+    }, // eksperymentatorium
   ];
   const instructorPassword = "Prowadzacy123!";
   const instructorsByEmail = new Map<string, Awaited<ReturnType<typeof prisma.user.upsert>>>();
   for (const def of instructorDefs) {
     const user = await prisma.user.upsert({
       where: { email: def.email },
-      update: {},
+      update: { bio: def.bio },
       create: {
         email: def.email,
         name: def.name,
+        bio: def.bio,
         role: "INSTRUCTOR",
         passwordHash: await bcrypt.hash(instructorPassword, 12),
       },

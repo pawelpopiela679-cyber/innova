@@ -46,3 +46,7 @@ next-env.d.ts
 /prisma/dev.db-journal
 *.db
 *.db-journal
+
+# user-uploaded files (instructor photos, etc.) — not part of the source,
+# but public/logo.png is: see README.
+/public/uploads/

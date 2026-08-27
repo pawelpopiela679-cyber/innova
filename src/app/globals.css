@@ -12,11 +12,14 @@
   --primary-foreground: #ffffff;
   --sage: #7d7a4a; /* olive */
   --sage-light: #b3af86; /* light olive, for blobs */
-  --sage-soft: #e6e2c9; /* very light olive-beige tint, pill backgrounds */
+  /* "-soft" tints are computed from the base color + background, not fixed
+     hex values, so they automatically follow whatever the master admin
+     picks in /admin/wyglad instead of going stale/mismatched. */
+  --sage-soft: color-mix(in srgb, var(--sage) 20%, var(--background));
   --coral: #c9848a; /* dusty powder pink */
-  --coral-soft: #f3dedf; /* light pink tint */
+  --coral-soft: color-mix(in srgb, var(--coral) 22%, var(--background));
   --mustard: #c2a05e; /* golden beige */
-  --mustard-soft: #f0e6cd; /* light golden-beige tint */
+  --mustard-soft: color-mix(in srgb, var(--mustard) 22%, var(--background));
   --muted: #8a7f5c; /* muted olive-beige-grey */
 
   /* Exact wordmark colors, kept separate from the UI accent tokens above so
@@ -59,11 +62,11 @@
     --primary-foreground: #26221a;
     --sage: #b3af86;
     --sage-light: #8f8a5e;
-    --sage-soft: #3c3826;
+    --sage-soft: color-mix(in srgb, var(--sage) 20%, var(--background));
     --coral: #e0adb1;
-    --coral-soft: #453230;
+    --coral-soft: color-mix(in srgb, var(--coral) 22%, var(--background));
     --mustard: #d9bb80;
-    --mustard-soft: #453b28;
+    --mustard-soft: color-mix(in srgb, var(--mustard) 22%, var(--background));
     --muted: #bcae8a;
   }
 }

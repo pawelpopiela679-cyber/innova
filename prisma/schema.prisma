@@ -42,6 +42,8 @@ model User {
   name         String
   phone        String?
   role         Role     @default(PARENT)
+  avatarUrl    String? // zdjęcie prowadzącego, np. /uploads/instructors/xxx.jpg
+  bio          String? // krótka notka, np. na stronę "Poznaj nas"
   createdAt    DateTime @default(now())
 
   children         Child[]
@@ -105,7 +107,7 @@ model ClassSession {
   capacity       Int           @default(10) // studio rule: max 10 dzieci na grupę
   meetingUrl     String? // online meeting link, shown to confirmed parents
   instructorId   String?
-  instructor     User?         @relation("InstructorSessions", fields: [instructorId], references: [id])
+  instructor     User?         @relation("InstructorSessions", fields: [instructorId], references: [id], onDelete: SetNull)
   instructorName String // free-text fallback so an instructor account isn't mandatory
   status         SessionStatus @default(SCHEDULED)
   createdAt      DateTime      @default(now())
@@ -131,4 +133,35 @@ model Enrollment {
 
   @@unique([sessionId, childId])
   @@index([parentId])
+}
+
+/// Single-row table (id is always "singleton") holding the site's color
+/// theme — editable by the master admin at /admin/wyglad instead of being
+/// hardcoded in globals.css. Falls back to the CSS defaults until a row
+/// exists.
+model SiteSettings {
+  id           String   @id @default("singleton")
+  background   String   @default("#efe4cf")
+  foreground   String   @default("#4a4326")
+  surface      String   @default("#f8f3e6")
+  border       String   @default("#e2d3ac")
+  primary      String   @default("#7d7a4a") // oliwkowy — przyciski, akcenty
+  primaryLight String   @default("#b3af86")
+  accent       String   @default("#c9848a") // pudrowy róż
+  gold         String   @default("#c2a05e") // złoty beż
+  muted        String   @default("#8a7f5c")
+  updatedAt    DateTime @updatedAt
+}
+
+/// Simple custom pages the master admin can add from /admin/strony without
+/// touching code — e.g. "Poznaj nas", "Regulamin", "FAQ".
+model Page {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  title     String
+  content   String // plain text, rendered as paragraphs (blank line = new paragraph)
+  showInNav Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

@@ -30,12 +30,26 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           + Nowe zajęcia
         </Link>
         {isMasterAdmin && (
-          <Link
-            href="/admin/prowadzacy"
-            className="rounded-full px-4 py-1.5 hover:bg-[var(--background)]"
-          >
-            Prowadzący
-          </Link>
+          <>
+            <Link
+              href="/admin/prowadzacy"
+              className="rounded-full px-4 py-1.5 hover:bg-[var(--background)]"
+            >
+              Prowadzący
+            </Link>
+            <Link
+              href="/admin/strony"
+              className="rounded-full px-4 py-1.5 hover:bg-[var(--background)]"
+            >
+              Strony
+            </Link>
+            <Link
+              href="/admin/wyglad"
+              className="rounded-full px-4 py-1.5 hover:bg-[var(--background)]"
+            >
+              Wygląd
+            </Link>
+          </>
         )}
       </nav>
       {children}
