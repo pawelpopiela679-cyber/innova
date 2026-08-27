@@ -18,6 +18,8 @@ type SearchParams = {
   view?: string;
   date?: string;
   classType?: string;
+  added?: string;
+  canceled?: string;
 };
 
 export default async function AdminAvailabilityPage({
@@ -46,6 +48,17 @@ export default async function AdminAvailabilityPage({
       <p className="mt-1 text-[var(--muted)]">
         Podgląd wolnych miejsc na dany dzień, tydzień i miesiąc — dla wszystkich prowadzących.
       </p>
+
+      {sp.added && (
+        <p className="mt-4 rounded-lg bg-emerald-50 px-4 py-2 text-sm text-emerald-700">
+          Dodano {sp.added} {sp.added === "1" ? "termin" : "terminów"} do kalendarza.
+        </p>
+      )}
+      {sp.canceled && (
+        <p className="mt-4 rounded-lg bg-gray-100 px-4 py-2 text-sm text-gray-700">
+          Zajęcia zostały odwołane.
+        </p>
+      )}
 
       <div className="mt-4 flex flex-wrap gap-4 text-sm">
         <span className="rounded-full bg-emerald-100 px-3 py-1 font-semibold text-emerald-700">

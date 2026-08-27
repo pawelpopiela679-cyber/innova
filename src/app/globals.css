@@ -1,27 +1,30 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fefcf6;
-  --foreground: #3c4630;
-  --surface: #ffffff;
-  --border: #efe6d2;
-  --primary: #6f8f57;
+  /* Brand palette: olive, beige, powder pink — the studio's real colors.
+     Variable names below are historical (sage/coral/mustard) but the
+     values are all olive/beige/pink family now; see comments per token. */
+  --background: #efe4cf; /* beige */
+  --foreground: #4a4326; /* dark olive-brown text */
+  --surface: #f8f3e6; /* lighter beige, cards */
+  --border: #e2d3ac; /* tan border */
+  --primary: #7d7a4a; /* olive */
   --primary-foreground: #ffffff;
-  --sage: #6f8f57;
-  --sage-light: #bdcda6;
-  --sage-soft: #e6eeda;
-  --coral: #c96a5c;
-  --coral-soft: #f7ded8;
-  --mustard: #dba848;
-  --mustard-soft: #f8ead0;
-  --muted: #93886e;
+  --sage: #7d7a4a; /* olive */
+  --sage-light: #b3af86; /* light olive, for blobs */
+  --sage-soft: #e6e2c9; /* very light olive-beige tint, pill backgrounds */
+  --coral: #c9848a; /* dusty powder pink */
+  --coral-soft: #f3dedf; /* light pink tint */
+  --mustard: #c2a05e; /* golden beige */
+  --mustard-soft: #f0e6cd; /* light golden-beige tint */
+  --muted: #8a7f5c; /* muted olive-beige-grey */
 
   /* Exact wordmark colors, kept separate from the UI accent tokens above so
      that future palette tweaks (buttons, banners, etc.) never drift the
      logo away from the studio's real brand colors. */
-  --logo-green: #707a52;
-  --logo-pink: #c9827c;
-  --logo-gold: #dda23c;
+  --logo-green: #7d7a4a;
+  --logo-pink: #d99a9f;
+  --logo-gold: #c9a768;
 }
 
 @theme inline {
@@ -48,20 +51,20 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #22271d;
-    --foreground: #f3efe2;
-    --surface: #2c3323;
-    --border: #414a34;
-    --primary: #a8b78e;
-    --primary-foreground: #22271d;
-    --sage: #a8b78e;
-    --sage-light: #8a9a6f;
-    --sage-soft: #3a4530;
-    --coral: #f0a89e;
-    --coral-soft: #4a332e;
-    --mustard: #f0c266;
-    --mustard-soft: #4a3f26;
-    --muted: #b7ae97;
+    --background: #26221a;
+    --foreground: #f1ead9;
+    --surface: #322c20;
+    --border: #4a4230;
+    --primary: #b3af86;
+    --primary-foreground: #26221a;
+    --sage: #b3af86;
+    --sage-light: #8f8a5e;
+    --sage-soft: #3c3826;
+    --coral: #e0adb1;
+    --coral-soft: #453230;
+    --mustard: #d9bb80;
+    --mustard-soft: #453b28;
+    --muted: #bcae8a;
   }
 }
 

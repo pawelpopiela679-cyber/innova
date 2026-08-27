@@ -1,29 +1,22 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
-import {
-  addWeeks,
-  setHours,
-  setMinutes,
-  setSeconds,
-  setMilliseconds,
-  nextMonday,
-  nextTuesday,
-  nextWednesday,
-  nextThursday,
-  nextFriday,
-  nextSaturday,
-  startOfDay,
-} from "date-fns";
+import { addDays, addWeeks, setHours, setMinutes, setSeconds, setMilliseconds } from "date-fns";
 
 const prisma = new PrismaClient();
 
 const MAX_GROUP_SIZE = 10; // studio rule: max 10 dzieci na grupę
 
+// Fixed real start of the semester (a Monday) — classes never start "relative
+// to today" (that made the calendar look like classes already started the
+// moment you ran the seed). Nothing is scheduled before this date except the
+// one-off "Dzień otwarty" event below.
+const SEMESTER_START = new Date(2026, 8, 14); // 14.09.2026, poniedziałek
+
 function at(date: Date, hours: number, minutes: number): Date {
   return setMilliseconds(setSeconds(setMinutes(setHours(date, hours), minutes), 0), 0);
 }
 
-/** Generates `count` weekly occurrences of a class starting from the next `anchor` weekday. */
+/** Generates `count` weekly occurrences of a class starting from `anchor`. */
 function weeklyOccurrences(
   anchor: Date,
   startHour: number,
@@ -53,7 +46,7 @@ type GroupDef = {
   durationMin: number;
   priceMonthly: number;
   oneTimeFee?: number;
-  weekday: (base: Date) => Date; // nextMonday, nextTuesday, ...
+  dayOffset: number; // 0=poniedziałek ... 6=niedziela, względem SEMESTER_START
   startHour: number;
   startMinute: number;
 };
@@ -70,8 +63,6 @@ type ClassTypeDef = {
 };
 
 async function main() {
-  const today = startOfDay(new Date());
-
   // --- Studio owner / admin account ---
   const adminEmail = process.env.SEED_ADMIN_EMAIL || "admin@innova-pracownia.pl";
   const adminPassword = process.env.SEED_ADMIN_PASSWORD || "ZmienMnie123!";
@@ -115,36 +106,20 @@ async function main() {
 
   // --- Class types + realne grupy wiekowe (dopasowane do ulotki INNOVA —
   // Oferta i cennik). Każda grupa to osobny, cotygodniowy termin z limitem
-  // ${MAX_GROUP_SIZE} dzieci. ---
+  // ${MAX_GROUP_SIZE} dzieci, zaczynający się od SEMESTER_START. ---
   const classTypeDefs: ClassTypeDef[] = [
     {
       key: "ENGLISH",
       name: "Angielski",
       description:
         "Nauka angielskiego przez zabawę, piosenki, gry i krótkie dialogi — zajęcia prowadzone w małych grupach, dopasowane do wieku i poziomu dziecka.",
-      color: "#6badd9",
+      color: "#8f8a56",
       ageMin: 3,
       ageMax: 7,
       instructorEmail: "ola@innova-pracownia.pl",
       groups: [
-        {
-          label: "",
-          ageLabel: "3–4 lata",
-          durationMin: 35,
-          priceMonthly: 149,
-          weekday: nextMonday,
-          startHour: 16,
-          startMinute: 0,
-        },
-        {
-          label: "",
-          ageLabel: "5–7 lat",
-          durationMin: 50,
-          priceMonthly: 199,
-          weekday: nextMonday,
-          startHour: 16,
-          startMinute: 45,
-        },
+        { label: "", ageLabel: "3–4 lata", durationMin: 35, priceMonthly: 149, dayOffset: 0, startHour: 16, startMinute: 0 },
+        { label: "", ageLabel: "5–7 lat", durationMin: 50, priceMonthly: 199, dayOffset: 0, startHour: 16, startMinute: 45 },
       ],
     },
     {
@@ -152,38 +127,14 @@ async function main() {
       name: "Zajęcia sceniczne",
       description:
         "Improwizacja, dykcja, praca z ciałem i głosem oraz przygotowywanie krótkich etiud — zajęcia budujące pewność siebie, wyobraźnię i swobodę wyrażania emocji.",
-      color: "#ab93dd",
+      color: "#b98a8d",
       ageMin: 6,
       ageMax: 15,
       instructorEmail: "kasia@innova-pracownia.pl",
       groups: [
-        {
-          label: "Scena dla każdego",
-          ageLabel: "6–9 lat",
-          durationMin: 60,
-          priceMonthly: 199,
-          weekday: nextThursday,
-          startHour: 17,
-          startMinute: 0,
-        },
-        {
-          label: "Scena dla każdego",
-          ageLabel: "10–15 lat",
-          durationMin: 75,
-          priceMonthly: 229,
-          weekday: nextThursday,
-          startHour: 18,
-          startMinute: 15,
-        },
-        {
-          label: "Słowo na scenie",
-          ageLabel: "9–15 lat",
-          durationMin: 75,
-          priceMonthly: 249,
-          weekday: nextThursday,
-          startHour: 19,
-          startMinute: 40,
-        },
+        { label: "Scena dla każdego", ageLabel: "6–9 lat", durationMin: 60, priceMonthly: 199, dayOffset: 3, startHour: 17, startMinute: 0 },
+        { label: "Scena dla każdego", ageLabel: "10–15 lat", durationMin: 75, priceMonthly: 229, dayOffset: 3, startHour: 18, startMinute: 15 },
+        { label: "Słowo na scenie", ageLabel: "9–15 lat", durationMin: 75, priceMonthly: 249, dayOffset: 3, startHour: 19, startMinute: 40 },
       ],
     },
     {
@@ -191,29 +142,13 @@ async function main() {
       name: "Robotyka",
       description:
         "Budowanie i programowanie prostych robotów oraz automatów — dzieci uczą się podstaw elektroniki, logicznego myślenia i programowania blokowego w przyjaznej, praktycznej formie.",
-      color: "#57a3b3",
+      color: "#6b6642",
       ageMin: 5,
       ageMax: 10,
       instructorEmail: "marek@innova-pracownia.pl",
       groups: [
-        {
-          label: "",
-          ageLabel: "5–7 lat",
-          durationMin: 60,
-          priceMonthly: 249,
-          weekday: nextWednesday,
-          startHour: 17,
-          startMinute: 0,
-        },
-        {
-          label: "",
-          ageLabel: "8–10 lat",
-          durationMin: 60,
-          priceMonthly: 249,
-          weekday: nextWednesday,
-          startHour: 18,
-          startMinute: 15,
-        },
+        { label: "", ageLabel: "5–7 lat", durationMin: 60, priceMonthly: 249, dayOffset: 2, startHour: 17, startMinute: 0 },
+        { label: "", ageLabel: "8–10 lat", durationMin: 60, priceMonthly: 249, dayOffset: 2, startHour: 18, startMinute: 15 },
       ],
     },
     {
@@ -221,36 +156,20 @@ async function main() {
       name: "Zajęcia kreatywne",
       description:
         "Malarstwo, rękodzieło, prace plastyczne i eksperymenty z różnymi materiałami — rozwijamy wyobraźnię i zdolności manualne najmłodszych w luźnej, artystycznej atmosferze.",
-      color: "#e79d94",
+      color: "#d9a3a6",
       ageMin: 5,
       ageMax: 15,
       instructorEmail: "ania@innova-pracownia.pl",
       groups: [
-        {
-          label: "Mix kreatywny",
-          ageLabel: "5–7 lat",
-          durationMin: 50,
-          priceMonthly: 229,
-          weekday: nextTuesday,
-          startHour: 16,
-          startMinute: 0,
-        },
-        {
-          label: "Mix kreatywny",
-          ageLabel: "8–11 lat",
-          durationMin: 60,
-          priceMonthly: 229,
-          weekday: nextTuesday,
-          startHour: 17,
-          startMinute: 0,
-        },
+        { label: "Mix kreatywny", ageLabel: "5–7 lat", durationMin: 50, priceMonthly: 229, dayOffset: 1, startHour: 16, startMinute: 0 },
+        { label: "Mix kreatywny", ageLabel: "8–11 lat", durationMin: 60, priceMonthly: 229, dayOffset: 1, startHour: 17, startMinute: 0 },
         {
           label: "Szydełkowanie / haft",
           ageLabel: "9–15 lat",
           durationMin: 75,
           priceMonthly: 229,
           oneTimeFee: 79,
-          weekday: nextTuesday,
+          dayOffset: 1,
           startHour: 18,
           startMinute: 15,
         },
@@ -261,47 +180,15 @@ async function main() {
       name: "Matematyka",
       description:
         "Matematyczne odkrycia przez zabawę, oswajanie z liczbami i logiczne myślenie dla najmłodszych, a dla starszych — pomoc szkolna, nadrabianie zaległości i przygotowanie do egzaminu ósmoklasisty.",
-      color: "#e0b463",
+      color: "#c9a768",
       ageMin: 4,
       ageMax: 15,
       instructorEmail: "beata@innova-pracownia.pl",
       groups: [
-        {
-          label: "Matematyczne odkrycia",
-          ageLabel: "4–5 lat",
-          durationMin: 35,
-          priceMonthly: 149,
-          weekday: nextFriday,
-          startHour: 16,
-          startMinute: 0,
-        },
-        {
-          label: "Matematyka bez stresu",
-          ageLabel: "6–8 lat",
-          durationMin: 50,
-          priceMonthly: 199,
-          weekday: nextFriday,
-          startHour: 16,
-          startMinute: 45,
-        },
-        {
-          label: "Logika + pomoc szkolna",
-          ageLabel: "klasy 1–3",
-          durationMin: 60,
-          priceMonthly: 199,
-          weekday: nextFriday,
-          startHour: 17,
-          startMinute: 45,
-        },
-        {
-          label: "Kurs E8",
-          ageLabel: "klasa 8",
-          durationMin: 75,
-          priceMonthly: 249,
-          weekday: nextFriday,
-          startHour: 19,
-          startMinute: 0,
-        },
+        { label: "Matematyczne odkrycia", ageLabel: "4–5 lat", durationMin: 35, priceMonthly: 149, dayOffset: 4, startHour: 16, startMinute: 0 },
+        { label: "Matematyka bez stresu", ageLabel: "6–8 lat", durationMin: 50, priceMonthly: 199, dayOffset: 4, startHour: 16, startMinute: 45 },
+        { label: "Logika + pomoc szkolna", ageLabel: "klasy 1–3", durationMin: 60, priceMonthly: 199, dayOffset: 4, startHour: 17, startMinute: 45 },
+        { label: "Kurs E8", ageLabel: "klasa 8", durationMin: 75, priceMonthly: 249, dayOffset: 4, startHour: 19, startMinute: 0 },
       ],
     },
     {
@@ -309,29 +196,13 @@ async function main() {
       name: "Eksperymentatorium",
       description:
         "Bezpieczne eksperymenty chemiczne i fizyczne, które tłumaczą, jak działa świat — dzieci samodzielnie odkrywają zjawiska naukowe pod okiem prowadzącego, ucząc się przez działanie.",
-      color: "#64bd9c",
+      color: "#a8a473",
       ageMin: 6,
       ageMax: 15,
       instructorEmail: "tomek@innova-pracownia.pl",
       groups: [
-        {
-          label: "",
-          ageLabel: "6–9 lat",
-          durationMin: 60,
-          priceMonthly: 229,
-          weekday: nextSaturday,
-          startHour: 11,
-          startMinute: 0,
-        },
-        {
-          label: "",
-          ageLabel: "10–15 lat",
-          durationMin: 75,
-          priceMonthly: 249,
-          weekday: nextSaturday,
-          startHour: 12,
-          startMinute: 15,
-        },
+        { label: "", ageLabel: "6–9 lat", durationMin: 60, priceMonthly: 229, dayOffset: 5, startHour: 11, startMinute: 0 },
+        { label: "", ageLabel: "10–15 lat", durationMin: 75, priceMonthly: 249, dayOffset: 5, startHour: 12, startMinute: 15 },
       ],
     },
   ];
@@ -379,13 +250,8 @@ async function main() {
       // Class type name is already shown alongside the title everywhere in the
       // UI (badge/dot), so keep the title itself to just the group descriptor.
       const title = `${group.label ? `${group.label} — ` : ""}${group.ageLabel}`;
-      const occurrences = weeklyOccurrences(
-        group.weekday(today),
-        group.startHour,
-        group.startMinute,
-        group.durationMin,
-        10
-      );
+      const anchor = addDays(SEMESTER_START, group.dayOffset);
+      const occurrences = weeklyOccurrences(anchor, group.startHour, group.startMinute, group.durationMin, 10);
       for (const occ of occurrences) {
         const existing = await prisma.classSession.findFirst({
           where: { classTypeId: classType.id, title, startsAt: occ.startsAt },
@@ -406,10 +272,53 @@ async function main() {
       }
       totalOccurrences += occurrences.length;
     }
-    console.log(
-      `${def.name}: ${def.groups.length} grup, ${totalOccurrences} terminów łącznie`
-    );
+    console.log(`${def.name}: ${def.groups.length} grup, ${totalOccurrences} terminów łącznie`);
   }
+
+  // --- Dzień otwarty: jednorazowe, bezpłatne wydarzenie (nie cotygodniowe
+  // zajęcia) przed startem semestru — jedyny termin widoczny w kalendarzu
+  // wcześniej niż SEMESTER_START. ---
+  const openDayType = await prisma.classType.upsert({
+    where: { key: "OPEN_DAY" },
+    update: {
+      name: "Dzień otwarty",
+      description:
+        "Bezpłatne zajęcia pokazowe — poznaj pracownię, prowadzących i ofertę zajęć przed startem zapisów na semestr.",
+      color: "#cf9a7c",
+      ageMin: 0,
+      ageMax: 99,
+    },
+    create: {
+      key: "OPEN_DAY",
+      name: "Dzień otwarty",
+      description:
+        "Bezpłatne zajęcia pokazowe — poznaj pracownię, prowadzących i ofertę zajęć przed startem zapisów na semestr.",
+      color: "#cf9a7c",
+      ageMin: 0,
+      ageMax: 99,
+    },
+  });
+  await prisma.pricingTier.deleteMany({ where: { classTypeId: openDayType.id } });
+
+  const openDayStart = new Date(2026, 8, 12, 10, 0); // 12.09.2026, sobota, 10:00
+  const openDayEnd = new Date(2026, 8, 12, 13, 0);
+  const existingOpenDay = await prisma.classSession.findFirst({
+    where: { classTypeId: openDayType.id, startsAt: openDayStart },
+  });
+  if (!existingOpenDay) {
+    await prisma.classSession.create({
+      data: {
+        classTypeId: openDayType.id,
+        title: "Dzień otwarty — bezpłatne zajęcia pokazowe",
+        startsAt: openDayStart,
+        endsAt: openDayEnd,
+        capacity: 30,
+        instructorId: admin.id,
+        instructorName: "Zespół INNOVA",
+      },
+    });
+  }
+  console.log(`Dzień otwarty: 12.09.2026, 10:00–13:00 (limit 30 osób)`);
 
   // --- A demo parent + child + a couple of enrollments, so the app has
   // something to show right after seeding. ---

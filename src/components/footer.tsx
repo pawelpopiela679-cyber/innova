@@ -1,4 +1,5 @@
 import { LeafSprig } from "@/components/decor";
+import { Logo } from "@/components/logo";
 
 export function Footer() {
   return (
@@ -13,6 +14,9 @@ export function Footer() {
       />
 
       <div className="relative mx-auto max-w-6xl px-4 py-8 text-sm">
+        <div className="mb-4 flex justify-center">
+          <Logo size="sm" />
+        </div>
         <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-center text-[var(--foreground)]">
           <span className="flex items-center gap-1.5">
             <span aria-hidden>📍</span> ul. Kolejowa, Czechowice-Dziedzice

@@ -24,8 +24,14 @@ treść oferty dopasowane do materiałów promocyjnych pracowni.
   wiek pasuje lepiej gdzie indziej), przenosi na listę rezerwową albo
   odrzuca. Rodzic za każdym razem dostaje e-mail z wynikiem.
 - **Grupy z limitem 10 dzieci** — każdy termin (`ClassSession`) to osobna
-  grupa wiekowa z twardym limitem miejsc; nowe grupy tworzy się w
-  `/admin/zajecia/nowe`.
+  grupa wiekowa z twardym limitem miejsc.
+- **Każdy prowadzący dodaje własny grafik** (`/admin/zajecia/nowe`) — dzień,
+  godzina, liczba tygodni do powtórzenia (system sam utworzy cały
+  cotygodniowy cykl) i limit miejsc. Prowadzący loguje się na swoje konto i
+  widzi/zarządza tylko tym, co dodał.
+- **Master admin (właściciel pracowni)** — konto z rolą `ADMIN` widzi
+  wszystko co prowadzący, a dodatkowo zakłada konta kolejnym prowadzącym w
+  `/admin/prowadzacy` (ustawia im e-mail/hasło startowe).
 - **Panel prowadzącego / administratora** — podgląd dostępności (wolnych
   miejsc) w widoku dnia, tygodnia i miesiąca, filtrowanie po rodzaju zajęć,
   dodawanie nowych terminów i odwoływanie zajęć.
@@ -39,6 +45,20 @@ treść oferty dopasowane do materiałów promocyjnych pracowni.
 - Sześć rodzajów zajęć na start: **angielski**, **zajęcia sceniczne**,
   **robotyka**, **zajęcia kreatywne**, **matematyka**, **eksperymentatorium**
   — łatwe do rozszerzenia o kolejne (patrz niżej).
+
+## Prawdziwe logo (plik graficzny)
+
+Domyślnie strona pokazuje wordmark odtworzony w kodzie (przybliżenie
+kolorystyczne). Żeby pokazać **dokładnie Wasz plik z logo**, zapisz go jako:
+
+```
+public/logo.png
+```
+
+(najlepiej PNG z przezroczystym tłem). Strona automatycznie zacznie
+wyświetlać ten plik wszędzie — w nawigacji, na stronie głównej i w stopce —
+bez żadnych zmian w kodzie. Jeśli pliku nie ma, strona po cichu wraca do
+wersji odtworzonej w kodzie (`src/components/logo.tsx`).
 
 ## Dane kontaktowe pracowni
 

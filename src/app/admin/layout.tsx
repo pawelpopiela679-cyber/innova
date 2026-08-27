@@ -1,8 +1,13 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
+import { getSession } from "@/lib/auth";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const pendingCount = await prisma.enrollment.count({ where: { status: "PENDING" } });
+  const [session, pendingCount] = await Promise.all([
+    getSession(),
+    prisma.enrollment.count({ where: { status: "PENDING" } }),
+  ]);
+  const isMasterAdmin = session?.role === "ADMIN";
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
@@ -24,6 +29,14 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         >
           + Nowe zajęcia
         </Link>
+        {isMasterAdmin && (
+          <Link
+            href="/admin/prowadzacy"
+            className="rounded-full px-4 py-1.5 hover:bg-[var(--background)]"
+          >
+            Prowadzący
+          </Link>
+        )}
       </nav>
       {children}
     </div>

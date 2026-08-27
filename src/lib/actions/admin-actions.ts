@@ -2,9 +2,10 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { addWeeks } from "date-fns";
 import { prisma } from "@/lib/db";
-import { getSession } from "@/lib/auth";
-import { createSessionSchema } from "@/lib/validation";
+import { getSession, hashPassword } from "@/lib/auth";
+import { createSessionSchema, createInstructorSchema } from "@/lib/validation";
 import {
   sendEnrollmentConfirmationEmail,
   sendEnrollmentDeclinedEmail,
@@ -17,6 +18,51 @@ async function requireStaff() {
     redirect("/logowanie?next=/admin");
   }
   return session!;
+}
+
+/** Only the studio owner ("master admin") manages staff accounts — instructors can't create other instructors. */
+async function requireAdmin() {
+  const session = await getSession();
+  if (!session || session.role !== "ADMIN") {
+    redirect("/logowanie?next=/admin/prowadzacy");
+  }
+  return session!;
+}
+
+export async function createInstructorAction(formData: FormData): Promise<void> {
+  await requireAdmin();
+
+  const parsed = createInstructorSchema.safeParse({
+    name: String(formData.get("name") ?? ""),
+    email: String(formData.get("email") ?? ""),
+    password: String(formData.get("password") ?? ""),
+  });
+  if (!parsed.success) {
+    redirect(
+      `/admin/prowadzacy?error=${encodeURIComponent(
+        parsed.error.issues[0]?.message ?? "Nieprawidłowe dane."
+      )}`
+    );
+  }
+
+  const existing = await prisma.user.findUnique({ where: { email: parsed.data.email } });
+  if (existing) {
+    redirect(
+      `/admin/prowadzacy?error=${encodeURIComponent("Konto z tym adresem e-mail już istnieje.")}`
+    );
+  }
+
+  await prisma.user.create({
+    data: {
+      name: parsed.data.name,
+      email: parsed.data.email,
+      passwordHash: await hashPassword(parsed.data.password),
+      role: "INSTRUCTOR",
+    },
+  });
+
+  revalidatePath("/admin/prowadzacy");
+  redirect("/admin/prowadzacy?added=1");
 }
 
 export async function createSessionAction(formData: FormData): Promise<void> {
@@ -32,6 +78,7 @@ export async function createSessionAction(formData: FormData): Promise<void> {
     instructorName: String(formData.get("instructorName") ?? staff.name),
     meetingUrl: String(formData.get("meetingUrl") ?? ""),
     description: String(formData.get("description") ?? ""),
+    weeksCount: String(formData.get("weeksCount") ?? "1"),
   };
 
   const parsed = createSessionSchema.safeParse(raw);
@@ -43,29 +90,47 @@ export async function createSessionAction(formData: FormData): Promise<void> {
     );
   }
 
-  const { classTypeId, title, date, startTime, endTime, capacity, instructorName, meetingUrl, description } =
-    parsed.data;
+  const {
+    classTypeId,
+    title,
+    date,
+    startTime,
+    endTime,
+    capacity,
+    instructorName,
+    meetingUrl,
+    description,
+    weeksCount,
+  } = parsed.data;
 
-  const startsAt = new Date(`${date}T${startTime}:00`);
-  const endsAt = new Date(`${date}T${endTime}:00`);
+  const firstStartsAt = new Date(`${date}T${startTime}:00`);
+  const firstEndsAt = new Date(`${date}T${endTime}:00`);
+  const durationMs = firstEndsAt.getTime() - firstStartsAt.getTime();
 
-  await prisma.classSession.create({
-    data: {
-      classTypeId,
-      title,
-      startsAt,
-      endsAt,
-      capacity,
-      instructorName,
-      instructorId: staff.role === "INSTRUCTOR" ? staff.sub : null,
-      meetingUrl: meetingUrl || null,
-      description: description || null,
-    },
-  });
+  // Repeats the same weekly slot for `weeksCount` weeks in one go — an
+  // instructor filling in their own recurring schedule doesn't have to
+  // submit the form 10 times for a 10-week series.
+  for (let i = 0; i < weeksCount; i++) {
+    const startsAt = addWeeks(firstStartsAt, i);
+    const endsAt = new Date(startsAt.getTime() + durationMs);
+    await prisma.classSession.create({
+      data: {
+        classTypeId,
+        title,
+        startsAt,
+        endsAt,
+        capacity,
+        instructorName,
+        instructorId: staff.role === "INSTRUCTOR" ? staff.sub : null,
+        meetingUrl: meetingUrl || null,
+        description: description || null,
+      },
+    });
+  }
 
   revalidatePath("/admin");
   revalidatePath("/kalendarz");
-  redirect("/admin?added=1");
+  redirect(`/admin?added=${weeksCount}`);
 }
 
 export async function cancelSessionAction(formData: FormData): Promise<void> {

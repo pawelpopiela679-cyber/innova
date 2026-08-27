@@ -58,7 +58,7 @@ export default async function HomePage() {
                 <span aria-hidden>⭐</span> Dzień otwarty: 12.09.2026
               </span>
               <span className="flex items-center gap-2 rounded-full bg-[var(--sage-soft)] px-5 py-2.5 text-sm font-semibold text-[var(--sage)]">
-                <span aria-hidden>📅</span> Start zajęć: 15.09.2026
+                <span aria-hidden>📅</span> Start zajęć: 14.09.2026
               </span>
             </div>
           </div>

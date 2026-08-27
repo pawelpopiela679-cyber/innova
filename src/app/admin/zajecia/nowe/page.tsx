@@ -15,9 +15,9 @@ export default async function NewSessionPage({
     <div className="max-w-2xl">
       <h1 className="text-2xl font-extrabold">Nowe zajęcia</h1>
       <p className="mt-1 text-[var(--muted)]">
-        Dodaj pojedynczy termin zajęć do kalendarza. Aby dodać cotygodniowy cykl, powtórz ten
-        formularz dla kolejnych dat (lub skorzystaj ze skryptu <code>prisma/seed.ts</code> jako
-        wzoru).
+        Podaj dzień i godzinę pierwszych zajęć — jeśli to cykl cotygodniowy (np. „co
+        środę o 17:00 przez 10 tygodni”), ustaw liczbę tygodni poniżej, a resztę terminów
+        dodamy automatycznie w tych samych godzinach.
       </p>
 
       {sp.error && (
@@ -58,7 +58,7 @@ export default async function NewSessionPage({
 
         <div>
           <label htmlFor="date" className="text-sm font-medium">
-            Data
+            Data pierwszych zajęć
           </label>
           <input
             id="date"
@@ -107,6 +107,25 @@ export default async function NewSessionPage({
             required
             className="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-2"
           />
+        </div>
+
+        <div className="sm:col-span-2">
+          <label htmlFor="weeksCount" className="text-sm font-medium">
+            Powtórz co tydzień, przez ile tygodni?
+          </label>
+          <input
+            id="weeksCount"
+            name="weeksCount"
+            type="number"
+            min={1}
+            max={20}
+            defaultValue={10}
+            required
+            className="mt-1 w-full max-w-[10rem] rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-2"
+          />
+          <p className="mt-1 text-xs text-[var(--muted)]">
+            Wpisz 1, jeśli to jednorazowe zajęcia (np. odrabianie zaległości), bez powtórzeń.
+          </p>
         </div>
 
         <div className="sm:col-span-2">

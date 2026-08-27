@@ -28,6 +28,12 @@ export const enrollSchema = z.object({
   childId: z.string().min(1),
 });
 
+export const createInstructorSchema = z.object({
+  name: z.string().trim().min(2, "Podaj imię i nazwisko."),
+  email: z.string().trim().toLowerCase().email("Podaj poprawny adres e-mail."),
+  password: z.string().min(8, "Hasło musi mieć co najmniej 8 znaków."),
+});
+
 export const createSessionSchema = z
   .object({
     classTypeId: z.string().min(1, "Wybierz rodzaj zajęć."),
@@ -43,6 +49,12 @@ export const createSessionSchema = z
     instructorName: z.string().trim().min(1, "Podaj prowadzącego."),
     meetingUrl: z.string().trim().optional().or(z.literal("")),
     description: z.string().trim().optional().or(z.literal("")),
+    weeksCount: z.coerce
+      .number()
+      .int()
+      .min(1, "Podaj co najmniej 1 tydzień.")
+      .max(20, "Maksymalnie 20 tygodni na raz.")
+      .default(1),
   })
   .refine((v) => v.startTime < v.endTime, {
     message: "Godzina zakończenia musi być po godzinie rozpoczęcia.",
