@@ -214,26 +214,32 @@ function DayView({
                   Dodaj dziecko, aby się zapisać
                 </Link>
               ) : (
-                <form action={enrollAction} className="flex flex-wrap items-center gap-2">
-                  <input type="hidden" name="sessionId" value={s.id} />
-                  <select
-                    name="childId"
-                    required
-                    className="rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 py-1.5 text-sm"
-                  >
-                    {kids.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.firstName} {c.lastName}
-                      </option>
-                    ))}
-                  </select>
-                  <button
-                    type="submit"
-                    className="rounded-full bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-[var(--primary-foreground)] hover:opacity-90"
-                  >
-                    {s.isFull ? "Zapisz na listę rezerwową" : "Zapisz dziecko"}
-                  </button>
-                </form>
+                <div>
+                  <form action={enrollAction} className="flex flex-wrap items-center gap-2">
+                    <input type="hidden" name="sessionId" value={s.id} />
+                    <select
+                      name="childId"
+                      required
+                      className="rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 py-1.5 text-sm"
+                    >
+                      {kids.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.firstName} {c.lastName}
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      type="submit"
+                      className="rounded-full bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-[var(--primary-foreground)] hover:opacity-90"
+                    >
+                      Zgłoś chęć zapisu
+                    </button>
+                  </form>
+                  <p className="mt-1.5 text-xs text-[var(--muted)]">
+                    Zgłoszenie wymaga potwierdzenia przez pracownię — dobierzemy grupę odpowiednią
+                    do wieku dziecka i odpowiemy e-mailem.
+                  </p>
+                </div>
               )
             }
           />

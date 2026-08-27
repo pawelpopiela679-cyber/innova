@@ -5,11 +5,15 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { enrollSchema } from "@/lib/validation";
-import {
-  sendEnrollmentConfirmationEmail,
-  sendStudioNewSignupNotification,
-} from "@/lib/mailer";
+import { sendEnrollmentPendingEmail, sendStudioNewSignupNotification } from "@/lib/mailer";
+import { promoteNextWaitlisted } from "@/lib/enrollment-helpers";
 
+/**
+ * Parent-facing: submits a *request* to join a group. This never books a
+ * seat outright — every request starts as PENDING and needs staff review
+ * (see admin-actions.ts), who check the child's age against the group and
+ * confirm into the requested group or reassign to a better-fitting one.
+ */
 export async function enrollAction(formData: FormData): Promise<void> {
   const session = await getSession();
   if (!session) redirect("/logowanie?next=/kalendarz");
@@ -40,37 +44,22 @@ export async function enrollAction(formData: FormData): Promise<void> {
     where: { sessionId_childId: { sessionId, childId } },
   });
   if (already && already.status !== "CANCELED") {
-    redirect(`/panel/zapisy?info=${encodeURIComponent("Dziecko jest już zapisane na te zajęcia.")}`);
+    redirect(`/panel/zapisy?info=${encodeURIComponent("Dziecko ma już zgłoszenie na te zajęcia.")}`);
   }
-
-  const confirmedCount = classSession!.enrollments.length;
-  const waitlisted = confirmedCount >= classSession!.capacity;
 
   const enrollment = already
     ? await prisma.enrollment.update({
         where: { id: already.id },
-        data: {
-          status: waitlisted ? "WAITLIST" : "CONFIRMED",
-          canceledAt: null,
-        },
+        data: { status: "PENDING", canceledAt: null, confirmedAt: null },
       })
     : await prisma.enrollment.create({
-        data: {
-          sessionId,
-          childId,
-          parentId: session!.sub,
-          status: waitlisted ? "WAITLIST" : "CONFIRMED",
-        },
+        data: { sessionId, childId, parentId: session!.sub, status: "PENDING" },
       });
 
   const parent = await prisma.user.findUniqueOrThrow({ where: { id: session!.sub } });
-  const spotsLeftAfter = Math.max(
-    classSession!.capacity - (confirmedCount + (waitlisted ? 0 : 1)),
-    0
-  );
 
   await Promise.all([
-    sendEnrollmentConfirmationEmail({
+    sendEnrollmentPendingEmail({
       parentEmail: parent.email,
       parentName: parent.name,
       childName: `${child.firstName} ${child.lastName}`,
@@ -78,9 +67,6 @@ export async function enrollAction(formData: FormData): Promise<void> {
       sessionTitle: classSession!.title,
       startsAt: classSession!.startsAt,
       endsAt: classSession!.endsAt,
-      instructorName: classSession!.instructorName,
-      meetingUrl: classSession!.meetingUrl,
-      waitlisted,
     }),
     sendStudioNewSignupNotification({
       childName: `${child.firstName} ${child.lastName}`,
@@ -92,8 +78,8 @@ export async function enrollAction(formData: FormData): Promise<void> {
       sessionTitle: classSession!.title,
       startsAt: classSession!.startsAt,
       endsAt: classSession!.endsAt,
-      waitlisted,
-      spotsLeftAfter,
+      confirmedCount: classSession!.enrollments.length,
+      capacity: classSession!.capacity,
     }),
   ]);
 
@@ -109,7 +95,6 @@ export async function cancelEnrollmentAction(formData: FormData): Promise<void> 
   const enrollmentId = String(formData.get("enrollmentId") ?? "");
   const enrollment = await prisma.enrollment.findUnique({
     where: { id: enrollmentId },
-    include: { session: true },
   });
 
   if (enrollment && enrollment.parentId === session!.sub && enrollment.status !== "CANCELED") {
@@ -119,31 +104,8 @@ export async function cancelEnrollmentAction(formData: FormData): Promise<void> 
       data: { status: "CANCELED", canceledAt: new Date() },
     });
 
-    // Promote the earliest waitlisted enrollment for this session, if any.
     if (wasConfirmed) {
-      const nextInLine = await prisma.enrollment.findFirst({
-        where: { sessionId: enrollment.sessionId, status: "WAITLIST" },
-        orderBy: { createdAt: "asc" },
-        include: { child: true, parent: true, session: { include: { classType: true } } },
-      });
-      if (nextInLine) {
-        await prisma.enrollment.update({
-          where: { id: nextInLine.id },
-          data: { status: "CONFIRMED" },
-        });
-        await sendEnrollmentConfirmationEmail({
-          parentEmail: nextInLine.parent.email,
-          parentName: nextInLine.parent.name,
-          childName: `${nextInLine.child.firstName} ${nextInLine.child.lastName}`,
-          classTypeName: nextInLine.session.classType.name,
-          sessionTitle: nextInLine.session.title,
-          startsAt: nextInLine.session.startsAt,
-          endsAt: nextInLine.session.endsAt,
-          instructorName: nextInLine.session.instructorName,
-          meetingUrl: nextInLine.session.meetingUrl,
-          waitlisted: false,
-        });
-      }
+      await promoteNextWaitlisted(enrollment.sessionId);
     }
   }
 

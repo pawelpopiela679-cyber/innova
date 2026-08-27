@@ -6,12 +6,14 @@ import { prisma } from "@/lib/db";
 import { cancelEnrollmentAction } from "@/lib/actions/enrollment-actions";
 
 const STATUS_LABEL: Record<string, string> = {
+  PENDING: "Oczekuje na potwierdzenie",
   CONFIRMED: "Potwierdzony",
   WAITLIST: "Lista rezerwowa",
   CANCELED: "Anulowany",
 };
 
 const STATUS_CLASS: Record<string, string> = {
+  PENDING: "bg-sky-100 text-sky-700",
   CONFIRMED: "bg-emerald-100 text-emerald-700",
   WAITLIST: "bg-amber-100 text-amber-800",
   CANCELED: "bg-gray-200 text-gray-600",

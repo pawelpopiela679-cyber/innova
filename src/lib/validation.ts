@@ -35,7 +35,11 @@ export const createSessionSchema = z
     date: z.string().trim().min(1, "Podaj datę."),
     startTime: z.string().trim().regex(/^\d{2}:\d{2}$/, "Podaj godzinę rozpoczęcia."),
     endTime: z.string().trim().regex(/^\d{2}:\d{2}$/, "Podaj godzinę zakończenia."),
-    capacity: z.coerce.number().int().min(1, "Pojemność musi być co najmniej 1.").max(100),
+    capacity: z.coerce
+      .number()
+      .int()
+      .min(1, "Pojemność musi być co najmniej 1.")
+      .max(10, "Grupa może liczyć maksymalnie 10 dzieci."),
     instructorName: z.string().trim().min(1, "Podaj prowadzącego."),
     meetingUrl: z.string().trim().optional().or(z.literal("")),
     description: z.string().trim().optional().or(z.literal("")),

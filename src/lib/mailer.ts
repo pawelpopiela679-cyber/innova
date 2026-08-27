@@ -1,6 +1,7 @@
 import nodemailer from "nodemailer";
 import { format } from "date-fns";
 import { pl } from "date-fns/locale";
+import { calculateAge } from "@/lib/age";
 
 type MailInput = {
   to: string | string[];
@@ -143,6 +144,87 @@ INNOVA — Pracownia kreatywno-edukacyjna`;
   await sendMail({ to: parentEmail, subject, html, text });
 }
 
+/** Sent to the parent immediately after they submit a request — not a final confirmation. */
+export async function sendEnrollmentPendingEmail(params: {
+  parentEmail: string;
+  parentName: string;
+  childName: string;
+  classTypeName: string;
+  sessionTitle: string;
+  startsAt: Date;
+  endsAt: Date;
+}) {
+  const { parentEmail, parentName, childName, classTypeName, sessionTitle, startsAt, endsAt } =
+    params;
+  const when = `${formatSessionDate(startsAt)} – ${format(endsAt, "HH:mm")}`;
+  const subject = `Zgłoszenie przyjęte: ${sessionTitle} (${childName})`;
+
+  const text = `Cześć ${parentName},
+
+Dziękujemy za zgłoszenie! Twoje zgłoszenie oczekuje na potwierdzenie przez pracownię —
+sprawdzimy dostępność miejsc i dobierzemy właściwą grupę wiekową dla dziecka.
+Gdy tylko to zrobimy, wyślemy kolejnego e-maila z ostatecznym potwierdzeniem i przypisaną grupą.
+
+Zgłoszone zajęcia: ${classTypeName} — ${sessionTitle}
+Dziecko: ${childName}
+Wybrany termin: ${when}
+
+INNOVA — Pracownia kreatywno-edukacyjna`;
+
+  const html = `
+    <div style="font-family: sans-serif; max-width: 480px;">
+      <p>Cześć ${escapeHtml(parentName)},</p>
+      <p>Dziękujemy za zgłoszenie! Twoje zgłoszenie oczekuje na potwierdzenie przez pracownię —
+      sprawdzimy dostępność miejsc i dobierzemy właściwą grupę wiekową dla dziecka. Gdy tylko to
+      zrobimy, wyślemy kolejnego e-maila z ostatecznym potwierdzeniem i przypisaną grupą.</p>
+      <table style="border-collapse: collapse; margin: 16px 0;">
+        <tr><td style="padding:4px 12px 4px 0; color:#666;">Zajęcia</td><td><strong>${escapeHtml(
+          classTypeName
+        )} — ${escapeHtml(sessionTitle)}</strong></td></tr>
+        <tr><td style="padding:4px 12px 4px 0; color:#666;">Dziecko</td><td>${escapeHtml(
+          childName
+        )}</td></tr>
+        <tr><td style="padding:4px 12px 4px 0; color:#666;">Wybrany termin</td><td>${escapeHtml(
+          when
+        )}</td></tr>
+      </table>
+      <p style="color:#999; font-size: 12px;">INNOVA — Pracownia kreatywno-edukacyjna</p>
+    </div>`;
+
+  await sendMail({ to: parentEmail, subject, html, text });
+}
+
+/** Sent to the parent if the studio declines/cancels a pending request. */
+export async function sendEnrollmentDeclinedEmail(params: {
+  parentEmail: string;
+  parentName: string;
+  childName: string;
+  classTypeName: string;
+  sessionTitle: string;
+}) {
+  const { parentEmail, parentName, childName, classTypeName, sessionTitle } = params;
+  const subject = `Zgłoszenie nie zostało przyjęte: ${sessionTitle} (${childName})`;
+  const text = `Cześć ${parentName},
+
+Niestety nie możemy przyjąć zgłoszenia dziecka (${childName}) na zajęcia: ${classTypeName} — ${sessionTitle}.
+Zachęcamy do sprawdzenia innych terminów w kalendarzu lub kontaktu z nami.
+
+INNOVA — Pracownia kreatywno-edukacyjna`;
+  const html = `
+    <div style="font-family: sans-serif; max-width: 480px;">
+      <p>Cześć ${escapeHtml(parentName)},</p>
+      <p>Niestety nie możemy przyjąć zgłoszenia dziecka (${escapeHtml(
+        childName
+      )}) na zajęcia: <strong>${escapeHtml(classTypeName)} — ${escapeHtml(
+        sessionTitle
+      )}</strong>.</p>
+      <p>Zachęcamy do sprawdzenia innych terminów w kalendarzu lub kontaktu z nami.</p>
+      <p style="color:#999; font-size: 12px;">INNOVA — Pracownia kreatywno-edukacyjna</p>
+    </div>`;
+  await sendMail({ to: parentEmail, subject, html, text });
+}
+
+/** Notifies the studio of a new pending request that needs review + group assignment. */
 export async function sendStudioNewSignupNotification(params: {
   childName: string;
   childBirthDate: Date;
@@ -153,8 +235,8 @@ export async function sendStudioNewSignupNotification(params: {
   sessionTitle: string;
   startsAt: Date;
   endsAt: Date;
-  waitlisted: boolean;
-  spotsLeftAfter: number;
+  confirmedCount: number;
+  capacity: number;
 }) {
   const notifyEmail = process.env.STUDIO_NOTIFY_EMAIL;
   if (!notifyEmail) return;
@@ -169,39 +251,42 @@ export async function sendStudioNewSignupNotification(params: {
     sessionTitle,
     startsAt,
     endsAt,
-    waitlisted,
-    spotsLeftAfter,
+    confirmedCount,
+    capacity,
   } = params;
 
+  const age = calculateAge(childBirthDate);
   const when = `${formatSessionDate(startsAt)} – ${format(endsAt, "HH:mm")}`;
-  const subject = `Nowy zapis${waitlisted ? " (lista rezerwowa)" : ""}: ${childName} → ${sessionTitle}`;
+  const subject = `Nowe zgłoszenie — wymaga potwierdzenia: ${childName} (${age} lat) → ${sessionTitle}`;
 
-  const text = `Nowe zgłoszenie na zajęcia!
+  const text = `Nowe zgłoszenie na zajęcia — wymaga potwierdzenia i przypisania grupy!
 
 Zajęcia: ${classTypeName} — ${sessionTitle}
-Termin: ${when}
-Status: ${waitlisted ? "LISTA REZERWOWA (grupa pełna)" : "POTWIERDZONY"}
-Wolne miejsca po zapisie: ${spotsLeftAfter}
+Wybrany termin: ${when}
+Zajętość wybranej grupy: ${confirmedCount}/${capacity}
 
-Dziecko: ${childName} (ur. ${format(childBirthDate, "d MMMM yyyy", { locale: pl })})
+Dziecko: ${childName} — WIEK: ${age} lat (ur. ${format(childBirthDate, "d MMMM yyyy", { locale: pl })})
 Rodzic/opiekun: ${parentName}
 E-mail: ${parentEmail}
 Telefon: ${parentPhone ?? "brak"}
-`;
+
+Potwierdź zgłoszenie i przypisz grupę w panelu: /admin/zapisy`;
 
   const html = `
     <div style="font-family: sans-serif; max-width: 480px;">
-      <p><strong>Nowe zgłoszenie na zajęcia!</strong></p>
+      <p><strong>Nowe zgłoszenie na zajęcia — wymaga potwierdzenia i przypisania grupy!</strong></p>
       <p>${escapeHtml(classTypeName)} — ${escapeHtml(sessionTitle)}<br/>
       ${escapeHtml(when)}<br/>
-      Status: <strong>${waitlisted ? "LISTA REZERWOWA" : "POTWIERDZONY"}</strong><br/>
-      Wolne miejsca po zapisie: ${spotsLeftAfter}</p>
-      <p>Dziecko: ${escapeHtml(childName)} (ur. ${format(childBirthDate, "d MMMM yyyy", {
-        locale: pl,
-      })})<br/>
+      Zajętość wybranej grupy: ${confirmedCount}/${capacity}</p>
+      <p>Dziecko: ${escapeHtml(childName)} — <strong>wiek: ${age} lat</strong> (ur. ${format(
+        childBirthDate,
+        "d MMMM yyyy",
+        { locale: pl }
+      )})<br/>
       Rodzic/opiekun: ${escapeHtml(parentName)}<br/>
       E-mail: ${escapeHtml(parentEmail)}<br/>
       Telefon: ${escapeHtml(parentPhone ?? "brak")}</p>
+      <p><a href="/admin/zapisy">Potwierdź zgłoszenie i przypisz grupę →</a></p>
     </div>`;
 
   await sendMail({ to: notifyEmail.split(",").map((s) => s.trim()), subject, html, text });

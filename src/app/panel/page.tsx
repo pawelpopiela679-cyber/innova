@@ -13,7 +13,7 @@ export default async function ParentOverviewPage() {
     prisma.enrollment.findMany({
       where: {
         parentId: session.sub,
-        status: { in: ["CONFIRMED", "WAITLIST"] },
+        status: { in: ["PENDING", "CONFIRMED", "WAITLIST"] },
         session: { startsAt: { gte: new Date() } },
       },
       include: { child: true, session: { include: { classType: true } } },
@@ -72,6 +72,11 @@ export default async function ParentOverviewPage() {
               {e.status === "WAITLIST" && (
                 <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800">
                   Lista rezerwowa
+                </span>
+              )}
+              {e.status === "PENDING" && (
+                <span className="rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-700">
+                  Oczekuje na potwierdzenie
                 </span>
               )}
             </li>

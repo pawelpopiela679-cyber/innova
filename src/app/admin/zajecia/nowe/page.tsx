@@ -70,14 +70,15 @@ export default async function NewSessionPage({
         </div>
         <div>
           <label htmlFor="capacity" className="text-sm font-medium">
-            Liczba miejsc
+            Liczba miejsc (maks. 10)
           </label>
           <input
             id="capacity"
             name="capacity"
             type="number"
             min={1}
-            defaultValue={8}
+            max={10}
+            defaultValue={10}
             required
             className="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-2"
           />

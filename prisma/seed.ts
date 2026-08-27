@@ -17,6 +17,8 @@ import {
 
 const prisma = new PrismaClient();
 
+const MAX_GROUP_SIZE = 10; // studio rule: max 10 dzieci na grupę
+
 function at(date: Date, hours: number, minutes: number): Date {
   return setMilliseconds(setSeconds(setMinutes(setHours(date, hours), minutes), 0), 0);
 }
@@ -39,12 +41,32 @@ function weeklyOccurrences(
   return out;
 }
 
-type PricingTierDef = {
-  label: string;
-  ageLabel: string;
+/**
+ * One bookable weekly group for a specific age bracket / variant of a class
+ * type — mirrors a row in the studio's cennik (oferta i cennik), but also
+ * carries the scheduling info needed to actually generate ClassSession rows.
+ * Each group is capped at MAX_GROUP_SIZE.
+ */
+type GroupDef = {
+  label: string; // wariant name, e.g. "Mix kreatywny" — "" when the age bracket is the only variant
+  ageLabel: string; // e.g. "5–7 lat"
   durationMin: number;
   priceMonthly: number;
   oneTimeFee?: number;
+  weekday: (base: Date) => Date; // nextMonday, nextTuesday, ...
+  startHour: number;
+  startMinute: number;
+};
+
+type ClassTypeDef = {
+  key: string;
+  name: string;
+  description: string;
+  color: string;
+  ageMin: number;
+  ageMax: number;
+  instructorEmail: string;
+  groups: GroupDef[];
 };
 
 async function main() {
@@ -75,7 +97,7 @@ async function main() {
     { email: "tomek@innova-pracownia.pl", name: "Tomek Nowicki" }, // eksperymentatorium
   ];
   const instructorPassword = "Prowadzacy123!";
-  const instructors = [];
+  const instructorsByEmail = new Map<string, Awaited<ReturnType<typeof prisma.user.upsert>>>();
   for (const def of instructorDefs) {
     const user = await prisma.user.upsert({
       where: { email: def.email },
@@ -87,12 +109,14 @@ async function main() {
         passwordHash: await bcrypt.hash(instructorPassword, 12),
       },
     });
-    instructors.push(user);
+    instructorsByEmail.set(def.email, user);
   }
   console.log(`Prowadzący hasło (wszyscy): ${instructorPassword}`);
 
-  // --- Class types (dopasowane do ulotki INNOVA — Oferta i cennik) ---
-  const classTypeDefs = [
+  // --- Class types + realne grupy wiekowe (dopasowane do ulotki INNOVA —
+  // Oferta i cennik). Każda grupa to osobny, cotygodniowy termin z limitem
+  // ${MAX_GROUP_SIZE} dzieci. ---
+  const classTypeDefs: ClassTypeDef[] = [
     {
       key: "ENGLISH",
       name: "Angielski",
@@ -101,14 +125,27 @@ async function main() {
       color: "#6badd9",
       ageMin: 3,
       ageMax: 7,
-      instructor: instructors[0],
-      weekly: () => weeklyOccurrences(nextMonday(today), 16, 30, 50, 10),
-      title: "Angielski — grupa online",
-      capacity: 8,
-      pricing: [
-        { label: "", ageLabel: "3–4 lata", durationMin: 35, priceMonthly: 149 },
-        { label: "", ageLabel: "5–7 lat", durationMin: 50, priceMonthly: 199 },
-      ] satisfies PricingTierDef[],
+      instructorEmail: "ola@innova-pracownia.pl",
+      groups: [
+        {
+          label: "",
+          ageLabel: "3–4 lata",
+          durationMin: 35,
+          priceMonthly: 149,
+          weekday: nextMonday,
+          startHour: 16,
+          startMinute: 0,
+        },
+        {
+          label: "",
+          ageLabel: "5–7 lat",
+          durationMin: 50,
+          priceMonthly: 199,
+          weekday: nextMonday,
+          startHour: 16,
+          startMinute: 45,
+        },
+      ],
     },
     {
       key: "THEATER",
@@ -118,15 +155,36 @@ async function main() {
       color: "#ab93dd",
       ageMin: 6,
       ageMax: 15,
-      instructor: instructors[1],
-      weekly: () => weeklyOccurrences(nextThursday(today), 17, 30, 60, 10),
-      title: "Zajęcia sceniczne — grupa online",
-      capacity: 12,
-      pricing: [
-        { label: "Słowo na scenie", ageLabel: "9–15 lat", durationMin: 75, priceMonthly: 249 },
-        { label: "Scena dla każdego", ageLabel: "6–9 lat", durationMin: 60, priceMonthly: 199 },
-        { label: "Scena dla każdego", ageLabel: "10–15 lat", durationMin: 75, priceMonthly: 229 },
-      ] satisfies PricingTierDef[],
+      instructorEmail: "kasia@innova-pracownia.pl",
+      groups: [
+        {
+          label: "Scena dla każdego",
+          ageLabel: "6–9 lat",
+          durationMin: 60,
+          priceMonthly: 199,
+          weekday: nextThursday,
+          startHour: 17,
+          startMinute: 0,
+        },
+        {
+          label: "Scena dla każdego",
+          ageLabel: "10–15 lat",
+          durationMin: 75,
+          priceMonthly: 229,
+          weekday: nextThursday,
+          startHour: 18,
+          startMinute: 15,
+        },
+        {
+          label: "Słowo na scenie",
+          ageLabel: "9–15 lat",
+          durationMin: 75,
+          priceMonthly: 249,
+          weekday: nextThursday,
+          startHour: 19,
+          startMinute: 40,
+        },
+      ],
     },
     {
       key: "ROBOTICS",
@@ -136,14 +194,27 @@ async function main() {
       color: "#57a3b3",
       ageMin: 5,
       ageMax: 10,
-      instructor: instructors[2],
-      weekly: () => weeklyOccurrences(nextWednesday(today), 17, 0, 60, 10),
-      title: "Robotyka — grupa online",
-      capacity: 8,
-      pricing: [
-        { label: "", ageLabel: "5–7 lat", durationMin: 60, priceMonthly: 249 },
-        { label: "", ageLabel: "8–10 lat", durationMin: 60, priceMonthly: 249 },
-      ] satisfies PricingTierDef[],
+      instructorEmail: "marek@innova-pracownia.pl",
+      groups: [
+        {
+          label: "",
+          ageLabel: "5–7 lat",
+          durationMin: 60,
+          priceMonthly: 249,
+          weekday: nextWednesday,
+          startHour: 17,
+          startMinute: 0,
+        },
+        {
+          label: "",
+          ageLabel: "8–10 lat",
+          durationMin: 60,
+          priceMonthly: 249,
+          weekday: nextWednesday,
+          startHour: 18,
+          startMinute: 15,
+        },
+      ],
     },
     {
       key: "CREATIVE",
@@ -153,21 +224,37 @@ async function main() {
       color: "#e79d94",
       ageMin: 5,
       ageMax: 15,
-      instructor: instructors[3],
-      weekly: () => weeklyOccurrences(nextTuesday(today), 16, 0, 60, 10),
-      title: "Pracownia kreatywna — grupa online",
-      capacity: 10,
-      pricing: [
-        { label: "Mix kreatywny", ageLabel: "5–7 lat", durationMin: 50, priceMonthly: 229 },
-        { label: "Mix kreatywny", ageLabel: "8–11 lat", durationMin: 60, priceMonthly: 229 },
+      instructorEmail: "ania@innova-pracownia.pl",
+      groups: [
+        {
+          label: "Mix kreatywny",
+          ageLabel: "5–7 lat",
+          durationMin: 50,
+          priceMonthly: 229,
+          weekday: nextTuesday,
+          startHour: 16,
+          startMinute: 0,
+        },
+        {
+          label: "Mix kreatywny",
+          ageLabel: "8–11 lat",
+          durationMin: 60,
+          priceMonthly: 229,
+          weekday: nextTuesday,
+          startHour: 17,
+          startMinute: 0,
+        },
         {
           label: "Szydełkowanie / haft",
           ageLabel: "9–15 lat",
           durationMin: 75,
           priceMonthly: 229,
           oneTimeFee: 79,
+          weekday: nextTuesday,
+          startHour: 18,
+          startMinute: 15,
         },
-      ] satisfies PricingTierDef[],
+      ],
     },
     {
       key: "MATH",
@@ -177,31 +264,45 @@ async function main() {
       color: "#e0b463",
       ageMin: 4,
       ageMax: 15,
-      instructor: instructors[4],
-      weekly: () => weeklyOccurrences(nextFriday(today), 16, 0, 60, 10),
-      title: "Matematyka — grupa online",
-      capacity: 8,
-      pricing: [
+      instructorEmail: "beata@innova-pracownia.pl",
+      groups: [
         {
           label: "Matematyczne odkrycia",
           ageLabel: "4–5 lat",
           durationMin: 35,
           priceMonthly: 149,
+          weekday: nextFriday,
+          startHour: 16,
+          startMinute: 0,
         },
         {
           label: "Matematyka bez stresu",
           ageLabel: "6–8 lat",
           durationMin: 50,
           priceMonthly: 199,
+          weekday: nextFriday,
+          startHour: 16,
+          startMinute: 45,
         },
         {
           label: "Logika + pomoc szkolna",
           ageLabel: "klasy 1–3",
           durationMin: 60,
           priceMonthly: 199,
+          weekday: nextFriday,
+          startHour: 17,
+          startMinute: 45,
         },
-        { label: "Kurs E8", ageLabel: "klasa 8", durationMin: 75, priceMonthly: 249 },
-      ] satisfies PricingTierDef[],
+        {
+          label: "Kurs E8",
+          ageLabel: "klasa 8",
+          durationMin: 75,
+          priceMonthly: 249,
+          weekday: nextFriday,
+          startHour: 19,
+          startMinute: 0,
+        },
+      ],
     },
     {
       key: "SCIENCE",
@@ -211,14 +312,27 @@ async function main() {
       color: "#64bd9c",
       ageMin: 6,
       ageMax: 15,
-      instructor: instructors[5],
-      weekly: () => weeklyOccurrences(nextSaturday(today), 11, 0, 60, 10),
-      title: "Eksperymentatorium — grupa online",
-      capacity: 8,
-      pricing: [
-        { label: "", ageLabel: "6–9 lat", durationMin: 60, priceMonthly: 229 },
-        { label: "", ageLabel: "10–15 lat", durationMin: 75, priceMonthly: 249 },
-      ] satisfies PricingTierDef[],
+      instructorEmail: "tomek@innova-pracownia.pl",
+      groups: [
+        {
+          label: "",
+          ageLabel: "6–9 lat",
+          durationMin: 60,
+          priceMonthly: 229,
+          weekday: nextSaturday,
+          startHour: 11,
+          startMinute: 0,
+        },
+        {
+          label: "",
+          ageLabel: "10–15 lat",
+          durationMin: 75,
+          priceMonthly: 249,
+          weekday: nextSaturday,
+          startHour: 12,
+          startMinute: 15,
+        },
+      ],
     },
   ];
 
@@ -242,41 +356,59 @@ async function main() {
       },
     });
 
+    const instructor = instructorsByEmail.get(def.instructorEmail);
+    if (!instructor) throw new Error(`Brak prowadzącego: ${def.instructorEmail}`);
+
     // Reload the pricing table from scratch each run so the seed stays the
     // single source of truth for what's shown on the offer page.
     await prisma.pricingTier.deleteMany({ where: { classTypeId: classType.id } });
     await prisma.pricingTier.createMany({
-      data: def.pricing.map((tier, i) => ({
+      data: def.groups.map((g, i) => ({
         classTypeId: classType.id,
-        label: tier.label,
-        ageLabel: tier.ageLabel,
-        durationMin: tier.durationMin,
-        priceMonthly: tier.priceMonthly,
-        oneTimeFee: tier.oneTimeFee,
+        label: g.label,
+        ageLabel: g.ageLabel,
+        durationMin: g.durationMin,
+        priceMonthly: g.priceMonthly,
+        oneTimeFee: g.oneTimeFee,
         sortOrder: i,
       })),
     });
 
-    const occurrences = def.weekly();
-    for (const occ of occurrences) {
-      const existing = await prisma.classSession.findFirst({
-        where: { classTypeId: classType.id, startsAt: occ.startsAt },
-      });
-      if (existing) continue;
-      await prisma.classSession.create({
-        data: {
-          classTypeId: classType.id,
-          title: def.title,
-          startsAt: occ.startsAt,
-          endsAt: occ.endsAt,
-          capacity: def.capacity,
-          instructorId: def.instructor.id,
-          instructorName: def.instructor.name,
-          meetingUrl: "https://meet.innova-pracownia.pl/demo-room",
-        },
-      });
+    let totalOccurrences = 0;
+    for (const group of def.groups) {
+      // Class type name is already shown alongside the title everywhere in the
+      // UI (badge/dot), so keep the title itself to just the group descriptor.
+      const title = `${group.label ? `${group.label} — ` : ""}${group.ageLabel}`;
+      const occurrences = weeklyOccurrences(
+        group.weekday(today),
+        group.startHour,
+        group.startMinute,
+        group.durationMin,
+        10
+      );
+      for (const occ of occurrences) {
+        const existing = await prisma.classSession.findFirst({
+          where: { classTypeId: classType.id, title, startsAt: occ.startsAt },
+        });
+        if (existing) continue;
+        await prisma.classSession.create({
+          data: {
+            classTypeId: classType.id,
+            title,
+            startsAt: occ.startsAt,
+            endsAt: occ.endsAt,
+            capacity: MAX_GROUP_SIZE,
+            instructorId: instructor.id,
+            instructorName: instructor.name,
+            meetingUrl: "https://meet.innova-pracownia.pl/demo-room",
+          },
+        });
+      }
+      totalOccurrences += occurrences.length;
     }
-    console.log(`${def.name}: ${occurrences.length} terminów, ${def.pricing.length} wariantów cenowych`);
+    console.log(
+      `${def.name}: ${def.groups.length} grup, ${totalOccurrences} terminów łącznie`
+    );
   }
 
   // --- A demo parent + child + a couple of enrollments, so the app has
@@ -318,6 +450,7 @@ async function main() {
         childId: demoChild.id,
         parentId: demoParent.id,
         status: "CONFIRMED",
+        confirmedAt: new Date(),
       },
     });
   }

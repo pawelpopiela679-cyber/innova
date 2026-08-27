@@ -20,6 +20,7 @@ enum Role {
 }
 
 enum EnrollmentStatus {
+  PENDING // just submitted by a parent — awaiting staff review & group assignment
   CONFIRMED
   WAITLIST
   CANCELED
@@ -97,7 +98,7 @@ model ClassSession {
   description    String? // optional override / extra info for this specific date
   startsAt       DateTime
   endsAt         DateTime
-  capacity       Int           @default(8)
+  capacity       Int           @default(10) // studio rule: max 10 dzieci na grupę
   meetingUrl     String? // online meeting link, shown to confirmed parents
   instructorId   String?
   instructor     User?         @relation("InstructorSessions", fields: [instructorId], references: [id])
@@ -119,8 +120,9 @@ model Enrollment {
   child       Child            @relation(fields: [childId], references: [id], onDelete: Cascade)
   parentId    String
   parent      User             @relation(fields: [parentId], references: [id], onDelete: Cascade)
-  status      EnrollmentStatus @default(CONFIRMED)
+  status      EnrollmentStatus @default(PENDING)
   createdAt   DateTime         @default(now())
+  confirmedAt DateTime?
   canceledAt  DateTime?
 
   @@unique([sessionId, childId])

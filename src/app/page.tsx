@@ -35,8 +35,8 @@ export default async function HomePage() {
             <DashedDivider className="mx-auto mt-5 w-40 lg:mx-0" />
 
             <p className="mx-auto mt-5 max-w-xl text-lg text-[var(--muted)] lg:mx-0">
-              Zapisz dziecko na zajęcia w kilka minut: sprawdź kalendarz, wybierz
-              termin i od razu otrzymaj potwierdzenie zapisu na e-mail.
+              Zgłoś dziecko na zajęcia w kilka minut: sprawdź kalendarz, wybierz
+              termin, a my dobierzemy odpowiednią grupę i potwierdzimy zapis e-mailem.
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-3 lg:justify-start">
               <Link
@@ -54,11 +54,11 @@ export default async function HomePage() {
             </div>
 
             <div className="mx-auto mt-10 flex max-w-xl flex-wrap justify-center gap-3 lg:mx-0 lg:justify-start">
-              <span className="flex items-center gap-2 rounded-full bg-[var(--sage-soft)] px-5 py-2.5 text-sm font-semibold text-[var(--sage)]">
-                <span aria-hidden>📅</span> Start zajęć: 7.09.2026
-              </span>
               <span className="flex items-center gap-2 rounded-full bg-[var(--coral-soft)] px-5 py-2.5 text-sm font-semibold text-[var(--coral)]">
-                <span aria-hidden>⭐</span> Bezpłatne zajęcia pokazowe: 5.09.2026
+                <span aria-hidden>⭐</span> Dzień otwarty: 12.09.2026
+              </span>
+              <span className="flex items-center gap-2 rounded-full bg-[var(--sage-soft)] px-5 py-2.5 text-sm font-semibold text-[var(--sage)]">
+                <span aria-hidden>📅</span> Start zajęć: 15.09.2026
               </span>
             </div>
           </div>
@@ -136,22 +136,27 @@ export default async function HomePage() {
       <section className="mx-auto max-w-6xl px-4 pb-16">
         <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-8 text-center">
           <h2 className="font-heading text-xl font-bold">Jak to działa?</h2>
-          <div className="mt-6 grid gap-6 text-left sm:grid-cols-4">
+          <div className="mt-6 grid gap-6 text-left sm:grid-cols-2 lg:grid-cols-5">
             <Step n={1} title="Załóż konto rodzica" text="Szybka rejestracja e-mailem." />
             <Step
               n={2}
               title="Dodaj dziecko"
-              text="Imię, nazwisko i data urodzenia wystarczą."
+              text="Imię, nazwisko i data urodzenia — wiek pomaga dobrać grupę."
             />
             <Step
               n={3}
-              title="Wybierz termin"
-              text="Sprawdź kalendarz i opisy zajęć na dany dzień."
+              title="Zgłoś chęć zapisu"
+              text="Sprawdź kalendarz i wybierz termin, który Wam pasuje."
             />
             <Step
               n={4}
+              title="Potwierdzamy grupę"
+              text="Sprawdzamy dostępność i dobieramy grupę odpowiednią do wieku."
+            />
+            <Step
+              n={5}
               title="Gotowe!"
-              text="Zapis jest od razu potwierdzony e-mailem, a my dostajemy powiadomienie."
+              text="Dostajesz e-mail z potwierdzeniem i przypisaną grupą."
             />
           </div>
         </div>

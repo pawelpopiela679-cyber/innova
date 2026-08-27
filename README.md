@@ -11,18 +11,28 @@ treść oferty dopasowane do materiałów promocyjnych pracowni.
   konta.
 - **Kalendarz zajęć** (widok dzień / tydzień / miesiąc) z opisem zajęć na
   dany dzień i liczbą wolnych miejsc.
-- **Zapisy z potwierdzeniem** — po zapisaniu dziecka rodzic od razu widzi
-  ekran potwierdzenia i dostaje e-mail z potwierdzeniem (lub informacją o
-  liście rezerwowej, gdy grupa jest pełna).
-- **Powiadomienie e-mail dla pracowni** — każdy nowy zapis wysyła
-  automatyczne powiadomienie na adres `STUDIO_NOTIFY_EMAIL` z danymi dziecka,
-  rodzica i wybranych zajęć.
+- **Zgłoszenia wymagające potwierdzenia** — rodzic zgłasza chęć zapisu na
+  wybrany termin; nic nie jest automatycznie potwierdzane. Zgłoszenie trafia
+  do pracowni jako „oczekujące” (`PENDING`).
+- **Powiadomienie e-mail dla pracowni** — każde nowe zgłoszenie wysyła
+  automatyczne powiadomienie na adres `STUDIO_NOTIFY_EMAIL` z **wiekiem
+  dziecka** (wyliczonym z daty urodzenia), danymi rodzica i wybranymi
+  zajęciami — żeby łatwo dobrać właściwą grupę wiekową.
+- **Panel zgłoszeń** (`/admin/zapisy`) — pracownia przegląda zgłoszenia,
+  widzi wiek dziecka i zajętość grupy, po czym: potwierdza do wybranej grupy
+  (lub od razu **przypisuje inną grupę tego samego rodzaju zajęć**, jeśli
+  wiek pasuje lepiej gdzie indziej), przenosi na listę rezerwową albo
+  odrzuca. Rodzic za każdym razem dostaje e-mail z wynikiem.
+- **Grupy z limitem 10 dzieci** — każdy termin (`ClassSession`) to osobna
+  grupa wiekowa z twardym limitem miejsc; nowe grupy tworzy się w
+  `/admin/zajecia/nowe`.
 - **Panel prowadzącego / administratora** — podgląd dostępności (wolnych
   miejsc) w widoku dnia, tygodnia i miesiąca, filtrowanie po rodzaju zajęć,
   dodawanie nowych terminów i odwoływanie zajęć.
-- **Lista rezerwowa** — gdy grupa jest pełna, zapis trafia na listę
-  rezerwową i automatycznie awansuje na potwierdzony, jeśli zwolni się
-  miejsce (np. po anulowaniu przez innego rodzica).
+- **Lista rezerwowa** — gdy grupa jest pełna, zgłoszenie można przenieść na
+  listę rezerwową; automatycznie awansuje na potwierdzone, jeśli zwolni się
+  miejsce (np. po anulowaniu przez innego rodzica lub przeniesieniu kogoś do
+  innej grupy).
 - **Cennik na stronie ofertowej** (`/zajecia`) — warianty wiekowe, czas
   trwania i cena miesięczna dla każdego rodzaju zajęć (dane informacyjne,
   aplikacja nie obsługuje płatności).
@@ -106,15 +116,19 @@ prisma/seed.ts              dane startowe: 6 rodzajów zajęć + cennik, konto
                             admina, prowadzący, przykładowe terminy na
                             najbliższe tygodnie
 src/lib/auth.ts             hasła (bcrypt), sesje (JWT w ciasteczku)
-src/lib/mailer.ts           wysyłka e-maili (potwierdzenie + powiadomienie
-                            studia)
+src/lib/mailer.ts           wysyłka e-maili (zgłoszenie/potwierdzenie/
+                            odrzucenie + powiadomienie studia)
+src/lib/age.ts               liczenie wieku dziecka z daty urodzenia
 src/lib/availability.ts     obliczanie wolnych miejsc dla danego zakresu dat
+src/lib/enrollment-helpers.ts  wspólna logika awansu z listy rezerwowej
 src/lib/actions/*           Server Actions — cała logika zapisów, kont,
                             zarządzania terminami
 src/app/kalendarz           publiczny kalendarz zajęć (dzień/tydzień/miesiąc)
-src/app/panel               panel rodzica (dzieci, zapisy, potwierdzenia)
-src/app/admin                panel prowadzącego/administratora (dostępność
-                             terminów, dodawanie/odwoływanie zajęć)
+src/app/panel               panel rodzica (dzieci, zgłoszenia, potwierdzenia)
+src/app/admin                panel prowadzącego/administratora: /admin/zapisy
+                             (przegląd zgłoszeń, potwierdzanie, przypisywanie
+                             grup), dostępność terminów, dodawanie/odwoływanie
+                             zajęć
 ```
 
 ## Dodawanie kolejnych rodzajów zajęć

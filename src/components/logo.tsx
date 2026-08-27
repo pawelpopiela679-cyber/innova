@@ -28,20 +28,20 @@ export function Logo({
       className={`inline-flex flex-col ${align === "center" ? "items-center" : "items-start"} ${className ?? ""}`}
     >
       <span className={`font-logo font-bold ${text}`} style={{ letterSpacing: "0.01em" }}>
-        <span style={{ color: "var(--sage)" }}>IN</span>
-        <span style={{ color: "var(--coral)" }}>N</span>
+        <span style={{ color: "var(--logo-green)" }}>IN</span>
+        <span style={{ color: "var(--logo-pink)" }}>N</span>
         <span
           className="hollow-text"
           style={
             {
-              "--hollow-color": "var(--coral)",
+              "--hollow-color": "var(--logo-pink)",
               "--hollow-width": hollowWidth,
             } as React.CSSProperties
           }
         >
           O
         </span>
-        <span style={{ color: "var(--mustard)" }}>VA</span>
+        <span style={{ color: "var(--logo-gold)" }}>VA</span>
       </span>
 
       {withSubtitle && (

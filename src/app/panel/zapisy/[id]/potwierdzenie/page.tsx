@@ -21,20 +21,28 @@ export default async function EnrollmentConfirmationPage({
 
   if (!enrollment || enrollment.parentId !== session.sub) notFound();
 
+  const pending = enrollment.status === "PENDING";
   const waitlisted = enrollment.status === "WAITLIST";
+  const confirmed = enrollment.status === "CONFIRMED";
 
   return (
     <div className="mx-auto max-w-lg px-4 py-16 text-center">
       <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-3xl">
-        {waitlisted ? "⏳" : "✅"}
+        {pending ? "📩" : waitlisted ? "⏳" : "✅"}
       </div>
       <h1 className="mt-4 text-2xl font-extrabold">
-        {waitlisted ? "Dodano do listy rezerwowej" : "Zapis potwierdzony!"}
+        {pending
+          ? "Zgłoszenie przyjęte!"
+          : waitlisted
+            ? "Dodano do listy rezerwowej"
+            : "Zapis potwierdzony!"}
       </h1>
       <p className="mt-2 text-[var(--muted)]">
-        {waitlisted
-          ? "Grupa jest obecnie pełna. Odezwiemy się, jeśli zwolni się miejsce."
-          : "Wysłaliśmy potwierdzenie na Twój e-mail. Poinformowaliśmy również prowadzącego zajęcia."}
+        {pending
+          ? "Twoje zgłoszenie oczekuje na potwierdzenie przez pracownię — sprawdzimy dostępność i dobierzemy właściwą grupę wiekową. Wyślemy e-mail, gdy tylko to zrobimy."
+          : waitlisted
+            ? "Grupa jest obecnie pełna. Odezwiemy się, jeśli zwolni się miejsce."
+            : "Wysłaliśmy potwierdzenie na Twój e-mail. Poinformowaliśmy również prowadzącego zajęcia."}
       </p>
 
       <div className="mt-6 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 text-left">
@@ -49,6 +57,7 @@ export default async function EnrollmentConfirmationPage({
         </div>
         <h2 className="mt-1 text-lg font-bold">{enrollment.session.title}</h2>
         <p className="mt-1 text-sm">
+          {pending ? "Wybrany termin: " : ""}
           {format(enrollment.session.startsAt, "EEEE d MMMM yyyy, HH:mm", { locale: pl })}–
           {format(enrollment.session.endsAt, "HH:mm")}
         </p>
@@ -58,7 +67,7 @@ export default async function EnrollmentConfirmationPage({
         <p className="text-sm text-[var(--muted)]">
           Prowadzący: {enrollment.session.instructorName}
         </p>
-        {!waitlisted && enrollment.session.meetingUrl && (
+        {confirmed && enrollment.session.meetingUrl && (
           <p className="mt-3 text-sm">
             Link do zajęć online:{" "}
             <a href={enrollment.session.meetingUrl} className="text-[var(--primary)] underline">

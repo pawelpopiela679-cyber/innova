@@ -15,6 +15,13 @@
   --mustard: #dba848;
   --mustard-soft: #f8ead0;
   --muted: #93886e;
+
+  /* Exact wordmark colors, kept separate from the UI accent tokens above so
+     that future palette tweaks (buttons, banners, etc.) never drift the
+     logo away from the studio's real brand colors. */
+  --logo-green: #707a52;
+  --logo-pink: #c9827c;
+  --logo-gold: #dda23c;
 }
 
 @theme inline {
