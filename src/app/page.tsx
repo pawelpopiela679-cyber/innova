@@ -2,6 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { classTypeIcon } from "@/lib/class-type-icons";
 import { Blob, DashedDivider, HeartDoodle, HeroIllustration, Sparkle } from "@/components/decor";
+import { Logo } from "@/components/logo";
 
 export default async function HomePage() {
   const classTypes = await prisma.classType.findMany({ orderBy: { createdAt: "asc" } });
@@ -20,13 +21,9 @@ export default async function HomePage() {
 
         <div className="relative mx-auto grid max-w-6xl gap-10 px-4 py-16 lg:grid-cols-2 lg:items-center lg:py-24">
           <div className="text-center lg:text-left">
-            <p className="font-heading text-2xl font-bold tracking-tight sm:text-3xl">
-              <span className="text-[var(--sage)]">IN</span>
-              <span className="text-[var(--coral)]">NOVA</span>
-              <span className="ml-2 align-middle text-base font-normal text-[var(--muted)] sm:text-lg">
-                — Pracownia kreatywno-edukacyjna
-              </span>
-            </p>
+            <div className="flex justify-center lg:justify-start">
+              <Logo size="lg" withSubtitle />
+            </div>
 
             <div className="mt-4 flex items-center justify-center gap-2 lg:justify-start">
               <p className="font-script text-4xl text-[var(--sage)] sm:text-5xl">Miejsce rozwoju</p>

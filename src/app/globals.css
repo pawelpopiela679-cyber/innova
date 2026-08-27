@@ -35,6 +35,7 @@
   --font-sans: var(--font-body), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     sans-serif;
   --font-heading: var(--font-heading), var(--font-sans);
+  --font-logo: var(--font-logo), var(--font-sans);
   --font-script: var(--font-script), cursive;
 }
 
@@ -61,4 +62,12 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+}
+
+/* Used for the logo's hollow "O" — an outlined letter with no fill,
+   matching the studio's wordmark. */
+.hollow-text {
+  color: transparent;
+  -webkit-text-stroke-width: var(--hollow-width, 1.5px);
+  -webkit-text-stroke-color: var(--hollow-color, currentColor);
 }

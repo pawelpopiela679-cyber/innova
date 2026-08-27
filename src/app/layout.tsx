@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Fredoka, Caveat, Nunito } from "next/font/google";
+import { Fredoka, Quicksand, Caveat, Nunito } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
@@ -8,6 +8,12 @@ const fredoka = Fredoka({
   subsets: ["latin-ext"],
   weight: ["500", "600", "700"],
   variable: "--font-heading",
+});
+
+const quicksand = Quicksand({
+  subsets: ["latin-ext"],
+  weight: ["600", "700"],
+  variable: "--font-logo",
 });
 
 const caveat = Caveat({
@@ -32,7 +38,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="pl"
-      className={`${fredoka.variable} ${caveat.variable} ${nunito.variable} h-full antialiased`}
+      className={`${fredoka.variable} ${quicksand.variable} ${caveat.variable} ${nunito.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <Navbar />

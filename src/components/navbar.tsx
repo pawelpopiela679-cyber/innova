@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getSession } from "@/lib/auth";
 import { logoutAction } from "@/lib/actions/auth-actions";
+import { Logo } from "@/components/logo";
 
 export async function Navbar() {
   const session = await getSession();
@@ -9,12 +10,8 @@ export async function Navbar() {
   return (
     <header className="sticky top-0 z-30 border-b border-[var(--border)] bg-[var(--surface)]/85 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
-        <Link
-          href="/"
-          className="flex items-baseline gap-2 font-heading text-2xl font-bold tracking-tight transition-transform hover:scale-105"
-        >
-          <span className="text-[var(--sage)]">IN</span>
-          <span className="text-[var(--coral)]">NOVA</span>
+        <Link href="/" className="transition-transform hover:scale-105">
+          <Logo size="sm" />
         </Link>
 
         <nav className="hidden md:flex items-center gap-5 text-sm font-semibold">
