@@ -155,10 +155,16 @@ npm run db:studio      # graficzny podgląd/edycja bazy danych (Prisma Studio)
 
 ## Uwagi dot. wdrożenia na produkcję
 
-- Zamień `provider = "sqlite"` w `prisma/schema.prisma` na `postgresql` (lub
-  inną docelową bazę) i ustaw prawdziwy `DATABASE_URL` — reszta kodu
-  działa bez zmian.
+- **Wdrożenie na home.pl (hosting z obsługą Node.js): pełna instrukcja krok
+  po kroku w [`DEPLOY.md`](./DEPLOY.md)**, razem z gotowym plikiem
+  `server.js` potrzebnym na tego typu hostingu.
+- Zamień `provider = "sqlite"` w `prisma/schema.prisma` na `mysql` (zalecane
+  na hostingu współdzielonym, patrz `DEPLOY.md`) albo `postgresql` (VPS/
+  chmura) i ustaw prawdziwy `DATABASE_URL` — reszta kodu działa bez zmian.
 - Skonfiguruj prawdziwe dane SMTP, inaczej e-maile nie będą faktycznie
   wysyłane (zobaczysz je jedynie w logach serwera).
 - Ustaw unikalny, losowy `AUTH_SECRET`.
 - Zmień hasła kont utworzonych przez seed (lub usuń konto demo rodzica).
+- Na hostingu bez własnej kontroli nad procesem Node.js (np. panel typu
+  "Node.js Selector" na home.pl) użyj `npm run start:passenger`
+  (`node server.js`) zamiast `npm start` — patrz komentarz w `server.js`.

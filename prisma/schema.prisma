@@ -1,11 +1,15 @@
 // Prisma schema for the Innova kids' creative studio registration system.
 // Default datasource is SQLite for a zero-config local/dev setup.
-// For production, switch `provider` to "postgresql" (or your DB of choice)
-// and point DATABASE_URL at a real database — the rest of the schema
-// works unchanged.
+// For production, switch `provider` to "mysql" (see DEPLOY.md for home.pl /
+// shared-hosting deployment) or "postgresql" — the rest of the schema works
+// unchanged.
 
 generator client {
   provider = "prisma-client-js"
+  // Covers common shared-hosting Linux distros (the exact one on home.pl's
+  // Node.js hosting isn't publicly documented) in addition to whatever OS
+  // you develop on. Harmless to keep even if unused.
+  binaryTargets = ["native", "debian-openssl-3.0.x", "rhel-openssl-3.0.x", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
