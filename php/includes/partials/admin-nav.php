@@ -13,6 +13,7 @@ $isMasterAdmin = $user['role'] === 'ADMIN';
   <a href="<?= e(url('admin-profil.php')) ?>" style="border-radius:999px; padding:6px 16px;">Mój profil</a>
   <?php if ($isMasterAdmin): ?>
     <a href="<?= e(url('admin-prowadzacy.php')) ?>" style="border-radius:999px; padding:6px 16px;">Prowadzący</a>
+    <a href="<?= e(url('admin-cennik.php')) ?>" style="border-radius:999px; padding:6px 16px;">Cennik</a>
     <a href="<?= e(url('admin-strony.php')) ?>" style="border-radius:999px; padding:6px 16px;">Strony</a>
     <a href="<?= e(url('admin-wyglad.php')) ?>" style="border-radius:999px; padding:6px 16px;">Wygląd</a>
   <?php endif; ?>
