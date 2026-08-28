@@ -62,7 +62,13 @@ img { max-width: 100%; }
   display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
 }
 .navbar-links { display: flex; align-items: center; gap: 20px; font-size: 0.9rem; font-weight: 600; flex-wrap: wrap; }
+.navbar-links a { position: relative; text-decoration: none; transition: color .15s ease; padding-bottom: 2px; }
+.navbar-links a::after {
+  content: ''; position: absolute; left: 0; right: 100%; bottom: -2px; height: 2px;
+  background: var(--coral); border-radius: 2px; transition: right .2s ease;
+}
 .navbar-links a:hover { color: var(--coral); }
+.navbar-links a:hover::after { right: 0; }
 .navbar-right { display: flex; align-items: center; gap: 12px; font-size: 0.9rem; }
 
 /* --- Logo --- */
@@ -84,21 +90,24 @@ img { max-width: 100%; }
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
   border-radius: 999px; padding: 10px 20px; font-weight: 700; font-size: 0.9rem;
   border: 1px solid transparent; cursor: pointer; text-decoration: none;
-  transition: transform .15s, opacity .15s, background-color .15s;
+  transition: transform .2s cubic-bezier(.34,1.56,.64,1), opacity .15s ease,
+    background-color .15s ease, box-shadow .2s ease, border-color .15s ease;
 }
-.btn:hover { transform: scale(1.03); }
+.btn:hover { transform: scale(1.05); box-shadow: 0 6px 16px -6px rgba(74,67,38,.35); }
+.btn:active { transform: scale(0.96); box-shadow: none; }
 .btn-primary { background: var(--primary); color: var(--primary-foreground); }
-.btn-primary:hover { opacity: .9; }
+.btn-primary:hover { opacity: .92; box-shadow: 0 8px 18px -6px color-mix(in srgb, var(--primary) 60%, transparent); }
 .btn-outline { background: var(--surface); border-color: var(--border); color: var(--foreground); }
-.btn-outline:hover { background: var(--background); }
+.btn-outline:hover { background: var(--background); border-color: var(--sage); }
 .btn-danger { background: transparent; border-color: var(--border); color: #b0413e; }
-.btn-danger:hover { background: #fbecec; }
+.btn-danger:hover { background: #fbecec; border-color: #e6b8b8; }
 .btn-sm { padding: 6px 14px; font-size: 0.82rem; }
-.btn[disabled] { opacity: .5; cursor: not-allowed; }
+.btn[disabled] { opacity: .5; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
 
 /* --- Karty --- */
 .card {
   background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px;
+  transition: box-shadow .2s ease, border-color .2s ease;
 }
 .card-top-accent { border-top-width: 4px; border-top-style: solid; padding-top: 28px; position: relative; }
 .card-badge {
@@ -108,8 +117,22 @@ img { max-width: 100%; }
 }
 .icon-box {
   width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
-  font-size: 1.3rem; flex-shrink: 0;
+  font-size: 1.3rem; flex-shrink: 0; transition: transform .2s ease;
 }
+
+/* Karty, które są linkami (oferta na stronie głównej) — unoszą się przy najechaniu,
+   dokładnie jak w wersji Next.js (hover:-translate-y-1 hover:shadow-lg). */
+a.card-top-accent {
+  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+a.card-top-accent:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 28px -12px rgba(74,67,38,.28);
+  border-color: var(--sage-light);
+}
+a.card-top-accent:hover .icon-box { transform: scale(1.1) rotate(-4deg); }
+a.card-top-accent:hover h3 { color: var(--coral); }
+a.card-top-accent h3 { transition: color .15s ease; }
 
 .grid { display: grid; gap: 20px; }
 .grid-2 { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
@@ -122,6 +145,11 @@ input[type=time], input[type=number], input[type=tel], input[type=color],
 select, textarea {
   width: 100%; padding: 9px 12px; border-radius: 10px; border: 1px solid var(--border);
   background: var(--background); color: var(--foreground); font: inherit;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none; border-color: var(--sage);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--sage) 25%, transparent);
 }
 textarea { resize: vertical; }
 .field { margin-bottom: 16px; }
@@ -157,17 +185,27 @@ td { padding: 8px 12px 8px 0; border-top: 1px solid var(--border); }
 .cal-grid-month { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
 .cal-cell {
   border: 1px solid var(--border); border-radius: 10px; padding: 6px; min-height: 84px;
-  background: var(--surface); font-size: 0.78rem;
+  background: var(--surface); font-size: 0.78rem; transition: border-color .15s ease, box-shadow .15s ease;
 }
+.cal-cell:hover { border-color: var(--sage-light); box-shadow: 0 4px 12px -6px rgba(74,67,38,.2); }
 .cal-cell.muted { opacity: 0.4; }
 .cal-cell a { display: block; text-decoration: none; color: inherit; }
 .cal-daynum { font-weight: 700; }
 .cal-week-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
-.cal-day-card { border: 1px solid var(--border); border-radius: 12px; background: var(--surface); padding: 12px; }
-.session-card { border: 1px solid var(--border); border-radius: 14px; background: var(--surface); padding: 16px; margin-bottom: 12px; }
+.cal-day-card {
+  border: 1px solid var(--border); border-radius: 12px; background: var(--surface); padding: 12px;
+  transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+}
+a.cal-day-card:hover { border-color: var(--sage-light); box-shadow: 0 8px 16px -8px rgba(74,67,38,.25); transform: translateY(-2px); }
+.session-card {
+  border: 1px solid var(--border); border-radius: 14px; background: var(--surface); padding: 16px; margin-bottom: 12px;
+  transition: box-shadow .15s ease;
+}
+.session-card:hover { box-shadow: 0 6px 16px -8px rgba(74,67,38,.18); }
 
 footer.site-footer { border-top: 1px solid var(--border); background: var(--surface); padding: 32px 16px; text-align: center; font-size: 0.85rem; flex-shrink: 0; }
 .footer-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 24px; margin-top: 8px; }
+.footer-links a { transition: color .15s ease; }
 .footer-links a:hover { color: var(--coral); }
 
 .text-muted { color: var(--muted); }
