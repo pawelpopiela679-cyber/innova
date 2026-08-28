@@ -97,28 +97,33 @@ require __DIR__ . '/includes/layout_top.php';
                 </tr>
               </thead>
               <tbody>
-                <?php foreach ($tiers as $t): ?>
+                <?php foreach ($tiers as $t):
+                    $saveFormId = 'save-tier-' . $t['id'];
+                    $deleteFormId = 'delete-tier-' . $t['id'];
+                ?>
+                  <!-- Formularze deklarowane POZA <tr>/<td> (zagnieżdżanie <form> w wierszu
+                       tabeli jest nieprawidłowym HTML-em i część przeglądarek go "gubi",
+                       przez co przycisk Zapisz/Usuń nic by nie robił) — pola w wierszu
+                       łączymy z formularzem atrybutem form="...". -->
+                  <form id="<?= $saveFormId ?>" method="post"></form>
+                  <form id="<?= $deleteFormId ?>" method="post" onsubmit="return confirm('Na pewno usunąć tę pozycję cennika?')"></form>
                   <tr>
-                    <form method="post">
-                      <?= csrf_field() ?>
-                      <input type="hidden" name="_action" value="update_tier">
-                      <input type="hidden" name="id" value="<?= (int) $t['id'] ?>">
-                      <td><input type="text" name="label" value="<?= e($t['label']) ?>" style="min-width:120px;"></td>
-                      <td><input type="text" name="age_label" required value="<?= e($t['age_label']) ?>" style="min-width:90px;"></td>
-                      <td><input type="number" name="duration_min" min="1" required value="<?= (int) $t['duration_min'] ?>" style="width:80px;"></td>
-                      <td><input type="number" name="price_monthly" min="0" required value="<?= (int) $t['price_monthly'] ?>" style="width:90px;"></td>
-                      <td><input type="number" name="one_time_fee" min="0" value="<?= $t['one_time_fee'] !== null ? (int) $t['one_time_fee'] : '' ?>" placeholder="—" style="width:100px;"></td>
-                      <td><input type="number" name="sort_order" value="<?= (int) $t['sort_order'] ?>" style="width:70px;"></td>
-                      <td style="white-space:nowrap;">
-                        <button type="submit" class="btn btn-primary btn-sm">Zapisz</button>
-                    </form>
-                    <form method="post" class="inline" onsubmit="return confirm('Na pewno usunąć tę pozycję cennika?')">
-                      <?= csrf_field() ?>
-                      <input type="hidden" name="_action" value="delete_tier">
-                      <input type="hidden" name="id" value="<?= (int) $t['id'] ?>">
-                      <button type="submit" class="btn btn-danger btn-sm">Usuń</button>
-                    </form>
-                      </td>
+                    <input type="hidden" form="<?= $saveFormId ?>" name="csrf_token" value="<?= e(csrf_token()) ?>">
+                    <input type="hidden" form="<?= $saveFormId ?>" name="_action" value="update_tier">
+                    <input type="hidden" form="<?= $saveFormId ?>" name="id" value="<?= (int) $t['id'] ?>">
+                    <td><input form="<?= $saveFormId ?>" type="text" name="label" value="<?= e($t['label']) ?>" style="min-width:120px;"></td>
+                    <td><input form="<?= $saveFormId ?>" type="text" name="age_label" required value="<?= e($t['age_label']) ?>" style="min-width:90px;"></td>
+                    <td><input form="<?= $saveFormId ?>" type="number" name="duration_min" min="1" required value="<?= (int) $t['duration_min'] ?>" style="width:80px;"></td>
+                    <td><input form="<?= $saveFormId ?>" type="number" name="price_monthly" min="0" required value="<?= (int) $t['price_monthly'] ?>" style="width:90px;"></td>
+                    <td><input form="<?= $saveFormId ?>" type="number" name="one_time_fee" min="0" value="<?= $t['one_time_fee'] !== null ? (int) $t['one_time_fee'] : '' ?>" placeholder="—" style="width:100px;"></td>
+                    <td><input form="<?= $saveFormId ?>" type="number" name="sort_order" value="<?= (int) $t['sort_order'] ?>" style="width:70px;"></td>
+                    <td style="white-space:nowrap; display:flex; gap:6px;">
+                      <button type="submit" form="<?= $saveFormId ?>" class="btn btn-primary btn-sm">Zapisz</button>
+                      <input type="hidden" form="<?= $deleteFormId ?>" name="csrf_token" value="<?= e(csrf_token()) ?>">
+                      <input type="hidden" form="<?= $deleteFormId ?>" name="_action" value="delete_tier">
+                      <input type="hidden" form="<?= $deleteFormId ?>" name="id" value="<?= (int) $t['id'] ?>">
+                      <button type="submit" form="<?= $deleteFormId ?>" class="btn btn-danger btn-sm">Usuń</button>
+                    </td>
                   </tr>
                 <?php endforeach; ?>
               </tbody>
