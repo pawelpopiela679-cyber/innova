@@ -56,9 +56,28 @@ require __DIR__ . '/includes/layout_top.php';
     <div class="grid grid-2">
       <?php foreach ($fields as $f): ?>
         <div class="field">
-          <label for="<?= e($f['key']) ?>"><?= e($f['label']) ?></label>
-          <input id="<?= e($f['key']) ?>" name="<?= e($f['key']) ?>" type="color" value="<?= e($theme[$f['key']]) ?>" style="height:44px; padding:4px;">
-          <p class="field-hint"><?= e($f['hint']) ?></p>
+          <label for="<?= e($f['key']) ?>_hex"><?= e($f['label']) ?></label>
+          <div class="flex items-center gap-2">
+            <input
+              id="<?= e($f['key']) ?>_swatch"
+              type="color"
+              value="<?= e($theme[$f['key']]) ?>"
+              style="height:44px; width:44px; padding:2px; flex-shrink:0;"
+              oninput="document.getElementById('<?= e($f['key']) ?>_hex').value=this.value"
+            >
+            <input
+              id="<?= e($f['key']) ?>_hex"
+              name="<?= e($f['key']) ?>"
+              type="text"
+              value="<?= e($theme[$f['key']]) ?>"
+              placeholder="#rrggbb"
+              pattern="#[0-9a-fA-F]{6}"
+              maxlength="7"
+              style="font-family:monospace;"
+              oninput="if(/^#[0-9a-fA-F]{6}$/.test(this.value)){document.getElementById('<?= e($f['key']) ?>_swatch').value=this.value}"
+            >
+          </div>
+          <p class="field-hint"><?= e($f['hint']) ?> Możesz wkleić kod HEX (np. #4d6b3f) bezpośrednio w pole tekstowe.</p>
         </div>
       <?php endforeach; ?>
     </div>
