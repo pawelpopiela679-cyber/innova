@@ -150,10 +150,12 @@ function render_logo(string $size = 'md', bool $withSubtitle = false): string
     $height = $heights[$size] ?? 60;
 
     if (is_file(__DIR__ . '/../logo.png')) {
+        // Prawdziwy plik logo ma dopisek "Pracownia kreatywno-edukacyjna" już
+        // wbudowany w grafikę — nie dokładamy go drugi raz pod spodem
+        // (w przeciwieństwie do odtworzonej w kodzie wersji zastępczej niżej).
         $src = e(url('logo.png')) . '?v=' . filemtime(__DIR__ . '/../logo.png');
         $img = '<img src="' . $src . '" alt="INNOVA — Pracownia kreatywno-edukacyjna" style="height:' . $height . 'px;width:auto;">';
-        $sub = $withSubtitle ? '<span class="logo-sub"><span class="line"></span>Pracownia kreatywno-edukacyjna<span class="line"></span></span>' : '';
-        return '<span class="logo ' . $sizeClass . '">' . $img . $sub . '</span>';
+        return '<span class="logo ' . $sizeClass . '">' . $img . '</span>';
     }
 
     $sub = $withSubtitle ? '<span class="logo-sub"><span class="line"></span>Pracownia kreatywno-edukacyjna<span class="line"></span></span>' : '';
