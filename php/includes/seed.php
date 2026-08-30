@@ -86,15 +86,19 @@ function run_seed(): array
     }
     $log[] = 'Prowadzący hasło (wszyscy): ' . $instructorPassword;
 
-    // --- Rodzaje zajęć + realne grupy wiekowe (jak w prisma/seed.ts) ---
+    // --- Rodzaje zajęć + realne grupy wiekowe, zgodnie z prawdziwym grafikiem
+    //     pracowni (odczytanym z odręcznej tabeli: Poniedziałek/Wtorek/Piątek —
+    //     Środa i Czwartek bez zajęć). dayOffset liczony od SEMESTER_START
+    //     (poniedziałek): 0=pon, 1=wt, 4=pt. ---
     $classTypeDefs = [
         [
             'key' => 'ENGLISH', 'name' => 'Angielski',
             'description' => 'Nauka angielskiego przez zabawę, piosenki, gry i krótkie dialogi — zajęcia prowadzone w małych grupach, dopasowane do wieku i poziomu dziecka.',
-            'color' => '#8f8a56', 'age_min' => 3, 'age_max' => 7, 'instructor' => 'ola@innova-pracownia.pl',
+            'color' => '#8f8a56', 'age_min' => 3, 'age_max' => 12, 'instructor' => 'ola@innova-pracownia.pl',
             'groups' => [
-                ['label' => '', 'age_label' => '3–4 lata', 'duration' => 35, 'price' => 149, 'day' => 0, 'h' => 16, 'm' => 0],
-                ['label' => '', 'age_label' => '5–7 lat', 'duration' => 50, 'price' => 199, 'day' => 0, 'h' => 16, 'm' => 45],
+                ['label' => '', 'age_label' => '3–4 lata', 'duration' => 35, 'price' => 149, 'day' => 1, 'h' => 13, 'm' => 0],
+                ['label' => '', 'age_label' => '5–7 lat', 'duration' => 50, 'price' => 199, 'day' => 1, 'h' => 13, 'm' => 50],
+                ['label' => '', 'age_label' => '8–12 lat', 'duration' => 60, 'price' => 219, 'day' => 1, 'h' => 19, 'm' => 0],
             ],
         ],
         [
@@ -102,9 +106,11 @@ function run_seed(): array
             'description' => 'Improwizacja, dykcja, praca z ciałem i głosem oraz przygotowywanie krótkich etiud — zajęcia budujące pewność siebie, wyobraźnię i swobodę wyrażania emocji.',
             'color' => '#b98a8d', 'age_min' => 6, 'age_max' => 15, 'instructor' => 'kasia@innova-pracownia.pl',
             'groups' => [
-                ['label' => 'Scena dla każdego', 'age_label' => '6–9 lat', 'duration' => 60, 'price' => 199, 'day' => 3, 'h' => 17, 'm' => 0],
-                ['label' => 'Scena dla każdego', 'age_label' => '10–15 lat', 'duration' => 75, 'price' => 229, 'day' => 3, 'h' => 18, 'm' => 15],
-                ['label' => 'Słowo na scenie', 'age_label' => '9–15 lat', 'duration' => 75, 'price' => 249, 'day' => 3, 'h' => 19, 'm' => 40],
+                ['label' => 'Scena', 'age_label' => '6–9 lat', 'duration' => 60, 'price' => 199, 'day' => 1, 'h' => 15, 'm' => 0],
+                ['label' => 'Słowo na scenie', 'age_label' => '9–15 lat', 'duration' => 85, 'price' => 249, 'day' => 1, 'h' => 16, 'm' => 10],
+                // Druga grupa "Słowo na scenie MIX" (wtorek, po "Słowo na scenie")
+                // celowo pominięta — godzina na grafiku nieczytelna ("16:80-17:85",
+                // niemożliwa). Dodaj ją ręcznie w „+ Nowe zajęcia", gdy znasz godzinę.
             ],
         ],
         [
@@ -112,8 +118,9 @@ function run_seed(): array
             'description' => 'Budowanie i programowanie prostych robotów oraz automatów — dzieci uczą się podstaw elektroniki, logicznego myślenia i programowania blokowego w przyjaznej, praktycznej formie.',
             'color' => '#6b6642', 'age_min' => 5, 'age_max' => 10, 'instructor' => 'marek@innova-pracownia.pl',
             'groups' => [
-                ['label' => '', 'age_label' => '5–7 lat', 'duration' => 60, 'price' => 249, 'day' => 2, 'h' => 17, 'm' => 0],
-                ['label' => '', 'age_label' => '8–10 lat', 'duration' => 60, 'price' => 249, 'day' => 2, 'h' => 18, 'm' => 15],
+                ['label' => 'Robotyka „1”', 'age_label' => '5–7 lat', 'duration' => 60, 'price' => 249, 'day' => 0, 'h' => 13, 'm' => 0],
+                ['label' => 'Robotyka „2”', 'age_label' => '8–10 lat', 'duration' => 60, 'price' => 249, 'day' => 0, 'h' => 14, 'm' => 0],
+                ['label' => 'Robotyka „3”', 'age_label' => '8–10 lat', 'duration' => 60, 'price' => 249, 'day' => 4, 'h' => 15, 'm' => 10],
             ],
         ],
         [
@@ -121,9 +128,9 @@ function run_seed(): array
             'description' => 'Malarstwo, rękodzieło, prace plastyczne i eksperymenty z różnymi materiałami — rozwijamy wyobraźnię i zdolności manualne najmłodszych w luźnej, artystycznej atmosferze.',
             'color' => '#d9a3a6', 'age_min' => 5, 'age_max' => 15, 'instructor' => 'ania@innova-pracownia.pl',
             'groups' => [
-                ['label' => 'Mix kreatywny', 'age_label' => '5–7 lat', 'duration' => 50, 'price' => 229, 'day' => 1, 'h' => 16, 'm' => 0],
-                ['label' => 'Mix kreatywny', 'age_label' => '8–11 lat', 'duration' => 60, 'price' => 229, 'day' => 1, 'h' => 17, 'm' => 0],
-                ['label' => 'Szydełkowanie / haft', 'age_label' => '9–15 lat', 'duration' => 75, 'price' => 229, 'fee' => 79, 'day' => 1, 'h' => 18, 'm' => 15],
+                ['label' => 'Mikrokreatywny', 'age_label' => '8–11 lat', 'duration' => 50, 'price' => 229, 'day' => 0, 'h' => 15, 'm' => 10],
+                ['label' => 'Mix kreatywny', 'age_label' => '5–7 lat', 'duration' => 60, 'price' => 229, 'day' => 0, 'h' => 16, 'm' => 10],
+                ['label' => 'Szydełkowanie', 'age_label' => '9–15 lat', 'duration' => 75, 'price' => 229, 'fee' => 79, 'day' => 0, 'h' => 17, 'm' => 20],
             ],
         ],
         [
@@ -131,10 +138,9 @@ function run_seed(): array
             'description' => 'Matematyczne odkrycia przez zabawę, oswajanie z liczbami i logiczne myślenie dla najmłodszych, a dla starszych — pomoc szkolna, nadrabianie zaległości i przygotowanie do egzaminu ósmoklasisty.',
             'color' => '#c9a768', 'age_min' => 4, 'age_max' => 15, 'instructor' => 'beata@innova-pracownia.pl',
             'groups' => [
-                ['label' => 'Matematyczne odkrycia', 'age_label' => '4–5 lat', 'duration' => 35, 'price' => 149, 'day' => 4, 'h' => 16, 'm' => 0],
-                ['label' => 'Matematyka bez stresu', 'age_label' => '6–8 lat', 'duration' => 50, 'price' => 199, 'day' => 4, 'h' => 16, 'm' => 45],
-                ['label' => 'Logika + pomoc szkolna', 'age_label' => 'klasy 1–3', 'duration' => 60, 'price' => 199, 'day' => 4, 'h' => 17, 'm' => 45],
-                ['label' => 'Kurs E8', 'age_label' => 'klasa 8', 'duration' => 75, 'price' => 249, 'day' => 4, 'h' => 19, 'm' => 0],
+                ['label' => 'Matematyczne odkrycia', 'age_label' => '4–5 lat', 'duration' => 35, 'price' => 149, 'day' => 4, 'h' => 13, 'm' => 0],
+                ['label' => 'Logika + pomoc szkolna', 'age_label' => 'klasy 1–3', 'duration' => 60, 'price' => 199, 'day' => 4, 'h' => 17, 'm' => 40],
+                ['label' => '', 'age_label' => 'klasy 6–8', 'duration' => 50, 'price' => 199, 'day' => 4, 'h' => 18, 'm' => 45],
             ],
         ],
         [
@@ -142,8 +148,11 @@ function run_seed(): array
             'description' => 'Bezpieczne eksperymenty chemiczne i fizyczne, które tłumaczą, jak działa świat — dzieci samodzielnie odkrywają zjawiska naukowe pod okiem prowadzącego, ucząc się przez działanie.',
             'color' => '#a8a473', 'age_min' => 6, 'age_max' => 15, 'instructor' => 'tomek@innova-pracownia.pl',
             'groups' => [
-                ['label' => '', 'age_label' => '6–9 lat', 'duration' => 60, 'price' => 229, 'day' => 5, 'h' => 11, 'm' => 0],
-                ['label' => '', 'age_label' => '10–15 lat', 'duration' => 75, 'price' => 249, 'day' => 5, 'h' => 12, 'm' => 15],
+                ['label' => '', 'age_label' => '6–9 lat', 'duration' => 60, 'price' => 229, 'day' => 0, 'h' => 18, 'm' => 40],
+                // Piątek 16:10-16:35 (25 min) — dokładnie tak jak na grafiku; jeśli
+                // to literówka i miało być dłużej, popraw w /admin-cennik.php i
+                // usuń/dodaj terminy w „Dostępność terminów".
+                ['label' => '', 'age_label' => '10–15 lat', 'duration' => 25, 'price' => 249, 'day' => 4, 'h' => 16, 'm' => 10],
             ],
         ],
     ];
@@ -156,6 +165,13 @@ function run_seed(): array
         ]);
         $instructorId = $instructorIds[$def['instructor']];
         $instructorName = $instructorDefs[array_search($def['instructor'], array_column($instructorDefs, 'email'), true)]['name'];
+
+        // Usuwa STARE terminy tego rodzaju zajęć, które nie mają żadnego
+        // zgłoszenia — pozwala bezpiecznie podmienić cały grafik (dni/godziny)
+        // na nowy, bez ręcznego kasowania w panelu i BEZ ryzyka utraty
+        // prawdziwych zgłoszeń rodziców (te sesje zawsze zostają nietknięte).
+        $pdo->prepare('DELETE FROM class_sessions WHERE class_type_id = ? AND id NOT IN (SELECT DISTINCT session_id FROM enrollments)')
+            ->execute([$classTypeId]);
 
         $pdo->prepare('DELETE FROM pricing_tiers WHERE class_type_id = ?')->execute([$classTypeId]);
         foreach ($def['groups'] as $i => $g) {
