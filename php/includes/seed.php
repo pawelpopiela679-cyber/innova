@@ -7,35 +7,41 @@
  * (upsert po adresie e-mail / kluczu / tytule+terminie).
  */
 
-function seed_upsert_user(PDO $pdo, string $email, array $data): int
+/**
+ * Zakłada konto, jeśli nie istnieje ($createData). Jeśli konto JUŻ istnieje,
+ * aktualizuje TYLKO pola podane w $updateData (domyślnie żadne) — dzięki
+ * temu ponowne uruchomienie seeda (przy aktualizacji grafiku) nigdy nie
+ * cofa zmian, które admin/prowadzący wprowadzili sami przez panel (własny
+ * profil, edycja prowadzącego) — dokładnie tak jak działało to w
+ * pierwotnej wersji Next.js (prisma upsert z pustym/częściowym `update`).
+ */
+function seed_upsert_user(PDO $pdo, string $email, array $createData, array $updateData = []): int
 {
     $existing = $pdo->prepare('SELECT id FROM users WHERE email = ?');
     $existing->execute([$email]);
     $row = $existing->fetch();
     if ($row) {
-        $sets = [];
-        $values = [];
-        foreach ($data as $col => $val) {
-            if ($col === 'password_hash' && $val === null) {
-                continue; // nie nadpisuj hasła przy ponownym seedzie
+        if ($updateData) {
+            $sets = [];
+            $values = [];
+            foreach ($updateData as $col => $val) {
+                $sets[] = "$col = ?";
+                $values[] = $val;
             }
-            $sets[] = "$col = ?";
-            $values[] = $val;
-        }
-        if ($sets) {
             $values[] = (int) $row['id'];
             $pdo->prepare('UPDATE users SET ' . implode(', ', $sets) . ' WHERE id = ?')->execute($values);
         }
         return (int) $row['id'];
     }
-    $data['email'] = $email;
-    $cols = array_keys($data);
+    $createData['email'] = $email;
+    $cols = array_keys($createData);
     $stmt = $pdo->prepare('INSERT INTO users (' . implode(',', $cols) . ') VALUES (' . in_placeholders($cols) . ')');
-    $stmt->execute(array_values($data));
+    $stmt->execute(array_values($createData));
     return db_last_id($pdo);
 }
 
-function seed_upsert_class_type(PDO $pdo, string $key, array $data): int
+/** @return array{0:int,1:bool} [id klasy, czy dopiero co utworzona] */
+function seed_upsert_class_type(PDO $pdo, string $key, array $data): array
 {
     $existing = $pdo->prepare('SELECT id FROM class_types WHERE key_name = ?');
     $existing->execute([$key]);
@@ -43,11 +49,11 @@ function seed_upsert_class_type(PDO $pdo, string $key, array $data): int
     if ($row) {
         $pdo->prepare('UPDATE class_types SET name=?, description=?, color=?, age_min=?, age_max=? WHERE id=?')
             ->execute([$data['name'], $data['description'], $data['color'], $data['age_min'], $data['age_max'], $row['id']]);
-        return (int) $row['id'];
+        return [(int) $row['id'], false];
     }
     $pdo->prepare('INSERT INTO class_types (key_name, name, description, color, age_min, age_max) VALUES (?,?,?,?,?,?)')
         ->execute([$key, $data['name'], $data['description'], $data['color'], $data['age_min'], $data['age_max']]);
-    return db_last_id($pdo);
+    return [db_last_id($pdo), true];
 }
 
 /** @return string[] log linijek do pokazania na stronie install.php */
@@ -57,12 +63,14 @@ function run_seed(): array
     $log = [];
 
     // --- Konto właściciela pracowni (master admin) ---
+    // Bez $updateData: jeśli konto już istnieje, seed NIE dotyka imienia ani
+    // hasła — nie cofa zmian wprowadzonych przez admina w "Mój profil".
     $adminId = seed_upsert_user($pdo, SEED_ADMIN_EMAIL, [
         'name' => 'Właściciel Pracowni',
         'role' => 'ADMIN',
         'password_hash' => hash_password(SEED_ADMIN_PASSWORD),
     ]);
-    $log[] = 'Admin: ' . SEED_ADMIN_EMAIL . ' / hasło: ' . SEED_ADMIN_PASSWORD;
+    $log[] = 'Admin: ' . SEED_ADMIN_EMAIL . ' / hasło startowe: ' . SEED_ADMIN_PASSWORD . ' (tylko przy pierwszej instalacji — późniejsze zmiany w „Mój profil” nie są nadpisywane)';
 
     // --- Prowadzący ---
     $instructorDefs = [
@@ -76,15 +84,18 @@ function run_seed(): array
     $instructorPassword = 'Prowadzacy123!';
     $instructorIds = [];
     foreach ($instructorDefs as $def) {
-        $id = seed_upsert_user($pdo, $def['email'], [
-            'name' => $def['name'],
-            'bio' => $def['bio'],
-            'role' => 'INSTRUCTOR',
-            'password_hash' => hash_password($instructorPassword),
-        ]);
+        // $updateData ogranicza się do bio — jeśli konto już istnieje, seed
+        // nie nadpisuje imienia/hasła/zdjęcia, które admin mógł zmienić w
+        // /admin-prowadzacy-edytuj.php (tak samo jak w pierwotnym seed.ts).
+        $id = seed_upsert_user(
+            $pdo,
+            $def['email'],
+            ['name' => $def['name'], 'bio' => $def['bio'], 'role' => 'INSTRUCTOR', 'password_hash' => hash_password($instructorPassword)],
+            ['bio' => $def['bio']]
+        );
         $instructorIds[$def['email']] = $id;
     }
-    $log[] = 'Prowadzący hasło (wszyscy): ' . $instructorPassword;
+    $log[] = 'Prowadzący hasło startowe (nowe konta): ' . $instructorPassword . ' (istniejące konta zachowują swoje hasła/dane z panelu)';
 
     // --- Rodzaje zajęć + realne grupy wiekowe, zgodnie z prawdziwym grafikiem
     //     pracowni (odczytanym z odręcznej tabeli: Poniedziałek/Wtorek/Piątek —
@@ -159,7 +170,7 @@ function run_seed(): array
 
     $weeksToGenerate = 10;
     foreach ($classTypeDefs as $def) {
-        $classTypeId = seed_upsert_class_type($pdo, $def['key'], [
+        [$classTypeId, $classTypeIsNew] = seed_upsert_class_type($pdo, $def['key'], [
             'name' => $def['name'], 'description' => $def['description'], 'color' => $def['color'],
             'age_min' => $def['age_min'], 'age_max' => $def['age_max'],
         ]);
@@ -173,10 +184,16 @@ function run_seed(): array
         $pdo->prepare('DELETE FROM class_sessions WHERE class_type_id = ? AND id NOT IN (SELECT DISTINCT session_id FROM enrollments)')
             ->execute([$classTypeId]);
 
-        $pdo->prepare('DELETE FROM pricing_tiers WHERE class_type_id = ?')->execute([$classTypeId]);
-        foreach ($def['groups'] as $i => $g) {
-            $pdo->prepare('INSERT INTO pricing_tiers (class_type_id, label, age_label, duration_min, price_monthly, one_time_fee, sort_order) VALUES (?,?,?,?,?,?,?)')
-                ->execute([$classTypeId, $g['label'], $g['age_label'], $g['duration'], $g['price'], $g['fee'] ?? null, $i]);
+        // Cennik zakładamy TYLKO przy pierwszym utworzeniu tego rodzaju zajęć.
+        // Gdy rodzaj zajęć już istnieje, seed w ogóle nie rusza pricing_tiers —
+        // od tego momentu cennik zarządzany jest ręcznie w /admin-cennik.php i
+        // ponowne uruchomienie seeda (np. przy aktualizacji grafiku) nie może
+        // cofnąć wprowadzonych tam zmian cen.
+        if ($classTypeIsNew) {
+            foreach ($def['groups'] as $i => $g) {
+                $pdo->prepare('INSERT INTO pricing_tiers (class_type_id, label, age_label, duration_min, price_monthly, one_time_fee, sort_order) VALUES (?,?,?,?,?,?,?)')
+                    ->execute([$classTypeId, $g['label'], $g['age_label'], $g['duration'], $g['price'], $g['fee'] ?? null, $i]);
+            }
         }
 
         $total = 0;
@@ -206,7 +223,7 @@ function run_seed(): array
     }
 
     // --- Dzień otwarty (jednorazowe wydarzenie przed startem semestru) ---
-    $openDayTypeId = seed_upsert_class_type($pdo, 'OPEN_DAY', [
+    [$openDayTypeId] = seed_upsert_class_type($pdo, 'OPEN_DAY', [
         'name' => 'Dzień otwarty',
         'description' => 'Bezpłatne zajęcia pokazowe — poznaj pracownię, prowadzących i ofertę zajęć przed startem zapisów na semestr.',
         'color' => '#cf9a7c', 'age_min' => 0, 'age_max' => 99,
@@ -223,6 +240,8 @@ function run_seed(): array
     $log[] = 'Dzień otwarty: ' . format_pl_date(OPEN_DAY_DATE) . ', 10:00–13:00 (limit 30 osób)';
 
     // --- Przykładowy rodzic + dziecko + jeden potwierdzony zapis ---
+    // Bez $updateData: jeśli ktoś już zmienił hasło/dane tego konta (albo je
+    // usunął — patrz DEPLOY_HOMEPL.md), seed tego nie cofa/nie odtwarza.
     $demoParentId = seed_upsert_user($pdo, 'rodzic@example.com', [
         'name' => 'Testowy Rodzic', 'phone' => '500600700', 'role' => 'PARENT',
         'password_hash' => hash_password('Haslo123!'),
