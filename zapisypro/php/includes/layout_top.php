@@ -55,6 +55,7 @@ $isParent = $user && $user['role'] === 'PARENT';
             <summary>Więcej ▾</summary>
             <div class="nav-more-panel">
               <a href="<?= e(url('umowy.php')) ?>">Umowy</a>
+              <a href="<?= e(url('rodo.php')) ?>">RODO</a>
               <a href="<?= e(url('prowadzacy.php')) ?>">Prowadzący</a>
               <a href="<?= e(url('komunikacja.php')) ?>">Komunikacja</a>
               <a href="<?= e(url('godziny.php')) ?>">Godziny i wynagrodzenia</a>

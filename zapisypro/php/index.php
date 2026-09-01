@@ -11,6 +11,9 @@ try {
 $pageTitle = 'ZapisyPro — system zapisów i płatności dla szkółek i klubów';
 require __DIR__ . '/includes/layout_top.php';
 ?>
+<?php if (!empty($_GET['account_deleted'])): ?>
+  <p class="alert alert-success container mt-6" style="max-width:640px;">Twoje konto i wszystkie powiązane z nim dane zostały trwale usunięte.</p>
+<?php endif; ?>
 <section class="hero">
   <div class="container hero-inner">
     <div class="reveal">

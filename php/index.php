@@ -6,6 +6,9 @@ $classTypes = db()->query('SELECT * FROM class_types ORDER BY id ASC')->fetchAll
 $pageTitle = 'INNOVA — Pracownia kreatywno-edukacyjna';
 require __DIR__ . '/includes/layout_top.php';
 ?>
+<?php if (!empty($_GET['account_deleted'])): ?>
+  <p class="alert alert-success container mt-6" style="max-width:640px;">Twoje konto i wszystkie powiązane z nim dane zostały trwale usunięte.</p>
+<?php endif; ?>
 <section class="container" style="padding:56px 16px; text-align:center;">
   <?= render_logo('lg', true) ?>
   <p class="mt-4" style="font-family:var(--font-script); font-size:2.4rem; color:var(--sage); margin:0;">Miejsce rozwoju</p>

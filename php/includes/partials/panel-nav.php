@@ -4,4 +4,5 @@
   <a href="<?= e(url('panel-dzieci.php')) ?>" style="border-radius:999px; padding:6px 16px;">Moje dzieci</a>
   <a href="<?= e(url('panel-zapisy.php')) ?>" style="border-radius:999px; padding:6px 16px;">Moje zapisy</a>
   <a href="<?= e(url('kalendarz.php')) ?>" style="border-radius:999px; padding:6px 16px;">Kalendarz zajęć</a>
+  <a href="<?= e(url('panel-konto.php')) ?>" style="border-radius:999px; padding:6px 16px;">Moje dane</a>
 </nav>

@@ -9,7 +9,26 @@ $fresh = $fresh->fetch();
 $error = null;
 $success = null;
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+// --- RODO: eksport i usunięcie własnego konta (tylko rodzice — patrz includes/rodo.php) ---
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && ($_GET['export'] ?? '') === '1' && $user['role'] === 'PARENT') {
+    rodo_send_export_download(rodo_export_user_data((int) $user['id'], (int) $user['org_id']), 'zapisypro-moje-dane');
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['_action'] ?? '') === 'delete_account' && $user['role'] === 'PARENT') {
+    csrf_check();
+    $password = (string) ($_POST['delete_password'] ?? '');
+    if (!verify_password($password, $fresh['password_hash'])) {
+        $error = 'Nieprawidłowe hasło — konto NIE zostało usunięte.';
+    } else {
+        $userId = (int) $user['id'];
+        $orgId = (int) $user['org_id'];
+        logout_user();
+        rodo_delete_user($userId, $orgId);
+        redirect('index.php?account_deleted=1');
+    }
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['_action'] ?? '') !== 'delete_account') {
     csrf_check();
     $name = trim((string) ($_POST['name'] ?? ''));
     $email = trim(strtolower((string) ($_POST['email'] ?? '')));
@@ -114,5 +133,28 @@ require __DIR__ . '/includes/layout_top.php';
     </div>
     <button type="submit" class="btn btn-primary" style="width:100%;">Zapisz zmiany</button>
   </form>
+
+  <?php if ($user['role'] === 'PARENT'): ?>
+  <h2 class="mt-8">Twoje dane (RODO)</h2>
+  <p class="text-muted">Masz prawo pobrać kopię swoich danych i żądać ich usunięcia.</p>
+  <div class="form-card mt-4 reveal">
+    <a href="<?= e(url('profil.php?export=1')) ?>" class="btn btn-outline">Pobierz moje dane (JSON)</a>
+  </div>
+
+  <div class="form-card mt-4 reveal" style="border-color:#f3c8c6;">
+    <h3 style="margin-top:0;color:#b3261e;">Usuń moje konto</h3>
+    <p class="text-muted">Usuwa Twoje konto, dane dzieci i całą historię zgłoszeń/umów — <strong>nieodwracalnie</strong>.
+      Pobierz dane powyżej, jeśli chcesz zachować kopię.</p>
+    <form method="post" class="mt-4" onsubmit="return confirm('To NIEODWRACALNIE usunie Twoje konto, dzieci i historię zapisów. Na pewno?');">
+      <?= csrf_field() ?>
+      <input type="hidden" name="_action" value="delete_account">
+      <div class="field" style="max-width:280px;">
+        <label for="delete_password">Potwierdź hasłem</label>
+        <input id="delete_password" name="delete_password" type="password" required autocomplete="current-password">
+      </div>
+      <button type="submit" class="btn btn-danger">Trwale usuń moje konto</button>
+    </form>
+  </div>
+  <?php endif; ?>
 </div>
 <?php require __DIR__ . '/includes/layout_bottom.php'; ?>
