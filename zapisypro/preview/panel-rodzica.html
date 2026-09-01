@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
-<div class="preview-banner">🖥️ Statyczny podgląd — spróbuj kliknąć „Zgłoś nieobecność”, a potem wybierz termin odrobienia. Nawigacja: <a href="index.html">Strona główna</a> · <a href="dashboard.html">Panel organizacji</a> · <a href="kalendarz.html">Kalendarz</a> · <a href="panel-rodzica.html">Panel rodzica</a> · <a href="logowanie.html">Logowanie</a></div>
+<div class="preview-banner">🖥️ Statyczny podgląd — spróbuj kliknąć „Zgłoś nieobecność”, a potem wybierz termin odrobienia. Nawigacja: <a href="index.html">Strona główna</a> · <a href="dashboard.html">Panel organizacji</a> · <a href="kalendarz.html">Kalendarz</a> · <a href="raporty.html">Raporty</a> · <a href="umowy.html">Umowy</a> · <a href="panel-rodzica.html">Panel rodzica</a> · <a href="logowanie.html">Logowanie</a></div>
 
 <header class="navbar">
   <div class="navbar-inner">
@@ -35,6 +35,23 @@
   <p class="text-muted">Demo Szkółka Rozwoju</p>
 
   <div class="enroll-list mt-6" id="enroll-list"></div>
+
+  <h2 class="mt-8">Moje umowy</h2>
+  <div class="form-card mt-4 reveal" id="contract-box">
+    <div class="flex items-center gap-2" style="justify-content:space-between;">
+      <h3 style="margin:0;">Regulamin zajęć</h3>
+      <span class="badge badge-pending" id="contract-badge">Wymaga akceptacji</span>
+    </div>
+    <div class="mt-4" style="white-space:pre-wrap; max-height:120px; overflow-y:auto; border:1px solid var(--border); border-radius:10px; padding:14px; font-size:.9rem;">§1. Zajęcia odbywają się zgodnie z grafikiem w kalendarzu online.
+§2. Nieobecność należy zgłosić z poziomu panelu rodzica.
+§3. Opłata za zajęcia płatna jest do 5. dnia miesiąca...</div>
+    <form class="mt-4" id="contract-form" onsubmit="event.preventDefault(); acceptContract();">
+      <div class="field"><label>Imię i nazwisko (jako potwierdzenie akceptacji)</label><input value="Testowy Rodzic" required></div>
+      <label class="checkbox-inline"><input type="checkbox" required> Przeczytałem/-am i akceptuję treść powyżej.</label>
+      <button type="submit" class="btn btn-primary mt-2">Akceptuję</button>
+    </form>
+    <p class="text-muted mt-2" style="font-size:.85rem;display:none;" id="contract-accepted-note">Zaakceptowano jako „Testowy Rodzic”.</p>
+  </div>
 </div>
 </main>
 
@@ -109,6 +126,13 @@
   };
 
   render();
+
+  window.acceptContract = function () {
+    document.getElementById('contract-badge').outerHTML = '<span class="badge badge-confirmed">✓ Zaakceptowano</span>';
+    document.getElementById('contract-form').style.display = 'none';
+    document.getElementById('contract-accepted-note').style.display = 'block';
+    zpToast('Umowa zaakceptowana.');
+  };
 </script>
 </body>
 </html>
