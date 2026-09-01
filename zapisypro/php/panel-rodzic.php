@@ -16,9 +16,25 @@ $stmt = db()->prepare("SELECT e.*, cs.title, cs.starts_at, ct.name AS ct_name, c
 $stmt->execute([$user['id'], date('Y-m-d H:i:s')]);
 $upcoming = $stmt->fetchAll();
 
-$stmt = db()->prepare("SELECT COUNT(*) c FROM enrollments WHERE parent_id = ? AND payment_status = 'UNPAID' AND status = 'CONFIRMED'");
+$stmt = db()->prepare("SELECT e.*, cs.title, cs.starts_at, ct.name AS ct_name, c.first_name
+    FROM enrollments e JOIN class_sessions cs ON cs.id = e.session_id JOIN class_types ct ON ct.id = cs.class_type_id
+    JOIN children c ON c.id = e.child_id
+    WHERE e.parent_id = ? AND e.status = 'CONFIRMED' AND e.payment_status = 'UNPAID'
+    ORDER BY cs.starts_at ASC");
 $stmt->execute([$user['id']]);
-$unpaidCount = (int) $stmt->fetch()['c'];
+$arrears = $stmt->fetchAll();
+$unpaidCount = count($arrears);
+$arrearsTotalCents = array_sum(array_column($arrears, 'amount_due_cents'));
+
+$todayStart = (new DateTime('today'))->format('Y-m-d H:i:s');
+$todayEnd = (new DateTime('tomorrow'))->format('Y-m-d H:i:s');
+$stmt = db()->prepare("SELECT e.*, cs.title, cs.starts_at, cs.ends_at, ct.name AS ct_name, ct.color AS ct_color, c.first_name
+    FROM enrollments e JOIN class_sessions cs ON cs.id = e.session_id JOIN class_types ct ON ct.id = cs.class_type_id
+    JOIN children c ON c.id = e.child_id
+    WHERE e.parent_id = ? AND e.status IN ('CONFIRMED','WAITLIST') AND cs.starts_at >= ? AND cs.starts_at < ?
+    ORDER BY cs.starts_at ASC");
+$stmt->execute([$user['id'], $todayStart, $todayEnd]);
+$todaySessions = $stmt->fetchAll();
 
 $pageTitle = 'Panel rodzica — ' . $org['name'];
 require __DIR__ . '/includes/layout_top.php';
@@ -42,6 +58,47 @@ require __DIR__ . '/includes/layout_top.php';
       <div class="stat-value" data-count="<?= $unpaidCount ?>">0</div>
       <div class="stat-label">Do opłacenia</div>
       <a href="<?= e(url('panel-zapisy.php')) ?>" class="stat-link">Zobacz →</a>
+    </div>
+  </div>
+
+  <div class="two-col mt-8">
+    <div>
+      <h2>Zajęcia dziś <span class="text-muted" style="font-weight:400;"><?= e(format_pl_date($todayStart, true)) ?></span></h2>
+      <?php if (!$todaySessions): ?>
+        <p class="text-muted mt-2">Brak zajęć dziś.</p>
+      <?php else: ?>
+        <div class="agenda-list mt-4">
+          <?php foreach ($todaySessions as $s): ?>
+            <div class="agenda-card reveal">
+              <div class="agenda-dot" style="background:<?= e($s['ct_color']) ?>;"></div>
+              <div class="agenda-main">
+                <div class="agenda-title"><?= e($s['ct_name']) ?> — <?= e($s['title']) ?></div>
+                <div class="text-muted"><?= e($s['first_name']) ?> · <?= h_m($s['starts_at']) ?>–<?= h_m($s['ends_at']) ?></div>
+              </div>
+              <span class="badge badge-<?= strtolower($s['status']) ?>"><?= $s['status'] === 'WAITLIST' ? 'Lista rezerwowa' : 'Potwierdzone' ?></span>
+            </div>
+          <?php endforeach; ?>
+        </div>
+      <?php endif; ?>
+    </div>
+
+    <div>
+      <h2>Zaległości<?php if ($arrears): ?> <span class="text-muted" style="font-weight:400;">łącznie <?= format_money((int) $arrearsTotalCents) ?></span><?php endif; ?></h2>
+      <?php if (!$arrears): ?>
+        <p class="text-muted mt-2">Brak zaległości — wszystko opłacone! 🎉</p>
+      <?php else: ?>
+        <div class="enroll-list mt-4">
+          <?php foreach ($arrears as $a): ?>
+            <div class="enroll-card reveal">
+              <div class="enroll-main">
+                <div class="enroll-title"><?= e($a['ct_name']) ?> — <?= e($a['title']) ?></div>
+                <div class="text-muted"><?= e($a['first_name']) ?> · <?= e(format_pl_date($a['starts_at'])) ?></div>
+              </div>
+              <div class="enroll-badges"><span class="badge badge-pending"><?= $a['amount_due_cents'] ? format_money((int) $a['amount_due_cents']) : 'Do opłacenia' ?></span></div>
+            </div>
+          <?php endforeach; ?>
+        </div>
+      <?php endif; ?>
     </div>
   </div>
 
