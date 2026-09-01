@@ -218,4 +218,15 @@ function ensure_schema(): void
         updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (org_id) REFERENCES organizations(id) ON DELETE CASCADE
     )$engine");
+
+    // Licznik nieudanych logowań (ochrona przed brute-force) — patrz includes/rate_limit.php.
+    // Bez org_id celowo: identyfikator już zawiera e-mail albo IP, więc jeden
+    // rekord wystarcza niezależnie od tego, do której organizacji ktoś próbuje
+    // się dostać (a super-admin i tak nie ma org_id).
+    $pdo->exec("CREATE TABLE IF NOT EXISTS login_attempts (
+        identifier VARCHAR(190) PRIMARY KEY,
+        attempts INT NOT NULL DEFAULT 0,
+        last_attempt_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        locked_until DATETIME NULL
+    )$engine");
 }

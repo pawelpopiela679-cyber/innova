@@ -15,3 +15,39 @@
 
 # Ładne błędy zamiast listowania katalogów.
 Options -Indexes
+
+# --- Nagłówki bezpieczeństwa HTTP ---
+# W IfModule, żeby nic się nie wywaliło, gdyby mod_headers nie był akurat
+# włączony na danym hostingu (rzadkie, ale zdarza się na współdzielonych).
+<IfModule mod_headers.c>
+  # Przeglądarka nie zgaduje typu pliku po zawartości (blokuje część ataków
+  # przez podrzucenie pliku z fałszywym Content-Type).
+  Header always set X-Content-Type-Options "nosniff"
+  # Strona nie może być osadzona w <iframe> na obcej domenie — chroni przed
+  # clickjackingiem (np. fałszywym overlayem nad przyciskiem logowania).
+  Header always set X-Frame-Options "SAMEORIGIN"
+  # Nie wysyłaj pełnego adresu URL (mogącego zawierać dane) do stron trzecich
+  # przy kliknięciu w link wychodzący.
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  # Wyłącza dostęp do kamery/mikrofonu/lokalizacji — appka tego nie używa.
+  Header always set Permissions-Policy "geolocation=(), camera=(), microphone=(), payment=()"
+  # Content-Security-Policy: ogranicza, skąd strona może ładować
+  # skrypty/style/obrazy/fonty. 'unsafe-inline' w script-src/style-src jest
+  # tu konieczne, bo kod używa inline onclick="" / onsubmit="" i inline
+  # style="" — pełne ich wyeliminowanie (przeniesienie do assets/app.js i
+  # klas CSS) pozwoliłoby zaostrzyć tę politykę w przyszłości.
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'"
+</IfModule>
+
+# --- HTTPS wymuszony (włącz PO założeniu certyfikatu SSL w Panelu klienta
+#     home.pl — inaczej strona przestanie działać, dopóki certyfikat nie
+#     jest aktywny). Odkomentuj poniższe 3 linijki: ---
+# <IfModule mod_rewrite.c>
+#   RewriteCond %{HTTPS} off
+#   RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+# </IfModule>
+# Gdy HTTPS jest już wymuszony jak wyżej, dodaj też (mówi przeglądarce, żeby
+# przez rok samodzielnie zawsze łączyła się po HTTPS, nawet bez przekierowania):
+# <IfModule mod_headers.c>
+#   Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+# </IfModule>

@@ -135,4 +135,12 @@ function ensure_schema(): void
         created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
     )$engine");
+
+    // Licznik nieudanych logowań (ochrona przed brute-force) — patrz includes/rate_limit.php.
+    $pdo->exec("CREATE TABLE IF NOT EXISTS login_attempts (
+        identifier VARCHAR(190) PRIMARY KEY,
+        attempts INT NOT NULL DEFAULT 0,
+        last_attempt_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        locked_until DATETIME NULL
+    )$engine");
 }

@@ -67,6 +67,16 @@ i sprawdź, że panel organizacji działa.
    nie podepniesz bramki płatności — dziś zmiana planu w `/abonament.php`
    jest natychmiastowa i nie wymaga potwierdzenia płatności (patrz
    README_PHP.md, sekcja "czego świadomie brakuje").
+5. **Załóż darmowy certyfikat SSL** (Panel klienta home.pl → SSL/Let's
+   Encrypt) i odkomentuj blok wymuszający HTTPS w `.htaccess` (opisany
+   wewnątrz pliku, na samym końcu) — to trzyma dane logowania i dane dzieci
+   Twoich klientów zaszyfrowane w tranzycie, a ciasteczko sesji dostaje
+   flagę `secure`. **Szczególnie ważne przy danych dzieci** (RODO).
+
+Logowanie ma już wbudowaną ochronę przed brute-force (blokada na 15 minut
+po 5 nieudanych próbach z tego samego adresu IP albo na to samo konto —
+niezależnie dla każdej organizacji) oraz komplet nagłówków bezpieczeństwa
+HTTP w `.htaccess` — nic dodatkowego nie musisz konfigurować.
 
 ## Aktualizacje w przyszłości
 

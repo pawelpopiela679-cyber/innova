@@ -12,13 +12,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($email === '' || $password === '') {
         $error = 'Podaj e-mail i hasło.';
+    } elseif ($locked = login_rate_limit_check($email)) {
+        $error = $locked;
     } else {
         $stmt = db()->prepare('SELECT * FROM users WHERE email = ?');
         $stmt->execute([$email]);
         $u = $stmt->fetch();
         if (!$u || !verify_password($password, $u['password_hash'])) {
+            login_rate_limit_record_failure($email);
             $error = 'Nieprawidłowy e-mail lub hasło.';
         } else {
+            login_rate_limit_record_success($email);
             login_user($u);
             if ($next !== '') {
                 redirect($next);

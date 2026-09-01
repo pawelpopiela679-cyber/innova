@@ -114,6 +114,16 @@ Zrób to **od razu**, zanim ktokolwiek inny wejdzie na stronę:
 4. W Panelu klienta home.pl zmień hasło do skrzynki `rodzic@example.com`
    (konto demo) albo usuń je w bazie przez phpMyAdmin (Panel klienta →
    Bazy danych → phpMyAdmin → tabela `users`).
+5. **Załóż darmowy certyfikat SSL** (Panel klienta home.pl → SSL/Let's
+   Encrypt) i odkomentuj blok wymuszający HTTPS w `.htaccess` (opisany
+   wewnątrz pliku, na samym końcu) — bez tego dane logowania i dzieci
+   podróżują niezaszyfrowane, a ciasteczko sesji nigdy nie dostanie flagi
+   `secure`.
+
+Dane logowania mają już wbudowaną ochronę przed brute-force (blokada na
+15 minut po 5 nieudanych próbach z tego samego adresu IP albo na to samo
+konto) oraz komplet nagłówków bezpieczeństwa HTTP w `.htaccess` — nic
+dodatkowego nie musisz konfigurować.
 
 ## Krok 6: sprawdź, czy działa
 
