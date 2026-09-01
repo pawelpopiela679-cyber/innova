@@ -20,6 +20,34 @@ function create_index_if_missing(PDO $pdo, string $indexName, string $table, str
     }
 }
 
+/**
+ * Dodaje kolumnę do istniejącej tabeli, jeśli jej jeszcze nie ma — bezpieczne
+ * do wielokrotnego uruchomienia (w odróżnieniu od CREATE TABLE, ALTER TABLE
+ * ADD COLUMN nie ma jednej wspólnej składni "IF NOT EXISTS" w MySQL/SQLite,
+ * więc sprawdzamy ręcznie). Potrzebne, żeby install.php mógł donstalować
+ * nowe pola (np. enrollments.paid_at) na instalacji, która już wcześniej
+ * istniała, bez utraty danych.
+ */
+function ensure_column(PDO $pdo, string $table, string $column, string $definition): void
+{
+    if (db_is_mysql()) {
+        $stmt = $pdo->prepare("SELECT COUNT(*) c FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = ? AND column_name = ?");
+        $stmt->execute([$table, $column]);
+        if ((int) $stmt->fetch()['c'] > 0) {
+            return;
+        }
+        $pdo->exec("ALTER TABLE $table ADD COLUMN $column $definition");
+    } else {
+        $cols = $pdo->query("PRAGMA table_info($table)")->fetchAll();
+        foreach ($cols as $c) {
+            if ($c['name'] === $column) {
+                return;
+            }
+        }
+        $pdo->exec("ALTER TABLE $table ADD COLUMN $column $definition");
+    }
+}
+
 function ensure_schema(): void
 {
     $pdo = db();
@@ -150,6 +178,32 @@ function ensure_schema(): void
     )$engine");
     create_index_if_missing($pdo, 'idx_enrollments_parent', 'enrollments', 'parent_id');
     create_index_if_missing($pdo, 'idx_enrollments_org', 'enrollments', 'org_id');
+
+    // Kiedy zapis realnie został opłacony — do raportów przychodu wg okresu
+    // (payment_status samo w sobie mówi tylko "opłacone/nie", bez daty).
+    ensure_column($pdo, 'enrollments', 'paid_at', 'DATETIME NULL');
+
+    $pdo->exec("CREATE TABLE IF NOT EXISTS contracts (
+        id $pk,
+        org_id INT NOT NULL,
+        title VARCHAR(190) NOT NULL,
+        content TEXT NOT NULL,
+        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (org_id) REFERENCES organizations(id) ON DELETE CASCADE
+    )$engine");
+
+    $pdo->exec("CREATE TABLE IF NOT EXISTS contract_acceptances (
+        id $pk,
+        org_id INT NOT NULL,
+        contract_id INT NOT NULL,
+        parent_id INT NOT NULL,
+        signer_name VARCHAR(190) NOT NULL,
+        accepted_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE (contract_id, parent_id),
+        FOREIGN KEY (org_id) REFERENCES organizations(id) ON DELETE CASCADE,
+        FOREIGN KEY (contract_id) REFERENCES contracts(id) ON DELETE CASCADE,
+        FOREIGN KEY (parent_id) REFERENCES users(id) ON DELETE CASCADE
+    )$engine");
 
     $pdo->exec("CREATE TABLE IF NOT EXISTS org_settings (
         org_id INT PRIMARY KEY,

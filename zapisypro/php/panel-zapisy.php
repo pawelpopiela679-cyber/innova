@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$stmt = db()->prepare("SELECT e.*, cs.title, cs.starts_at, cs.class_type_id, ct.name AS ct_name, ct.color AS ct_color, c.first_name, c.last_name
+$stmt = db()->prepare("SELECT e.*, cs.title, cs.starts_at, cs.ends_at, cs.meeting_url, cs.class_type_id, ct.name AS ct_name, ct.color AS ct_color, c.first_name, c.last_name
     FROM enrollments e JOIN class_sessions cs ON cs.id = e.session_id JOIN class_types ct ON ct.id = cs.class_type_id
     JOIN children c ON c.id = e.child_id
     WHERE e.parent_id = ? AND e.org_id = ?
@@ -82,6 +82,12 @@ require __DIR__ . '/includes/layout_top.php';
           <div class="agenda-dot" style="background:<?= e($r['ct_color']) ?>;display:inline-block;"></div>
           <span class="enroll-title"><?= e($r['ct_name']) ?> — <?= e($r['title']) ?></span>
           <div class="text-muted"><?= e($r['first_name'] . ' ' . $r['last_name']) ?> · <?= e(format_pl_date($r['starts_at'], true, true)) ?></div>
+          <?php if (in_array($r['status'], ['CONFIRMED', 'WAITLIST'], true)): ?>
+            <div style="font-size:.78rem;">
+              <a href="<?= e(google_calendar_link($r['ct_name'] . ' — ' . $r['title'], $r['starts_at'], $r['ends_at'], '', $r['meeting_url'] ?? '')) ?>" target="_blank" rel="noopener" class="text-muted">+ Kalendarz Google</a>
+              <?php if ($r['meeting_url']): ?> · <a href="<?= e($r['meeting_url']) ?>" target="_blank" rel="noopener">🔗 dołącz online</a><?php endif; ?>
+            </div>
+          <?php endif; ?>
         </div>
         <div class="enroll-badges">
           <span class="badge badge-<?= strtolower($r['status']) ?>"><?= match ($r['status']) { 'PENDING' => 'Oczekuje', 'CONFIRMED' => 'Potwierdzone', 'WAITLIST' => 'Lista rezerwowa', 'REJECTED' => 'Odrzucone', 'CANCELED' => 'Anulowane', default => $r['status'] } ?></span>

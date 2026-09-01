@@ -52,7 +52,23 @@ hr { border: none; border-top: 1px solid var(--border); }
 .navbar-links { display: flex; gap: 20px; flex: 1; font-size: .92rem; font-weight: 600; }
 .navbar-links a { color: var(--fg); }
 .navbar-links a:hover { color: var(--primary); text-decoration: none; }
-.navbar-right { display: flex; align-items: center; gap: 12px; font-size: .88rem; }
+.navbar-right { display: flex; align-items: center; gap: 12px; font-size: .88rem; flex-shrink: 0; white-space: nowrap; }
+
+.nav-more { position: relative; }
+.nav-more summary { list-style: none; cursor: pointer; color: var(--fg); display: flex; align-items: center; gap: 4px; }
+.nav-more summary::-webkit-details-marker { display: none; }
+.nav-more summary:hover { color: var(--primary); }
+.nav-more[open] summary { color: var(--primary); }
+.nav-more-panel {
+  position: absolute; top: calc(100% + 10px); left: 0; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; box-shadow: var(--shadow-lg); padding: 8px; display: flex; flex-direction: column;
+  min-width: 220px; z-index: 30;
+}
+.nav-more-panel a { padding: 8px 10px; border-radius: 8px; color: var(--fg); font-weight: 600; }
+.nav-more-panel a:hover { background: #f4f4fb; color: var(--primary); text-decoration: none; }
+@media (max-width: 860px) {
+  .nav-more-panel { position: static; box-shadow: none; border: none; padding: 0 0 0 12px; }
+}
 
 .logo { display: inline-flex; align-items: center; gap: 6px; font-weight: 800; font-size: 1.15rem; color: var(--fg); }
 .logo-mark { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 9px; background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #fff; font-family: 'Sora', sans-serif; }
@@ -162,6 +178,9 @@ input[type=color] { padding: 4px; height: 42px; cursor: pointer; }
 .stat-value { font-size: 2rem; font-weight: 800; font-family: 'Sora', sans-serif; color: var(--primary); }
 .stat-label { color: var(--muted); font-size: .85rem; margin: 4px 0 10px; }
 .stat-link { font-size: .82rem; font-weight: 700; }
+.trend-up, .trend-down { display: block; font-size: .74rem; font-weight: 700; margin-top: 2px; }
+.trend-up { color: #1f9d55; }
+.trend-down { color: #d64545; }
 
 .usage-bars > div { font-size: .88rem; }
 .usage-bar { height: 8px; border-radius: 99px; background: var(--border); margin-top: 6px; overflow: hidden; }
@@ -230,6 +249,13 @@ input[type=color] { padding: 4px; height: 42px; cursor: pointer; }
 
 /* ---------- Footer ---------- */
 .site-footer { text-align: center; padding: 40px 20px; border-top: 1px solid var(--border); margin-top: 40px; font-size: .85rem; }
+
+/* ---------- Druk (np. raporty.php -> "Drukuj / zapisz jako PDF") ---------- */
+@media print {
+  .navbar, .site-footer, .btn, form, .preview-banner { display: none !important; }
+  body { background: #fff; }
+  .form-card, .table-wrap { box-shadow: none; border: 1px solid #ccc; }
+}
 
 /* ---------- Animations ---------- */
 @keyframes cellIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }

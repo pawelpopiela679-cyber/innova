@@ -50,17 +50,25 @@ $isParent = $user && $user['role'] === 'PARENT';
         <a href="<?= e(url('zapisy.php')) ?>">Zgłoszenia</a>
         <a href="<?= e(url('zajecia.php')) ?>">Zajęcia</a>
         <?php if ($isOrgAdmin): ?>
-          <a href="<?= e(url('prowadzacy.php')) ?>">Prowadzący</a>
-          <a href="<?= e(url('komunikacja.php')) ?>">Komunikacja</a>
-          <a href="<?= e(url('godziny.php')) ?>">Godziny i wynagrodzenia</a>
-          <a href="<?= e(url('wyglad.php')) ?>">Wygląd</a>
-          <a href="<?= e(url('abonament.php')) ?>">Abonament</a>
+          <a href="<?= e(url('raporty.php')) ?>">Raporty</a>
+          <details class="nav-more">
+            <summary>Więcej ▾</summary>
+            <div class="nav-more-panel">
+              <a href="<?= e(url('umowy.php')) ?>">Umowy</a>
+              <a href="<?= e(url('prowadzacy.php')) ?>">Prowadzący</a>
+              <a href="<?= e(url('komunikacja.php')) ?>">Komunikacja</a>
+              <a href="<?= e(url('godziny.php')) ?>">Godziny i wynagrodzenia</a>
+              <a href="<?= e(url('wyglad.php')) ?>">Wygląd</a>
+              <a href="<?= e(url('abonament.php')) ?>">Abonament</a>
+            </div>
+          </details>
         <?php endif; ?>
       <?php elseif ($isParent): ?>
         <a href="<?= e(url('panel-rodzic.php')) ?>">Panel</a>
         <a href="<?= e(url('panel-dzieci.php')) ?>">Moje dzieci</a>
         <a href="<?= e(url('kalendarz.php')) ?>">Kalendarz zajęć</a>
         <a href="<?= e(url('panel-zapisy.php')) ?>">Moje zapisy</a>
+        <a href="<?= e(url('panel-umowy.php')) ?>">Moje umowy</a>
       <?php endif; ?>
     </nav>
 

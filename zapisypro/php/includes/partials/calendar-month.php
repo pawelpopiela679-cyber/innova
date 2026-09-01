@@ -16,8 +16,13 @@ foreach ($sessions as $s) {
 
   <?php foreach ($days as $i => $day):
       $dateStr = date_param($day['date']);
-      $daySessions = $byDate[$dateStr] ?? [];
-      $freeSpots = array_sum(array_column($daySessions, 'spots_left'));
+      // Nazwa celowo NIE "$daySessions": ten plik jest wołany przez require w
+      // tym samym scope co kalendarz.php, który ma WŁASNĄ zmienną
+      // $daySessions (lista zajęć wybranego dnia pod spodem kalendarza) — ta
+      // sama nazwa tutaj by ją nadpisała po każdym przebiegu tej pętli
+      // (dokładnie ten sam błąd co kolizja $org w layout_top.php).
+      $cellSessions = $byDate[$dateStr] ?? [];
+      $freeSpots = array_sum(array_column($cellSessions, 'spots_left'));
       $isSelected = $dateStr === $selectedDate;
       $isToday = $dateStr === date('Y-m-d');
   ?>
@@ -25,12 +30,12 @@ foreach ($sessions as $s) {
        class="cal-cell <?= $day['inMonth'] ? '' : 'muted' ?> <?= $isSelected ? 'selected' : '' ?> <?= $isToday ? 'today' : '' ?>"
        style="animation-delay: <?= $i * 8 ?>ms;">
         <div class="cal-daynum"><?= (int) $day['date']->format('j') ?></div>
-        <?php if ($daySessions): ?>
+        <?php if ($cellSessions): ?>
           <div class="cal-free <?= $freeSpots > 0 ? 'ok' : 'full' ?>"><?= $freeSpots ?> wolnych</div>
-          <?php foreach (array_slice($daySessions, 0, 2) as $s): ?>
+          <?php foreach (array_slice($cellSessions, 0, 2) as $s): ?>
             <div class="cal-dot-row"><span class="dot" style="background:<?= e($s['ct_color']) ?>;"></span><?= h_m($s['starts_at']) ?></div>
           <?php endforeach; ?>
-          <?php if (count($daySessions) > 2): ?><div class="text-muted" style="font-size:.7rem;">+<?= count($daySessions) - 2 ?> więcej</div><?php endif; ?>
+          <?php if (count($cellSessions) > 2): ?><div class="text-muted" style="font-size:.7rem;">+<?= count($cellSessions) - 2 ?> więcej</div><?php endif; ?>
         <?php endif; ?>
     </a>
   <?php endforeach; ?>

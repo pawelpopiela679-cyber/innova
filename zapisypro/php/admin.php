@@ -26,6 +26,18 @@ $sessionsThisWeek = (int) $stmt->fetch()['c'];
 
 $instructorCount = org_instructor_count((int) $org['id']);
 
+// --- Przychód w tym miesiącu (i miesiąc wcześniej, do porównania) ---
+$monthStart = (new DateTime('first day of this month'))->format('Y-m-d 00:00:00');
+$monthEnd = (new DateTime('first day of next month'))->format('Y-m-d 00:00:00');
+$stmt = db()->prepare("SELECT COALESCE(SUM(amount_due_cents), 0) c FROM enrollments WHERE org_id = ? AND payment_status = 'PAID' AND paid_at >= ? AND paid_at < ?");
+$stmt->execute([$org['id'], $monthStart, $monthEnd]);
+$revenueThisMonthCents = (int) $stmt->fetch()['c'];
+
+$prevMonthStart = (new DateTime('first day of last month'))->format('Y-m-d 00:00:00');
+$stmt = db()->prepare("SELECT COALESCE(SUM(amount_due_cents), 0) c FROM enrollments WHERE org_id = ? AND payment_status = 'PAID' AND paid_at >= ? AND paid_at < ?");
+$stmt->execute([$org['id'], $prevMonthStart, $monthStart]);
+$revenueLastMonthCents = (int) $stmt->fetch()['c'];
+
 // --- Zajęcia dziś ---
 $todayStart = (new DateTime('today'))->format('Y-m-d H:i:s');
 $todayEnd = (new DateTime('tomorrow'))->format('Y-m-d H:i:s');
@@ -87,6 +99,18 @@ require __DIR__ . '/includes/layout_top.php';
 
   <div class="stat-grid mt-6">
     <div class="stat-card reveal">
+      <div class="stat-value"><?= number_format($revenueThisMonthCents / 100, 0, ',', ' ') ?> zł</div>
+      <div class="stat-label">
+        Przychód w tym miesiącu
+        <?php if ($revenueLastMonthCents > 0):
+          $deltaPct = round((($revenueThisMonthCents - $revenueLastMonthCents) / $revenueLastMonthCents) * 100);
+        ?>
+          <span class="<?= $deltaPct >= 0 ? 'trend-up' : 'trend-down' ?>"><?= $deltaPct >= 0 ? '▲' : '▼' ?> <?= abs($deltaPct) ?>% vs poprz. mies.</span>
+        <?php endif; ?>
+      </div>
+      <a href="<?= e(url('raporty.php')) ?>" class="stat-link">Raporty →</a>
+    </div>
+    <div class="stat-card reveal">
       <div class="stat-value" data-count="<?= $pendingCount ?>">0</div>
       <div class="stat-label">Zgłoszenia do potwierdzenia</div>
       <a href="<?= e(url('zapisy.php')) ?>" class="stat-link">Zobacz →</a>
@@ -121,6 +145,7 @@ require __DIR__ . '/includes/layout_top.php';
               <div class="agenda-main">
                 <div class="agenda-title"><?= e($s['ct_name']) ?> — <?= e($s['title']) ?></div>
                 <div class="text-muted"><?= h_m($s['starts_at']) ?>–<?= h_m($s['ends_at']) ?> · <?= e($s['instructor_name']) ?></div>
+                <?php if ($s['meeting_url']): ?><div style="font-size:.78rem;"><a href="<?= e($s['meeting_url']) ?>" target="_blank" rel="noopener">🔗 dołącz online</a></div><?php endif; ?>
               </div>
               <div class="agenda-status <?= (int) $s['confirmed_count'] >= (int) $s['capacity'] ? 'full' : 'ok' ?>"><?= (int) $s['confirmed_count'] ?>/<?= (int) $s['capacity'] ?></div>
             </div>

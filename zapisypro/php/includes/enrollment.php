@@ -95,10 +95,11 @@ function reclaim_absence(int $absentEnrollmentId, int $makeupSessionId, int $org
 
     $pdo->beginTransaction();
     try {
-        $insert = $pdo->prepare("INSERT INTO enrollments (org_id, session_id, child_id, parent_id, status, payment_status, created_at, confirmed_at)
-            VALUES (?, ?, ?, ?, 'CONFIRMED', 'PAID', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)");
-        // payment_status = PAID od razu: rodzic już zapłacił za odrabiane zajęcia w pierwotnym zapisie.
-        $insert->execute([$orgId, $makeupSessionId, $absence['child_id'], $absence['parent_id']]);
+        $insert = $pdo->prepare("INSERT INTO enrollments (org_id, session_id, child_id, parent_id, status, payment_status, amount_due_cents, created_at, confirmed_at, paid_at)
+            VALUES (?, ?, ?, ?, 'CONFIRMED', 'PAID', ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)");
+        // payment_status = PAID od razu (z tą samą kwotą co oryginał): rodzic już
+        // zapłacił za odrabiane zajęcia w pierwotnym zapisie, to nie jest nowa opłata.
+        $insert->execute([$orgId, $makeupSessionId, $absence['child_id'], $absence['parent_id'], $absence['amount_due_cents']]);
         $newId = db_last_id($pdo);
 
         $pdo->prepare('UPDATE enrollments SET rescheduled_to_enrollment_id = ? WHERE id = ?')
@@ -117,6 +118,7 @@ function set_payment_status(int $enrollmentId, int $orgId, string $status, ?int 
     if (!in_array($status, ['PAID', 'UNPAID'], true)) {
         throw new InvalidArgumentException('Nieprawidłowy status płatności.');
     }
-    $stmt = db()->prepare('UPDATE enrollments SET payment_status = ?, amount_due_cents = COALESCE(?, amount_due_cents) WHERE id = ? AND org_id = ?');
-    $stmt->execute([$status, $amountDueCents, $enrollmentId, $orgId]);
+    $paidAt = $status === 'PAID' ? date('Y-m-d H:i:s') : null;
+    $stmt = db()->prepare('UPDATE enrollments SET payment_status = ?, amount_due_cents = COALESCE(?, amount_due_cents), paid_at = ? WHERE id = ? AND org_id = ?');
+    $stmt->execute([$status, $amountDueCents, $paidAt, $enrollmentId, $orgId]);
 }

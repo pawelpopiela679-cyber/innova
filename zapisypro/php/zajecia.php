@@ -33,6 +33,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $capacity = max(1, min(60, (int) ($_POST['capacity'] ?? 10)));
         $weeksCount = max(1, min(20, (int) ($_POST['weeksCount'] ?? 1)));
         $instructorName = trim((string) ($_POST['instructorName'] ?? ''));
+        $meetingUrl = trim((string) ($_POST['meetingUrl'] ?? ''));
+        if ($meetingUrl !== '' && !filter_var($meetingUrl, FILTER_VALIDATE_URL)) {
+            $meetingUrl = ''; // niepoprawny URL — po prostu nie zapisujemy linku, zamiast blokować cały formularz
+        }
 
         $ownsType = db()->prepare('SELECT id FROM class_types WHERE id = ? AND org_id = ?');
         $ownsType->execute([$classTypeId, $org['id']]);
@@ -50,8 +54,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             for ($w = 0; $w < $weeksCount; $w++) {
                 $starts = (clone $anchor)->modify("+$w weeks")->setTime((int) $sh, (int) $sm);
                 $ends = (clone $anchor)->modify("+$w weeks")->setTime((int) $eh, (int) $em);
-                db()->prepare('INSERT INTO class_sessions (org_id, class_type_id, title, starts_at, ends_at, capacity, instructor_id, instructor_name) VALUES (?,?,?,?,?,?,?,?)')
-                    ->execute([$org['id'], $classTypeId, $title, $starts->format('Y-m-d H:i:s'), $ends->format('Y-m-d H:i:s'), $capacity, $instructorId, $instructorName ?: $user['name']]);
+                db()->prepare('INSERT INTO class_sessions (org_id, class_type_id, title, starts_at, ends_at, capacity, meeting_url, instructor_id, instructor_name) VALUES (?,?,?,?,?,?,?,?,?)')
+                    ->execute([$org['id'], $classTypeId, $title, $starts->format('Y-m-d H:i:s'), $ends->format('Y-m-d H:i:s'), $capacity, $meetingUrl ?: null, $instructorId, $instructorName ?: $user['name']]);
                 $added++;
             }
             redirect('zajecia.php?added=' . $added);
@@ -60,6 +64,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $sessionId = (int) ($_POST['sessionId'] ?? 0);
         db()->prepare("UPDATE class_sessions SET status = 'CANCELED' WHERE id = ? AND org_id = ?")->execute([$sessionId, $org['id']]);
         redirect('zajecia.php');
+    } elseif ($formAction === 'set_meeting_url') {
+        $sessionId = (int) ($_POST['sessionId'] ?? 0);
+        $meetingUrl = trim((string) ($_POST['meetingUrl'] ?? ''));
+        if ($meetingUrl !== '' && !filter_var($meetingUrl, FILTER_VALIDATE_URL)) {
+            $error = 'Nieprawidłowy adres URL linku do zajęć.';
+        } else {
+            db()->prepare('UPDATE class_sessions SET meeting_url = ? WHERE id = ? AND org_id = ?')
+                ->execute([$meetingUrl ?: null, $sessionId, $org['id']]);
+            redirect('zajecia.php');
+        }
     }
 }
 
@@ -133,6 +147,14 @@ require __DIR__ . '/includes/layout_top.php';
         </div>
         <div class="field"><label>Powtórz co tydzień, przez ile tygodni?</label><input type="number" name="weeksCount" value="8" min="1" max="20" style="max-width:8rem;"></div>
         <div class="field"><label>Prowadzący</label><input name="instructorName" value="<?= e($user['name']) ?>" required></div>
+        <div class="field">
+          <label for="meetingUrl">Link do zajęć online (Google Meet / Zoom, opcjonalnie)</label>
+          <div class="flex gap-2">
+            <input id="meetingUrl" name="meetingUrl" placeholder="https://meet.google.com/..." style="flex:1;">
+            <a href="https://meet.new" target="_blank" rel="noopener" class="btn btn-outline btn-sm" style="white-space:nowrap;">Utwórz nowe Meet ↗</a>
+          </div>
+          <p class="field-hint">„Utwórz nowe Meet” otworzy od razu gotowy pokój Google Meet w nowej karcie — skopiuj z niego adres i wklej tutaj. Ten sam link zostanie ustawiony na wszystkich wygenerowanych terminach cyklu.</p>
+        </div>
         <button type="submit" class="btn btn-primary">Dodaj do kalendarza</button>
       </form>
       <?php endif; ?>
@@ -142,13 +164,31 @@ require __DIR__ . '/includes/layout_top.php';
   <h2 class="mt-8">Najbliższe terminy</h2>
   <div class="table-wrap mt-4 reveal">
     <table class="data-table">
-      <thead><tr><th>Zajęcia</th><th>Termin</th><th>Zapełnienie</th><th></th></tr></thead>
+      <thead><tr><th>Zajęcia</th><th>Termin</th><th>Zapełnienie</th><th>Link online</th><th></th></tr></thead>
       <tbody>
         <?php foreach ($upcoming as $s): ?>
           <tr>
             <td><span class="dot" style="background:<?= e($s['ct_color']) ?>;"></span><?= e($s['ct_name']) ?> — <?= e($s['title']) ?></td>
-            <td><?= e(format_pl_date($s['starts_at'], true, true)) ?></td>
+            <td>
+              <?= e(format_pl_date($s['starts_at'], true, true)) ?>
+              <a href="<?= e(google_calendar_link($s['ct_name'] . ' — ' . $s['title'], $s['starts_at'], $s['ends_at'], '', $s['meeting_url'] ?? '')) ?>" target="_blank" rel="noopener" class="text-muted" style="font-size:.78rem;display:block;">+ Kalendarz Google</a>
+            </td>
             <td><?= (int) $s['confirmed_count'] ?>/<?= (int) $s['capacity'] ?></td>
+            <td>
+              <?php if ($s['meeting_url']): ?>
+                <a href="<?= e($s['meeting_url']) ?>" target="_blank" rel="noopener">🔗 dołącz</a>
+              <?php endif; ?>
+              <details style="display:inline-block;">
+                <summary class="text-muted" style="cursor:pointer;font-size:.78rem;display:inline;"><?= $s['meeting_url'] ? 'zmień' : '+ dodaj link' ?></summary>
+                <form method="post" class="flex gap-2 mt-2">
+                  <?= csrf_field() ?>
+                  <input type="hidden" name="_action" value="set_meeting_url">
+                  <input type="hidden" name="sessionId" value="<?= $s['id'] ?>">
+                  <input name="meetingUrl" value="<?= e($s['meeting_url'] ?? '') ?>" placeholder="https://..." style="width:180px;">
+                  <button class="btn btn-outline btn-sm">Zapisz</button>
+                </form>
+              </details>
+            </td>
             <td><form method="post" onsubmit="return confirm('Odwołać ten termin?');"><?= csrf_field() ?><input type="hidden" name="_action" value="cancel_session"><input type="hidden" name="sessionId" value="<?= $s['id'] ?>"><button class="btn btn-outline btn-sm">Odwołaj</button></form></td>
           </tr>
         <?php endforeach; ?>

@@ -157,7 +157,7 @@ function run_seed(): array
         $e2 = $pdo->prepare('SELECT id FROM enrollments WHERE session_id = ? AND child_id = ?');
         $e2->execute([$sessionIds[1], $childId]);
         if (!$e2->fetch()) {
-            $pdo->prepare("INSERT INTO enrollments (org_id, session_id, child_id, parent_id, status, payment_status, attendance_status, absence_reported_at, confirmed_at) VALUES (?,?,?,?,'CONFIRMED','PAID','ABSENT',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)")
+            $pdo->prepare("INSERT INTO enrollments (org_id, session_id, child_id, parent_id, status, payment_status, amount_due_cents, attendance_status, absence_reported_at, confirmed_at, paid_at) VALUES (?,?,?,?,'CONFIRMED','PAID',15900,'ABSENT',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)")
                 ->execute([$orgId, $sessionIds[1], $childId, $parentId]);
         }
     }

@@ -139,6 +139,10 @@ require __DIR__ . '/includes/layout_top.php';
         <div class="agenda-main">
           <div class="agenda-title"><?= e($s['ct_name']) ?> — <?= e($s['title']) ?></div>
           <div class="text-muted"><?= h_m($s['starts_at']) ?>–<?= h_m($s['ends_at']) ?> · <?= e($s['instructor_name']) ?></div>
+          <div class="text-muted" style="font-size:.78rem;">
+            <a href="<?= e(google_calendar_link($s['ct_name'] . ' — ' . $s['title'], $s['starts_at'], $s['ends_at'], '', $s['meeting_url'] ?? '')) ?>" target="_blank" rel="noopener">+ Kalendarz Google</a>
+            <?php if ($s['meeting_url']): ?> · <a href="<?= e($s['meeting_url']) ?>" target="_blank" rel="noopener">🔗 dołącz online</a><?php endif; ?>
+          </div>
         </div>
         <div class="agenda-status <?= $s['is_full'] ? 'full' : 'ok' ?>"><?= $s['is_full'] ? 'Brak miejsc' : $s['spots_left'] . ' wolnych' ?></div>
         <?php if ($isParent): ?>

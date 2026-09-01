@@ -127,6 +127,28 @@ function format_money(int $cents): string
     return number_format($cents / 100, 2, ',', ' ') . ' zł';
 }
 
+/**
+ * Link "Dodaj do Kalendarza Google" — jednym kliknięciem otwiera Google
+ * Calendar z wypełnionym wydarzeniem, bez żadnej integracji API/OAuth (Google
+ * nie wymaga klucza do tego linku, działa dla każdego, kto ma konto Google).
+ * To jest ta "integracja jednym przyciskiem" — pełna dwukierunkowa
+ * synchronizacja (automatyczne dopisywanie się do kalendarza organizatora,
+ * wykrywanie zmian) wymagałaby już prawdziwej integracji OAuth z własnym
+ * projektem w Google Cloud Console — patrz README_PHP.md.
+ */
+function google_calendar_link(string $title, string $startsAt, string $endsAt, string $details = '', string $location = ''): string
+{
+    $fmt = fn(string $dt) => (new DateTime($dt))->format('Ymd\THis');
+    $params = [
+        'action' => 'TEMPLATE',
+        'text' => $title,
+        'dates' => $fmt($startsAt) . '/' . $fmt($endsAt),
+        'details' => $details,
+        'location' => $location,
+    ];
+    return 'https://calendar.google.com/calendar/render?' . http_build_query($params);
+}
+
 /** Logo platformy — jeśli w php/logo.png jest plik, użyj go, inaczej wordmark z CSS. */
 function render_logo(string $size = 'md'): string
 {

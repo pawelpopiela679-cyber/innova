@@ -8,7 +8,7 @@ $stmt = db()->prepare('SELECT COUNT(*) c FROM children WHERE parent_id = ?');
 $stmt->execute([$user['id']]);
 $childrenCount = (int) $stmt->fetch()['c'];
 
-$stmt = db()->prepare("SELECT e.*, cs.title, cs.starts_at, ct.name AS ct_name, c.first_name
+$stmt = db()->prepare("SELECT e.*, cs.title, cs.starts_at, cs.ends_at, cs.meeting_url, ct.name AS ct_name, c.first_name
     FROM enrollments e JOIN class_sessions cs ON cs.id = e.session_id JOIN class_types ct ON ct.id = cs.class_type_id
     JOIN children c ON c.id = e.child_id
     WHERE e.parent_id = ? AND e.status IN ('CONFIRMED','WAITLIST') AND cs.starts_at >= ?
@@ -28,7 +28,7 @@ $arrearsTotalCents = array_sum(array_column($arrears, 'amount_due_cents'));
 
 $todayStart = (new DateTime('today'))->format('Y-m-d H:i:s');
 $todayEnd = (new DateTime('tomorrow'))->format('Y-m-d H:i:s');
-$stmt = db()->prepare("SELECT e.*, cs.title, cs.starts_at, cs.ends_at, ct.name AS ct_name, ct.color AS ct_color, c.first_name
+$stmt = db()->prepare("SELECT e.*, cs.title, cs.starts_at, cs.ends_at, cs.meeting_url, ct.name AS ct_name, ct.color AS ct_color, c.first_name
     FROM enrollments e JOIN class_sessions cs ON cs.id = e.session_id JOIN class_types ct ON ct.id = cs.class_type_id
     JOIN children c ON c.id = e.child_id
     WHERE e.parent_id = ? AND e.status IN ('CONFIRMED','WAITLIST') AND cs.starts_at >= ? AND cs.starts_at < ?
@@ -74,6 +74,7 @@ require __DIR__ . '/includes/layout_top.php';
               <div class="agenda-main">
                 <div class="agenda-title"><?= e($s['ct_name']) ?> — <?= e($s['title']) ?></div>
                 <div class="text-muted"><?= e($s['first_name']) ?> · <?= h_m($s['starts_at']) ?>–<?= h_m($s['ends_at']) ?></div>
+                <?php if ($s['meeting_url']): ?><div style="font-size:.78rem;"><a href="<?= e($s['meeting_url']) ?>" target="_blank" rel="noopener">🔗 dołącz online</a></div><?php endif; ?>
               </div>
               <span class="badge badge-<?= strtolower($s['status']) ?>"><?= $s['status'] === 'WAITLIST' ? 'Lista rezerwowa' : 'Potwierdzone' ?></span>
             </div>
@@ -112,6 +113,10 @@ require __DIR__ . '/includes/layout_top.php';
         <div class="agenda-main">
           <div class="agenda-title"><?= e($u['ct_name']) ?> — <?= e($u['title']) ?></div>
           <div class="text-muted"><?= e($u['first_name']) ?> · <?= e(format_pl_date($u['starts_at'], true, true)) ?></div>
+          <div style="font-size:.78rem;">
+            <a href="<?= e(google_calendar_link($u['ct_name'] . ' — ' . $u['title'], $u['starts_at'], $u['ends_at'], '', $u['meeting_url'] ?? '')) ?>" target="_blank" rel="noopener" class="text-muted">+ Kalendarz Google</a>
+            <?php if ($u['meeting_url']): ?> · <a href="<?= e($u['meeting_url']) ?>" target="_blank" rel="noopener">🔗 dołącz online</a><?php endif; ?>
+          </div>
         </div>
         <span class="badge badge-<?= strtolower($u['status']) ?>"><?= $u['status'] === 'WAITLIST' ? 'Lista rezerwowa' : 'Potwierdzone' ?></span>
       </div>
