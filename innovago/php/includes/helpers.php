@@ -151,9 +151,10 @@ function google_calendar_link(string $title, string $startsAt, string $endsAt, s
 
 /**
  * Logo platformy — jeśli w php/logo.png jest plik, użyj go, inaczej wordmark
- * z CSS. Ten sam wielokolorowy wzorzec co logo INNOVA (../../php: IN/N/O/VA
- * w 4 kolorach), tu na "In/n/o/va" + dopisane "Go" jako akcent produktu —
- * jedno spójne logo rodziny marek Innova.
+ * z CSS. Wierna kopia oryginalnego logo INNOVA (../../php: WIELKIE litery
+ * IN/N/O/VA w 4 kolorach, ten sam font) — tu z dopisanym "GO" w tej samej
+ * wielkiej literze, jako piąty, akcentowy segment. Jedno spójne logo
+ * rodziny marek Innova, nie osobna interpretacja.
  */
 function render_logo(string $size = 'md'): string
 {
@@ -167,6 +168,6 @@ function render_logo(string $size = 'md'): string
     }
 
     return '<span class="logo ' . $sizeClass . '"><span class="logo-word">'
-        . '<span class="g1">In</span><span class="g2">n</span><span class="g3">o</span><span class="g4">va</span><span class="go">Go</span>'
+        . '<span class="g1">IN</span><span class="g2">N</span><span class="g3">O</span><span class="g4">VA</span><span class="go">GO</span>'
         . '</span></span>';
 }
