@@ -14,6 +14,12 @@
   --accent: #c9848a;
   --mustard: #c2a05e;
   --muted: #8a7f5c;
+  /* Dokładnie te same wartości co --logo-green/--logo-pink/--logo-gold w
+     ../../php/assets/style.css — to jest to samo logo INNOVA, tylko z
+     dopisanym "Go". */
+  --logo-green: #7d7a4a;
+  --logo-pink: #d99a9f;
+  --logo-gold: #c9a768;
   --radius: 16px;
   --shadow: 0 4px 24px rgba(74, 67, 38, 0.08);
   --shadow-lg: 0 12px 40px rgba(74, 67, 38, 0.16);
@@ -75,9 +81,20 @@ hr { border: none; border-top: 1px solid var(--border); }
   .nav-more-panel { position: static; box-shadow: none; border: none; padding: 0 0 0 12px; }
 }
 
-.logo { display: inline-flex; align-items: center; gap: 6px; font-weight: 800; font-size: 1.15rem; color: var(--fg); }
-.logo-mark { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 9px; background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #fff; font-family: 'Quicksand', sans-serif; }
-.logo-word b { color: var(--primary); }
+/* Logo InnovaGo — dokładnie ten sam wielokolorowy wordmark co macierzyste
+   logo INNOVA (../../php/assets/style.css: .logo-word .g1..g4), z dopisanym
+   pogrubionym "Go" jako różnicującym akcentem produktu. Żadnej odznaki/ikony
+   — jak w oryginale, samo słowo niesie markę. */
+.logo { display: inline-flex; align-items: center; color: var(--fg); }
+.logo-word { font-family: 'Quicksand', 'Nunito', sans-serif; font-weight: 700; letter-spacing: 0.01em; font-size: 1.3rem; }
+.logo-word .g1 { color: var(--logo-green); }
+.logo-word .g2 { color: var(--logo-pink); }
+.logo-word .g3 { color: var(--logo-pink); -webkit-text-stroke: 1.5px var(--logo-pink); color: transparent; }
+.logo-word .g4 { color: var(--logo-gold); }
+.logo-word .go { color: var(--accent); font-weight: 800; }
+.logo-sm .logo-word { font-size: 1.3rem; }
+.logo-md .logo-word { font-size: 2rem; }
+.logo-lg .logo-word { font-size: 3rem; }
 
 @media (max-width: 860px) {
   .navbar-toggle { display: block; }
