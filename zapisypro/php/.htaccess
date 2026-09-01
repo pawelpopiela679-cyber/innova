@@ -1,0 +1,17 @@
+# Blokuje bezpośredni dostęp z przeglądarki do plików, które nigdy nie
+# powinny być pobierane wprost (dane logowania do bazy, plik testowej bazy
+# SQLite).
+<FilesMatch "^(config\.local\.php|config\.local\.php\.example)$">
+  Require all denied
+</FilesMatch>
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+</IfModule>
+
+<FilesMatch "\.sqlite$">
+  Require all denied
+</FilesMatch>
+
+# Ładne błędy zamiast listowania katalogów.
+Options -Indexes

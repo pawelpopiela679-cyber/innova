@@ -58,3 +58,13 @@ next-env.d.ts
 /php/uploads/instructors/*
 !/php/uploads/instructors/.gitkeep
 /php/logo.png
+
+# --- Projekt 2: ZapisyPro (zapisypro/php/) — SaaS multi-tenant na home.pl ---
+/zapisypro/php/config.local.php
+/zapisypro/php/data.sqlite
+/zapisypro/php/storage/
+/zapisypro/php/uploads/instructors/*
+!/zapisypro/php/uploads/instructors/.gitkeep
+/zapisypro/php/uploads/avatars/*
+!/zapisypro/php/uploads/avatars/.gitkeep
+/zapisypro/php/logo.png

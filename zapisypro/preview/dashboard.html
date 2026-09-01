@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Panel — Demo Szkółka Rozwoju | ZapisyPro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="preview-banner">🖥️ Statyczny podgląd — panel organizacji (przykładowe dane). Nawigacja: <a href="index.html">Strona główna</a> · <a href="dashboard.html">Panel organizacji</a> · <a href="kalendarz.html">Kalendarz</a> · <a href="panel-rodzica.html">Panel rodzica</a> · <a href="logowanie.html">Logowanie</a></div>
+
+<header class="navbar">
+  <div class="navbar-inner">
+    <a href="dashboard.html" class="navbar-brand"><span class="logo"><span class="logo-mark">Z</span><span class="logo-word">apisy<b>Pro</b></span></span></a>
+    <button class="navbar-toggle" type="button" aria-label="Menu">☰</button>
+    <nav class="navbar-links">
+      <a href="dashboard.html">Panel</a>
+      <a href="kalendarz.html">Kalendarz</a>
+      <a href="#" onclick="zpToast('W pełnej wersji: lista zgłoszeń do potwierdzenia.'); return false;">Zgłoszenia</a>
+      <a href="#" onclick="zpToast('W pełnej wersji: rodzaje zajęć i terminy.'); return false;">Zajęcia</a>
+      <a href="#" onclick="zpToast('W pełnej wersji: lista prowadzących i limity planu.'); return false;">Prowadzący</a>
+      <a href="#" onclick="zpToast('W pełnej wersji: wysyłka e-mail/SMS do grup rodziców.'); return false;">Komunikacja</a>
+    </nav>
+    <div class="navbar-right">
+      <span class="text-muted">Właściciel Demo Szkółki</span>
+      <a href="index.html" class="btn btn-outline btn-sm">Wyloguj</a>
+    </div>
+  </div>
+</header>
+
+<main>
+<div class="container section">
+  <div class="banner reveal">🎁 Okres próbny planu <strong>Pro</strong> — aktywny do <strong>15 września 2026</strong>. <a href="#" onclick="zpToast('W pełnej wersji: szczegóły abonamentu i zmiana planu.'); return false;">Zobacz abonament →</a></div>
+
+  <h1 class="section-title">Panel — Demo Szkółka Rozwoju</h1>
+
+  <div class="stat-grid mt-6">
+    <div class="stat-card reveal">
+      <div class="stat-value" data-count="3">0</div>
+      <div class="stat-label">Zgłoszenia do potwierdzenia</div>
+      <a href="#" class="stat-link" onclick="zpToast('Otwiera listę zgłoszeń.'); return false;">Zobacz →</a>
+    </div>
+    <div class="stat-card reveal" style="animation-delay:60ms;">
+      <div class="stat-value" data-count="2">0</div>
+      <div class="stat-label">Nieopłacone zapisy</div>
+      <a href="#" class="stat-link" onclick="zpToast('Otwiera listę nieopłaconych.'); return false;">Zobacz →</a>
+    </div>
+    <div class="stat-card reveal" style="animation-delay:120ms;">
+      <div class="stat-value" data-count="8">0</div>
+      <div class="stat-label">Zajęcia w tym tygodniu</div>
+      <a href="kalendarz.html" class="stat-link">Kalendarz →</a>
+    </div>
+    <div class="stat-card reveal" style="animation-delay:180ms;">
+      <div class="stat-value" data-count="24">0</div>
+      <div class="stat-label">Zapisanych dzieci / limit 150</div>
+      <a href="#" class="stat-link" onclick="zpToast('Otwiera abonament i wykorzystanie limitów.'); return false;">Abonament →</a>
+    </div>
+  </div>
+
+  <h2 class="mt-8">Najnowsze zgłoszenia</h2>
+  <div class="table-wrap mt-4 reveal">
+    <table class="data-table">
+      <thead><tr><th>Dziecko</th><th>Zajęcia</th><th>Termin</th><th>Rodzic</th><th></th></tr></thead>
+      <tbody id="pending-rows"></tbody>
+    </table>
+  </div>
+</div>
+</main>
+
+<footer class="site-footer">
+  <p class="text-muted mt-4">© 2026 ZapisyPro</p>
+</footer>
+
+<script src="assets/app.js"></script>
+<script>
+  var pending = [
+    ['Zosia Testowa', 'Zajęcia plastyczne — Grupa A', 'wt. 15 wrz, 16:00', 'Testowy Rodzic'],
+    ['Kuba Malinowski', 'Robotyka — Grupa 2', 'śr. 16 wrz, 17:00', 'Anna Malinowska'],
+    ['Ola Wiśniewska', 'Angielski — 5-7 lat', 'czw. 17 wrz, 15:00', 'Piotr Wiśniewski'],
+  ];
+  var tbody = document.getElementById('pending-rows');
+  pending.forEach(function (p) {
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td>' + p[0] + '</td><td>' + p[1] + '</td><td>' + p[2] + '</td><td>' + p[3] + '</td>'
+      + '<td><button class="btn btn-primary btn-sm" onclick="this.closest(\'tr\').remove(); zpToast(\'Zgłoszenie potwierdzone (demo).\');">Potwierdź</button></td>';
+    tbody.appendChild(tr);
+  });
+</script>
+</body>
+</html>
