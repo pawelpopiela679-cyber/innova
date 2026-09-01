@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Panel — Demo Szkółka Rozwoju | InnovaGo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Quicksand:wght@600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="preview-banner">🖥️ Statyczny podgląd — panel organizacji (przykładowe dane). Nawigacja: <a href="index.html">Strona główna</a> · <a href="dashboard.html">Panel organizacji</a> · <a href="kalendarz.html">Kalendarz</a> · <a href="raporty.html">Raporty</a> · <a href="umowy.html">Umowy</a> · <a href="panel-rodzica.html">Panel rodzica</a> · <a href="logowanie.html">Logowanie</a></div>
+
+<header class="navbar">
+  <div class="navbar-inner">
+    <a href="dashboard.html" class="navbar-brand"><span class="logo"><span class="logo-mark">I</span><span class="logo-word">nnova<b>Go</b></span></span></a>
+    <button class="navbar-toggle" type="button" aria-label="Menu">☰</button>
+    <nav class="navbar-links">
+      <a href="dashboard.html">Panel</a>
+      <a href="kalendarz.html">Kalendarz</a>
+      <a href="#" onclick="zpToast('W pełnej wersji: lista zgłoszeń do potwierdzenia.'); return false;">Zgłoszenia</a>
+      <a href="#" onclick="zpToast('W pełnej wersji: rodzaje zajęć i terminy, w tym link Meet/Zoom.'); return false;">Zajęcia</a>
+      <a href="raporty.html">Raporty</a>
+      <details class="nav-more">
+        <summary>Więcej ▾</summary>
+        <div class="nav-more-panel">
+          <a href="umowy.html">Umowy</a>
+          <a href="#" onclick="zpToast('W pełnej wersji: lista prowadzących i limity planu.'); return false;">Prowadzący</a>
+          <a href="#" onclick="zpToast('W pełnej wersji: wysyłka e-mail/SMS do grup rodziców.'); return false;">Komunikacja</a>
+          <a href="#" onclick="zpToast('W pełnej wersji: godziny i szacowane wynagrodzenia.'); return false;">Godziny i wynagrodzenia</a>
+          <a href="#" onclick="zpToast('W pełnej wersji: kolory i branding organizacji.'); return false;">Wygląd</a>
+          <a href="#" onclick="zpToast('W pełnej wersji: plan, status, limity.'); return false;">Abonament</a>
+        </div>
+      </details>
+    </nav>
+    <div class="navbar-right">
+      <span class="text-muted">Właściciel Demo Szkółki</span>
+      <a href="index.html" class="btn btn-outline btn-sm">Wyloguj</a>
+    </div>
+  </div>
+</header>
+
+<main>
+<div class="container section">
+  <div class="banner reveal">🎁 Okres próbny planu <strong>Pro</strong> — aktywny do <strong>15 września 2026</strong>. <a href="#" onclick="zpToast('W pełnej wersji: szczegóły abonamentu i zmiana planu.'); return false;">Zobacz abonament →</a></div>
+
+  <h1 class="section-title">Panel — Demo Szkółka Rozwoju</h1>
+
+  <div class="stat-grid mt-6">
+    <div class="stat-card reveal">
+      <div class="stat-value">3 180 zł</div>
+      <div class="stat-label">Przychód w tym miesiącu <span class="trend-up">▲ 12% vs poprz. mies.</span></div>
+      <a href="raporty.html" class="stat-link">Raporty →</a>
+    </div>
+    <div class="stat-card reveal" style="animation-delay:60ms;">
+      <div class="stat-value" data-count="3">0</div>
+      <div class="stat-label">Zgłoszenia do potwierdzenia</div>
+      <a href="#" class="stat-link" onclick="zpToast('Otwiera listę zgłoszeń.'); return false;">Zobacz →</a>
+    </div>
+    <div class="stat-card reveal" style="animation-delay:120ms;">
+      <div class="stat-value" data-count="2">0</div>
+      <div class="stat-label">Nieopłacone zapisy</div>
+      <a href="#" class="stat-link" onclick="zpToast('Otwiera listę nieopłaconych.'); return false;">Zobacz →</a>
+    </div>
+    <div class="stat-card reveal" style="animation-delay:180ms;">
+      <div class="stat-value" data-count="8">0</div>
+      <div class="stat-label">Zajęcia w tym tygodniu</div>
+      <a href="kalendarz.html" class="stat-link">Kalendarz →</a>
+    </div>
+    <div class="stat-card reveal" style="animation-delay:240ms;">
+      <div class="stat-value" data-count="24">0</div>
+      <div class="stat-label">Zapisanych dzieci / limit 150</div>
+      <a href="#" class="stat-link" onclick="zpToast('Otwiera abonament i wykorzystanie limitów.'); return false;">Abonament →</a>
+    </div>
+  </div>
+
+  <div class="two-col mt-8">
+    <div>
+      <h2>Zajęcia dziś <span class="text-muted" style="font-weight:400;">wtorek 1 września 2026</span></h2>
+      <div class="agenda-list mt-4">
+        <div class="agenda-card reveal">
+          <div class="agenda-dot" style="background:#7d7a4a;"></div>
+          <div class="agenda-main">
+            <div class="agenda-title">Zajęcia plastyczne — Grupa A</div>
+            <div class="text-muted">16:00–17:00 · Anna Instruktor</div>
+            <div style="font-size:.78rem;"><a href="https://meet.google.com/abc-defg-hij" target="_blank" rel="noopener">🔗 dołącz online</a></div>
+          </div>
+          <div class="agenda-status ok">6/10</div>
+        </div>
+        <div class="agenda-card reveal" style="animation-delay:60ms;">
+          <div class="agenda-dot" style="background:#c9848a;"></div>
+          <div class="agenda-main">
+            <div class="agenda-title">Robotyka — Grupa 2</div>
+            <div class="text-muted">17:30–18:30 · Marek Prowadzący</div>
+          </div>
+          <div class="agenda-status full">10/10</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h2>Zaległości <span class="text-muted" style="font-weight:400;">łącznie 318,00 zł</span></h2>
+      <div class="enroll-list mt-4">
+        <div class="enroll-card reveal">
+          <div class="enroll-main">
+            <div class="enroll-title">Zosia Testowa <span class="text-muted">— Zajęcia plastyczne</span></div>
+            <div class="text-muted" style="font-size:.8rem;">Testowy Rodzic · 500600700 · zajęcia 8 września 2026</div>
+          </div>
+          <div class="enroll-badges"><span class="badge badge-pending">159,00 zł</span></div>
+          <div class="enroll-actions"><button class="btn btn-primary btn-sm" onclick="zpToast('Oznaczono jako opłacone (demo).'); this.closest('.enroll-card').style.opacity=.4;">Oznacz jako opłacone</button></div>
+        </div>
+        <div class="enroll-card reveal" style="animation-delay:60ms;">
+          <div class="enroll-main">
+            <div class="enroll-title">Kuba Malinowski <span class="text-muted">— Robotyka</span></div>
+            <div class="text-muted" style="font-size:.8rem;">Anna Malinowska · zajęcia 3 września 2026</div>
+          </div>
+          <div class="enroll-badges"><span class="badge badge-pending">159,00 zł</span></div>
+          <div class="enroll-actions"><button class="btn btn-primary btn-sm" onclick="zpToast('Oznaczono jako opłacone (demo).'); this.closest('.enroll-card').style.opacity=.4;">Oznacz jako opłacone</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="mt-8">Najnowsze zgłoszenia</h2>
+  <div class="table-wrap mt-4 reveal">
+    <table class="data-table">
+      <thead><tr><th>Dziecko</th><th>Zajęcia</th><th>Termin</th><th>Rodzic</th><th></th></tr></thead>
+      <tbody id="pending-rows"></tbody>
+    </table>
+  </div>
+</div>
+</main>
+
+<footer class="site-footer">
+  <p class="text-muted mt-4">© 2026 InnovaGo</p>
+</footer>
+
+<script src="assets/app.js"></script>
+<script>
+  var pending = [
+    ['Zosia Testowa', 'Zajęcia plastyczne — Grupa A', 'wt. 15 wrz, 16:00', 'Testowy Rodzic'],
+    ['Kuba Malinowski', 'Robotyka — Grupa 2', 'śr. 16 wrz, 17:00', 'Anna Malinowska'],
+    ['Ola Wiśniewska', 'Angielski — 5-7 lat', 'czw. 17 wrz, 15:00', 'Piotr Wiśniewski'],
+  ];
+  var tbody = document.getElementById('pending-rows');
+  pending.forEach(function (p) {
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td>' + p[0] + '</td><td>' + p[1] + '</td><td>' + p[2] + '</td><td>' + p[3] + '</td>'
+      + '<td><button class="btn btn-primary btn-sm" onclick="this.closest(\'tr\').remove(); zpToast(\'Zgłoszenie potwierdzone (demo).\');">Potwierdź</button></td>';
+    tbody.appendChild(tr);
+  });
+</script>
+</body>
+</html>

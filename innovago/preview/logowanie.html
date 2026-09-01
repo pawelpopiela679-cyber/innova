@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zaloguj się — InnovaGo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Quicksand:wght@600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  .split { display: grid; grid-template-columns: 1fr 1fr; min-height: calc(100vh - 90px); }
+  @media (max-width: 860px) { .split { grid-template-columns: 1fr; } }
+  .split-visual { background: linear-gradient(150deg, #7d7a4a, #c2a05e 60%, #c9848a); display: flex; align-items: center; justify-content: center; padding: 40px; }
+  .split-form { display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
+  .split-visual .mock-card { margin: 0; }
+</style>
+</head>
+<body>
+<div class="preview-banner">🖥️ Statyczny podgląd — wpisz cokolwiek i kliknij „Zaloguj się”. Nawigacja: <a href="index.html">Strona główna</a> · <a href="dashboard.html">Panel organizacji</a> · <a href="kalendarz.html">Kalendarz</a> · <a href="raporty.html">Raporty</a> · <a href="umowy.html">Umowy</a> · <a href="panel-rodzica.html">Panel rodzica</a> · <a href="logowanie.html">Logowanie</a></div>
+
+<header class="navbar">
+  <div class="navbar-inner">
+    <a href="index.html" class="navbar-brand"><span class="logo"><span class="logo-mark">I</span><span class="logo-word">nnova<b>Go</b></span></span></a>
+    <nav class="navbar-links"><a href="index.html">Platforma</a><a href="index.html#cennik">Cennik</a></nav>
+    <div class="navbar-right"><a href="dashboard.html" class="btn btn-primary btn-sm">Załóż organizację</a></div>
+  </div>
+</header>
+
+<main class="split">
+  <div class="split-visual reveal">
+    <div class="mock-card float">
+      <div class="mock-row"><span class="mock-dot" style="background:#7d7a4a"></span>Robotyka — grupa A <b>8/10</b></div>
+      <div class="mock-row"><span class="mock-dot" style="background:#c9848a"></span>Angielski — 5-7 lat <b>6/10</b></div>
+      <div class="mock-row"><span class="mock-dot" style="background:#b3af86"></span>Plastyka <b>10/10</b></div>
+      <div class="mock-bar"><div class="mock-bar-fill"></div></div>
+      <div class="mock-stat"><span>Należności opłacone</span><b>82%</b></div>
+    </div>
+  </div>
+  <div class="split-form">
+    <div class="container-sm reveal" style="animation-delay:100ms;">
+      <h1 class="section-title">Zaloguj się</h1>
+      <form class="mt-6 auth-card" onsubmit="event.preventDefault(); window.location.href='dashboard.html';">
+        <div class="field"><label for="email">E-mail</label><input id="email" type="email" placeholder="ty@twojaszkolka.pl"></div>
+        <div class="field"><label for="password">Hasło</label><input id="password" type="password" placeholder="••••••••"></div>
+        <button type="submit" class="btn btn-primary" style="width:100%;">Zaloguj się</button>
+      </form>
+      <p class="mt-6 text-muted">Prowadzisz szkółkę i nie masz jeszcze konta? <a href="dashboard.html">Załóż organizację</a></p>
+    </div>
+  </div>
+</main>
+
+<script src="assets/app.js"></script>
+</body>
+</html>

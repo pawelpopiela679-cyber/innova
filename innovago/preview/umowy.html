@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Umowy — Demo Szkółka Rozwoju | InnovaGo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Quicksand:wght@600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="preview-banner">🖥️ Statyczny podgląd — umowy (spróbuj dodać nową albo edytować istniejącą). Nawigacja: <a href="index.html">Strona główna</a> · <a href="dashboard.html">Panel organizacji</a> · <a href="kalendarz.html">Kalendarz</a> · <a href="raporty.html">Raporty</a> · <a href="umowy.html">Umowy</a> · <a href="panel-rodzica.html">Panel rodzica</a> · <a href="logowanie.html">Logowanie</a></div>
+
+<header class="navbar">
+  <div class="navbar-inner">
+    <a href="dashboard.html" class="navbar-brand"><span class="logo"><span class="logo-mark">I</span><span class="logo-word">nnova<b>Go</b></span></span></a>
+    <button class="navbar-toggle" type="button" aria-label="Menu">☰</button>
+    <nav class="navbar-links">
+      <a href="dashboard.html">Panel</a>
+      <a href="kalendarz.html">Kalendarz</a>
+      <a href="raporty.html">Raporty</a>
+      <a href="umowy.html">Umowy</a>
+    </nav>
+    <div class="navbar-right">
+      <span class="text-muted">Właściciel Demo Szkółki</span>
+      <a href="index.html" class="btn btn-outline btn-sm">Wyloguj</a>
+    </div>
+  </div>
+</header>
+
+<main>
+<div class="container section">
+  <h1 class="section-title">Umowy</h1>
+  <p class="text-muted">Regulaminy, umowy, zgody RODO itp. — rodzice akceptują je w swoim panelu.
+    Zmiana treści wymaga ponownej akceptacji przez wszystkich.</p>
+
+  <h2 class="mt-8">Nowa umowa</h2>
+  <form class="mt-4 form-card reveal" onsubmit="event.preventDefault(); addContract();">
+    <div class="field"><label>Tytuł</label><input id="new-title" required placeholder="np. Zgoda na wizerunek"></div>
+    <div class="field"><label>Treść</label><textarea id="new-content" rows="6" required placeholder="Wklej treść umowy/regulaminu..."></textarea></div>
+    <button type="submit" class="btn btn-primary">Dodaj umowę</button>
+  </form>
+
+  <h2 class="mt-8">Wszystkie umowy</h2>
+  <div class="table-wrap mt-4 reveal">
+    <table class="data-table">
+      <thead><tr><th>Tytuł</th><th>Zaktualizowano</th><th>Akceptacje</th><th></th></tr></thead>
+      <tbody id="contracts-rows"></tbody>
+    </table>
+  </div>
+</div>
+</main>
+
+<footer class="site-footer"><p class="text-muted mt-4">© 2026 InnovaGo</p></footer>
+
+<script src="assets/app.js"></script>
+<script>
+  var contracts = [
+    { title: 'Regulamin zajęć', updated: '28.08.2026', accepted: 22, total: 24 },
+    { title: 'Zgoda RODO', updated: '28.08.2026', accepted: 24, total: 24 },
+  ];
+
+  function render() {
+    var tbody = document.getElementById('contracts-rows');
+    tbody.innerHTML = '';
+    contracts.forEach(function (c, i) {
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td>' + c.title + '</td><td>' + c.updated + '</td><td>' + c.accepted + ' / ' + c.total + ' rodziców</td>'
+        + '<td><button class="btn btn-outline btn-sm" onclick="zpToast(\'Otwiera edycję treści (demo).\')">Edytuj</button> '
+        + '<button class="btn btn-outline btn-sm" onclick="removeContract(' + i + ')">Usuń</button></td>';
+      tbody.appendChild(tr);
+    });
+  }
+  window.removeContract = function (i) {
+    contracts.splice(i, 1);
+    render();
+    zpToast('Usunięto umowę (demo).');
+  };
+  window.addContract = function () {
+    var title = document.getElementById('new-title').value.trim();
+    if (!title) return;
+    contracts.unshift({ title: title, updated: 'dziś', accepted: 0, total: 24 });
+    document.getElementById('new-title').value = '';
+    document.getElementById('new-content').value = '';
+    render();
+    zpToast('Dodano umowę — rodzice zobaczą ją w swoim panelu.');
+  };
+  render();
+</script>
+</body>
+</html>

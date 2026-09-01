@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Raporty — Demo Szkółka Rozwoju | InnovaGo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Quicksand:wght@600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="preview-banner">🖥️ Statyczny podgląd — raporty (przykładowe dane). Nawigacja: <a href="index.html">Strona główna</a> · <a href="dashboard.html">Panel organizacji</a> · <a href="kalendarz.html">Kalendarz</a> · <a href="raporty.html">Raporty</a> · <a href="umowy.html">Umowy</a> · <a href="panel-rodzica.html">Panel rodzica</a> · <a href="logowanie.html">Logowanie</a></div>
+
+<header class="navbar">
+  <div class="navbar-inner">
+    <a href="dashboard.html" class="navbar-brand"><span class="logo"><span class="logo-mark">I</span><span class="logo-word">nnova<b>Go</b></span></span></a>
+    <button class="navbar-toggle" type="button" aria-label="Menu">☰</button>
+    <nav class="navbar-links">
+      <a href="dashboard.html">Panel</a>
+      <a href="kalendarz.html">Kalendarz</a>
+      <a href="raporty.html">Raporty</a>
+    </nav>
+    <div class="navbar-right">
+      <span class="text-muted">Właściciel Demo Szkółki</span>
+      <a href="index.html" class="btn btn-outline btn-sm">Wyloguj</a>
+    </div>
+  </div>
+</header>
+
+<main>
+<div class="container section">
+  <div class="flex items-center gap-2" style="justify-content:space-between;flex-wrap:wrap;">
+    <h1 class="section-title" style="margin-bottom:0;">Raporty</h1>
+    <div class="flex gap-2">
+      <button type="button" class="btn btn-outline btn-sm" onclick="zpToast('W pełnej wersji: pobiera plik CSV ze wszystkimi zapisami.')">⬇ Eksport CSV (wszystkie zapisy)</button>
+      <button type="button" class="btn btn-outline btn-sm" onclick="window.print()">🖨 Drukuj / zapisz jako PDF</button>
+    </div>
+  </div>
+
+  <h2 class="mt-8">Przychód — ostatnie 6 miesięcy</h2>
+  <div class="form-card mt-4 reveal" id="revenue-box"></div>
+
+  <h2 class="mt-8">Zaległości</h2>
+  <div class="form-card mt-4 reveal">
+    <p><strong>2</strong> nieopłaconych potwierdzonych zapisów, łącznie <strong>318,00 zł</strong>.</p>
+    <a href="dashboard.html" class="stat-link">Zobacz szczegóły na panelu →</a>
+  </div>
+
+  <h2 class="mt-8">Zapisy i frekwencja wg rodzaju zajęć</h2>
+  <div class="table-wrap mt-4 reveal">
+    <table class="data-table">
+      <thead><tr><th>Rodzaj zajęć</th><th>Zgłoszeń łącznie</th><th>Potwierdzone</th><th>Anulowane</th><th>Odrzucone</th><th>Zgłoszone nieobecności</th></tr></thead>
+      <tbody>
+        <tr><td>Zajęcia plastyczne</td><td>18</td><td>16</td><td>1</td><td>0</td><td>2</td></tr>
+        <tr><td>Robotyka</td><td>12</td><td>10</td><td>0</td><td>1</td><td>1</td></tr>
+        <tr><td>Angielski 5-7 lat</td><td>9</td><td>8</td><td>0</td><td>0</td><td>0</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</main>
+
+<footer class="site-footer"><p class="text-muted mt-4">© 2026 InnovaGo</p></footer>
+
+<script src="assets/app.js"></script>
+<script>
+  var months = [
+    ['Kwiecień 2026', 1400], ['Maj 2026', 1850], ['Czerwiec 2026', 2100],
+    ['Lipiec 2026', 900], ['Sierpień 2026', 1600], ['Wrzesień 2026', 3180],
+  ];
+  var max = Math.max.apply(null, months.map(function (m) { return m[1]; }));
+  var box = document.getElementById('revenue-box');
+  var total = 0;
+  months.forEach(function (m) {
+    total += m[1];
+    var row = document.createElement('div');
+    row.className = 'mt-2';
+    row.style.fontSize = '.88rem';
+    row.innerHTML = '<div class="flex" style="justify-content:space-between;"><span>' + m[0] + '</span><strong>' + m[1].toLocaleString('pl-PL') + ',00 zł</strong></div>'
+      + '<div class="usage-bar"><div class="usage-bar-fill" style="width:' + Math.round(m[1] / max * 100) + '%"></div></div>';
+    box.appendChild(row);
+  });
+  var totalRow = document.createElement('div');
+  totalRow.className = 'mt-4';
+  totalRow.style.cssText = 'border-top:1px solid var(--border);padding-top:12px;';
+  totalRow.innerHTML = '<strong>Razem: ' + total.toLocaleString('pl-PL') + ',00 zł</strong>';
+  box.appendChild(totalRow);
+</script>
+</body>
+</html>

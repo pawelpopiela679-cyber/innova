@@ -59,12 +59,12 @@ next-env.d.ts
 !/php/uploads/instructors/.gitkeep
 /php/logo.png
 
-# --- Projekt 2: ZapisyPro (zapisypro/php/) — SaaS multi-tenant na home.pl ---
-/zapisypro/php/config.local.php
-/zapisypro/php/data.sqlite
-/zapisypro/php/storage/
-/zapisypro/php/uploads/instructors/*
-!/zapisypro/php/uploads/instructors/.gitkeep
-/zapisypro/php/uploads/avatars/*
-!/zapisypro/php/uploads/avatars/.gitkeep
-/zapisypro/php/logo.png
+# --- Projekt 2: InnovaGo (innovago/php/) — SaaS multi-tenant na home.pl ---
+/innovago/php/config.local.php
+/innovago/php/data.sqlite
+/innovago/php/storage/
+/innovago/php/uploads/instructors/*
+!/innovago/php/uploads/instructors/.gitkeep
+/innovago/php/uploads/avatars/*
+!/innovago/php/uploads/avatars/.gitkeep
+/innovago/php/logo.png
