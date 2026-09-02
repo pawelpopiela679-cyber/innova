@@ -44,6 +44,23 @@ if (!defined('TPAY_ENV')) define('TPAY_ENV', 'sandbox');
 if (!defined('TPAY_WEBHOOK_SECRET')) define('TPAY_WEBHOOK_SECRET', '');
 if (!defined('TPAY_SIMULATE')) define('TPAY_SIMULATE', false); // domyślnie WYŁĄCZONE — trzeba świadomie włączyć w config.local.php
 
+// KROK 2 (płatności cykliczne, cron-platnosci-cykliczne.php):
+// - CRON_SECRET: jeśli cron wywoływany jest przez adres URL (np. wget/curl
+//   z harmonogramu zadań home.pl) zamiast bezpośrednio z linii poleceń,
+//   ten sekret w parametrze ?secret=... chroni skrypt przed uruchomieniem
+//   przez kogokolwiek z internetu (skrypt pobiera prawdziwe pieniądze!).
+//   Puste (domyślnie) = dostęp przez URL całkowicie zablokowany, działa
+//   tylko uruchomienie z linii poleceń (php cron-platnosci-cykliczne.php).
+// - TPAY_CRON_CHARGE_DAYS_AHEAD: ile dni przed terminem zajęć wolno
+//   automatycznie obciążyć kartę (żeby nie pobierać pieniędzy tygodnie
+//   wcześniej za zajęcia, które rodzic może jeszcze odwołać).
+// - TPAY_CRON_MAX_ATTEMPTS: po ilu nieudanych próbach cron przestaje
+//   próbować (i wyłącza automatyczne pobieranie tym tokenem), żeby nie
+//   próbować bez końca kartą, która np. wygasła.
+if (!defined('CRON_SECRET')) define('CRON_SECRET', '');
+if (!defined('TPAY_CRON_CHARGE_DAYS_AHEAD')) define('TPAY_CRON_CHARGE_DAYS_AHEAD', 3);
+if (!defined('TPAY_CRON_MAX_ATTEMPTS')) define('TPAY_CRON_MAX_ATTEMPTS', 3);
+
 // Płatności online są aktywne tylko, gdy mamy klucze ALBO jesteśmy jawnie w
 // trybie symulacji. Używane wszędzie tam, gdzie appka decyduje, czy pokazać
 // przycisk "Zapłać online", czy tylko tradycyjny opis "przelew/gotówka".

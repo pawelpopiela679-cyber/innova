@@ -85,6 +85,18 @@ define('TPAY_WEBHOOK_SECRET', '');
 // jest włączony razem z prawdziwym APP_URL.
 define('TPAY_SIMULATE', true);
 
+// --- KROK 2: płatności cykliczne (automatyczne pobieranie zapisaną kartą) ---
+// Sekret do wywoływania cron-platnosci-cykliczne.php przez adres URL (jeśli
+// Twój harmonogram zadań na home.pl wywołuje skrypty przez wget/curl zamiast
+// bezpośrednio "php nazwa_skryptu.php") — patrz instrukcja na górze tego
+// pliku. Zostaw puste, jeśli będziesz uruchamiać cron z linii poleceń
+// (zalecane — bezpieczniejsze, bo nikt z internetu nie może "zgadnąć" adresu).
+define('CRON_SECRET', '');
+// Ile dni przed terminem zajęć wolno automatycznie obciążyć kartę.
+define('TPAY_CRON_CHARGE_DAYS_AHEAD', 3);
+// Po ilu nieudanych próbach cron przestaje próbować tym tokenem.
+define('TPAY_CRON_MAX_ATTEMPTS', 3);
+
 // --- Konto super-admina (właściciela platformy InnovaGo) tworzone przez
 //     install.php — to jest konto, którym Ty zarządzasz wszystkimi
 //     organizacjami/klientami i ich planami subskrypcji. ---

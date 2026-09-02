@@ -267,3 +267,33 @@ function send_org_new_signup_notification(array $p): void
     $recipients = array_map('trim', explode(',', $p['orgNotifyEmail']));
     send_mail($recipients, $subject, $html, $text);
 }
+
+/**
+ * KROK 2: powiadomienie rodzica, że automatyczne pobranie płatności zapisaną
+ * kartą się nie powiodło (np. karta wygasła, brak środków) — wysyłane przez
+ * cron-platnosci-cykliczne.php. Ważne, żeby rodzic NIE dowiedział się o
+ * zaległości dopiero przy okazji zajęć — dajemy mu szansę dopłacić ręcznie
+ * (patrz link do panel-zapisy.php).
+ */
+function send_payment_charge_failed_email(array $p): void
+{
+    $subject = "Nie udało się pobrać płatności: {$p['sessionTitle']} ({$p['childName']})";
+    $text = "Cześć {$p['parentName']},\n\n"
+        . "Nie udało się automatycznie pobrać płatności zapisaną kartą za zajęcia:\n"
+        . "{$p['classTypeName']} — {$p['sessionTitle']} ({$p['childName']})\n"
+        . "Kwota: " . format_money((int) $p['amountCents']) . "\n"
+        . "Powód: {$p['reason']}\n\n"
+        . "Opłać ręcznie tutaj: " . APP_URL . "/panel-zapisy.php\n"
+        . "albo zaktualizuj/zapisz nową kartę przy najbliższej płatności.\n\n" . ($p['orgName'] ?? 'InnovaGo');
+
+    $html = '<div style="font-family: sans-serif; max-width: 480px;">'
+        . '<p>Cześć ' . esc_html_mail($p['parentName']) . ',</p>'
+        . '<p>Nie udało się automatycznie pobrać płatności zapisaną kartą za zajęcia:</p>'
+        . '<p><strong>' . esc_html_mail($p['classTypeName']) . ' — ' . esc_html_mail($p['sessionTitle']) . '</strong> (' . esc_html_mail($p['childName']) . ')<br>'
+        . 'Kwota: ' . esc_html_mail(format_money((int) $p['amountCents'])) . '<br>'
+        . 'Powód: ' . esc_html_mail($p['reason']) . '</p>'
+        . '<p><a href="' . esc_html_mail(APP_URL . '/panel-zapisy.php') . '">Opłać ręcznie →</a></p>'
+        . '<p style="color:#999; font-size: 12px;">' . esc_html_mail($p['orgName'] ?? 'InnovaGo') . '</p></div>';
+
+    send_mail($p['parentEmail'], $subject, $html, $text);
+}

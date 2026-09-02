@@ -259,4 +259,13 @@ function ensure_schema(): void
         FOREIGN KEY (parent_id) REFERENCES users(id) ON DELETE CASCADE
     )$engine");
     create_index_if_missing($pdo, 'idx_payment_tokens_parent', 'payment_tokens', 'parent_id');
+
+    // KROK 2: czy rodzic zgodził się, żeby TA konkretna zapisana karta była
+    // używana do automatycznych obciążeń za przyszłe zajęcia (cron
+    // cron-platnosci-cykliczne.php) — domyślnie 1 (tak), bo samo zapisanie
+    // karty przy płatności to już świadoma zgoda rodzica (patrz checkbox
+    // w panel-zapisy.php); rodzic może to później wyłączyć w
+    // panel-platnosci.php bez usuwania samej karty (np. gdy chce nadal
+    // płacić ręcznie tą kartą, ale nie chce automatycznych pobrań).
+    ensure_column($pdo, 'payment_tokens', 'auto_charge_enabled', 'TINYINT NOT NULL DEFAULT 1');
 }

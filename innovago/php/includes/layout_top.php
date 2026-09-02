@@ -69,6 +69,7 @@ $isParent = $user && $user['role'] === 'PARENT';
         <a href="<?= e(url('panel-dzieci.php')) ?>">Moje dzieci</a>
         <a href="<?= e(url('kalendarz.php')) ?>">Kalendarz zajęć</a>
         <a href="<?= e(url('panel-zapisy.php')) ?>">Moje zapisy</a>
+        <?php if (TPAY_ENABLED): ?><a href="<?= e(url('panel-platnosci.php')) ?>">Moje płatności</a><?php endif; ?>
         <a href="<?= e(url('panel-umowy.php')) ?>">Moje umowy</a>
       <?php endif; ?>
     </nav>

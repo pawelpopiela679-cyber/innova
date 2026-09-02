@@ -103,8 +103,17 @@ require __DIR__ . '/includes/layout_top.php';
             <!-- Płatność online (Tpay, KROK 1) — patrz platnosc.php. Przycisk
                  pojawia się tylko, gdy jest kwota do zapłaty i płatności
                  online są włączone; ręczne "Oznacz jako opłacone" po stronie
-                 organizacji (zapisy.php) zostaje jako metoda zapasowa. -->
-            <form method="post" action="<?= e(url('platnosc.php')) ?>" class="inline"><?= csrf_field() ?><input type="hidden" name="id" value="<?= $r['id'] ?>"><button class="btn btn-primary btn-sm">💳 Zapłać online</button></form>
+                 organizacji (zapisy.php) zostaje jako metoda zapasowa.
+                 Checkbox "zapamiętaj kartę" to KROK 2 (tokenizacja) — patrz
+                 platnosc.php ($requestTokenization) i panel-platnosci.php. -->
+            <form method="post" action="<?= e(url('platnosc.php')) ?>" class="inline flex items-center gap-2">
+              <?= csrf_field() ?>
+              <input type="hidden" name="id" value="<?= $r['id'] ?>">
+              <label class="text-muted" style="font-size:.78rem;display:flex;align-items:center;gap:4px;">
+                <input type="checkbox" name="saveCard" value="1"> zapamiętaj kartę
+              </label>
+              <button class="btn btn-primary btn-sm">💳 Zapłać online</button>
+            </form>
           <?php endif; ?>
           <?php if (in_array($r['status'], ['PENDING', 'CONFIRMED', 'WAITLIST'], true)): ?>
             <form method="post" class="inline" onsubmit="return confirm('Anulować ten zapis?');"><?= csrf_field() ?><input type="hidden" name="_action" value="cancel"><input type="hidden" name="id" value="<?= $r['id'] ?>"><button class="btn btn-outline btn-sm">Anuluj</button></form>

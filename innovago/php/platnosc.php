@@ -1,7 +1,8 @@
 <?php
 /**
  * ============================================================================
- *  PŁATNOŚĆ ONLINE — KROK 1 (start płatności jednorazowej)
+ *  PŁATNOŚĆ ONLINE — KROK 1 (start płatności jednorazowej) + KROK 2 (opcjonalna
+ *  tokenizacja karty przy tej płatności — patrz $requestTokenization niżej)
  * ============================================================================
  * Ta strona nie ma własnego formularza — to punkt wejścia, do którego
  * prowadzi przycisk "Zapłać online" (panel-zapisy.php / panel-rodzic.php).
@@ -65,6 +66,14 @@ if (!TPAY_ENABLED) {
     redirect_with('panel-zapisy.php', ['error' => 'Płatności online nie są obecnie włączone w tej organizacji.']);
 }
 
+// KROK 2: rodzic mógł zaznaczyć w panel-zapisy.php checkbox "zapamiętaj tę
+// kartę do przyszłych płatności" — jeśli tak, prosimy Tpay o tokenizację
+// PRZY OKAZJI tej samej płatności (nie ma osobnego "zapisz kartę bez
+// płacenia" — token powstaje jako efekt uboczny prawdziwej transakcji).
+// Zapisany token trafi do bazy automatycznie w tpay_mark_enrollment_paid(),
+// wywoływanym z webhooka po potwierdzeniu płatności — nie tutaj.
+$requestTokenization = !empty($_POST['saveCard']);
+
 try {
     $result = tpay_create_transaction([
         'amountCents' => (int) $enrollment['amount_due_cents'],
@@ -79,10 +88,7 @@ try {
         'errorUrl' => absolute_url('platnosc-powrot.php?status=error&id=' . $enrollmentId),
         'notificationUrl' => absolute_url('webhook-tpay.php'),
         'externalId' => (string) $enrollmentId,
-        // KROK 2 (tokenizacja) podłączamy w panel-platnosci.php — tam rodzic
-        // świadomie wybiera "zapamiętaj kartę". Tutaj, przy zwykłej
-        // pojedynczej płatności z listy zapisów, zostawiamy false.
-        'requestCardTokenization' => false,
+        'requestCardTokenization' => $requestTokenization,
     ]);
 } catch (RuntimeException $e) {
     // Błąd po stronie Tpay (np. sandbox nieosiągalny, złe klucy) — logujemy
