@@ -99,6 +99,13 @@ require __DIR__ . '/includes/layout_top.php';
           <?php endif; ?>
         </div>
         <div class="enroll-actions">
+          <?php if ($r['status'] === 'CONFIRMED' && $r['payment_status'] === 'UNPAID' && (int) $r['amount_due_cents'] > 0 && TPAY_ENABLED): ?>
+            <!-- Płatność online (Tpay, KROK 1) — patrz platnosc.php. Przycisk
+                 pojawia się tylko, gdy jest kwota do zapłaty i płatności
+                 online są włączone; ręczne "Oznacz jako opłacone" po stronie
+                 organizacji (zapisy.php) zostaje jako metoda zapasowa. -->
+            <form method="post" action="<?= e(url('platnosc.php')) ?>" class="inline"><?= csrf_field() ?><input type="hidden" name="id" value="<?= $r['id'] ?>"><button class="btn btn-primary btn-sm">💳 Zapłać online</button></form>
+          <?php endif; ?>
           <?php if (in_array($r['status'], ['PENDING', 'CONFIRMED', 'WAITLIST'], true)): ?>
             <form method="post" class="inline" onsubmit="return confirm('Anulować ten zapis?');"><?= csrf_field() ?><input type="hidden" name="_action" value="cancel"><input type="hidden" name="id" value="<?= $r['id'] ?>"><button class="btn btn-outline btn-sm">Anuluj</button></form>
           <?php endif; ?>

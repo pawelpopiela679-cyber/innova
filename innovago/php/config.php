@@ -37,6 +37,24 @@ if (!defined('SEED_SUPERADMIN_EMAIL')) define('SEED_SUPERADMIN_EMAIL', 'super@in
 if (!defined('SEED_SUPERADMIN_PASSWORD')) define('SEED_SUPERADMIN_PASSWORD', 'ZmienMnie123!');
 if (!defined('SEED_DEMO_ORG_ADMIN_EMAIL')) define('SEED_DEMO_ORG_ADMIN_EMAIL', 'admin@demo-szkola.pl');
 if (!defined('SEED_DEMO_ORG_ADMIN_PASSWORD')) define('SEED_DEMO_ORG_ADMIN_PASSWORD', 'Demo123!');
+if (!defined('TPAY_CLIENT_ID')) define('TPAY_CLIENT_ID', '');
+if (!defined('TPAY_CLIENT_SECRET')) define('TPAY_CLIENT_SECRET', '');
+if (!defined('TPAY_MERCHANT_ID')) define('TPAY_MERCHANT_ID', '');
+if (!defined('TPAY_ENV')) define('TPAY_ENV', 'sandbox');
+if (!defined('TPAY_WEBHOOK_SECRET')) define('TPAY_WEBHOOK_SECRET', '');
+if (!defined('TPAY_SIMULATE')) define('TPAY_SIMULATE', false); // domyślnie WYŁĄCZONE — trzeba świadomie włączyć w config.local.php
+
+// Płatności online są aktywne tylko, gdy mamy klucze ALBO jesteśmy jawnie w
+// trybie symulacji. Używane wszędzie tam, gdzie appka decyduje, czy pokazać
+// przycisk "Zapłać online", czy tylko tradycyjny opis "przelew/gotówka".
+define('TPAY_ENABLED', TPAY_SIMULATE || (TPAY_CLIENT_ID !== '' && TPAY_CLIENT_SECRET !== ''));
+
+if (TPAY_ENV === 'production' && TPAY_SIMULATE) {
+    // Zabezpieczenie przed najgorszym scenariuszem: ktoś wdraża appkę na
+    // produkcję i zapomina wyłączyć tryb symulacji — bez tego "płatności"
+    // wyglądałyby jak opłacone, a pieniądze nigdy by nie wpłynęły.
+    error_log('[InnovaGo] KRYTYCZNE: TPAY_ENV=production razem z TPAY_SIMULATE=true w config.local.php! Płatności NIE są prawdziwe. Ustaw TPAY_SIMULATE na false.');
+}
 
 if (!defined('AUTH_SECRET') || AUTH_SECRET === 'ZMIEN-MNIE-NA-DLUGI-LOSOWY-CIAG-ZNAKOW-1234567890') {
     error_log('[InnovaGo] UWAGA: AUTH_SECRET nie został zmieniony na własną wartość w config.local.php!');

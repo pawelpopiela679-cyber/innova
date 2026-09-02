@@ -28,6 +28,28 @@ function url(string $path = ''): string
     return $base . '/' . ltrim($path, '/');
 }
 
+/**
+ * Jak url(), ale zawsze zwraca pełny adres z "https://domena.pl/...", nie
+ * samą ścieżkę. Potrzebne wszędzie tam, gdzie link musi zadziałać spoza
+ * przeglądarki użytkownika — np. Tpay (włsny serwer, nie przeglądarka)
+ * musi dostać PEŁNY adres notificationUrl, żeby móc wysłać tam webhook
+ * (patrz platnosc.php i includes/tpay.php).
+ *
+ * Używa APP_URL z config.local.php, jeśli jest ustawiony (zalecane na
+ * produkcji — pewny, jawnie skonfigurowany adres). Gdy APP_URL jest puste
+ * (typowe w lokalnym środowisku testowym), składa adres z bieżącego żądania
+ * ($_SERVER) — wygodne do testów, ale mniej pewne niż jawny APP_URL.
+ */
+function absolute_url(string $path = ''): string
+{
+    if (defined('APP_URL') && APP_URL !== '') {
+        return rtrim(APP_URL, '/') . '/' . ltrim($path, '/');
+    }
+    $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    return $scheme . '://' . $host . url($path);
+}
+
 function redirect_with(string $path, array $params): never
 {
     $sep = str_contains($path, '?') ? '&' : '?';

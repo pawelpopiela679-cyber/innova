@@ -229,4 +229,34 @@ function ensure_schema(): void
         last_attempt_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         locked_until DATETIME NULL
     )$engine");
+
+    // --- Płatności online (Tpay) — patrz includes/tpay.php ---
+
+    // KROK 1 (płatność jednorazowa): dopisujemy do już istniejącej tabeli
+    // enrollments dane transakcji Tpay, żeby wiedzieć "który zapis odpowiada
+    // której transakcji" i móc bezpiecznie dopasować przychodzący webhook.
+    ensure_column($pdo, 'enrollments', 'tpay_transaction_id', 'VARCHAR(64) NULL');
+    // Ile razy próbowaliśmy automatycznie pobrać opłatę zapisanym tokenem
+    // (KROK 2) i jaki był ostatni błąd — do panelu admina i do zatrzymania
+    // się po kilku nieudanych próbach zamiast próbować bez końca.
+    ensure_column($pdo, 'enrollments', 'tpay_charge_attempts', 'INT NOT NULL DEFAULT 0');
+    ensure_column($pdo, 'enrollments', 'tpay_last_error', 'VARCHAR(255) NULL');
+
+    // KROK 2 (płatność cykliczna): token karty/BLIK-a zapisany przez Tpay po
+    // pierwszej płatności za zgodą rodzica — pozwala obciążać kolejne
+    // zajęcia bez ponownego wpisywania danych karty. Jeden rodzic może mieć
+    // kilka tokenów w historii (stare oznaczamy jako revoked_at zamiast
+    // kasować — zachowujemy historię do rozliczeń/audytu).
+    $pdo->exec("CREATE TABLE IF NOT EXISTS payment_tokens (
+        id $pk,
+        org_id INT NOT NULL,
+        parent_id INT NOT NULL,
+        tpay_card_token VARCHAR(191) NOT NULL,
+        card_label VARCHAR(60) NOT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        revoked_at DATETIME NULL,
+        FOREIGN KEY (org_id) REFERENCES organizations(id) ON DELETE CASCADE,
+        FOREIGN KEY (parent_id) REFERENCES users(id) ON DELETE CASCADE
+    )$engine");
+    create_index_if_missing($pdo, 'idx_payment_tokens_parent', 'payment_tokens', 'parent_id');
 }

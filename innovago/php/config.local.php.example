@@ -48,6 +48,43 @@ define('SMTP_FROM_NAME', 'InnovaGo');
 define('SMS_API_TOKEN', '');
 define('SMS_SENDER_NAME', 'InnovaGo');
 
+// --- Płatności online (Tpay) ---
+// Krok 1 (płatność jednorazowa) + Krok 2 (zapisana karta / płatność
+// cykliczna) — patrz includes/tpay.php, tam jest cała logika i komentarze
+// tłumaczące każdy krok. Załóż konto na https://tpay.com/dla-developera,
+// włącz tryb sandbox, i wklej klucze z panelu poniżej.
+//
+// Dopóki TPAY_CLIENT_ID jest puste, płatności online są WYŁĄCZONE —
+// rodzice widzą tylko tradycyjny sposób (przelew/gotówka + ręczne
+// "Oznacz jako opłacone" przez organizację), jak dotychczas.
+define('TPAY_CLIENT_ID', ''); // z panelu Tpay: Ustawienia -> Integracja -> OpenAPI
+define('TPAY_CLIENT_SECRET', '');
+// Numer skrzynki (POS ID) widoczny w panelu Tpay przy danych konta —
+// część transakcji/webhooków API go wymaga obok client_id/client_secret.
+define('TPAY_MERCHANT_ID', '');
+
+// "sandbox" = środowisko testowe Tpay (fałszywe pieniądze, do testów),
+// "production" = prawdziwe płatności. NIGDY nie zostawiaj "production" bez
+// realnie zweryfikowanego, aktywnego konta produkcyjnego Tpay.
+define('TPAY_ENV', 'sandbox'); // "sandbox" albo "production"
+
+// Sekret, którym Tpay podpisuje powiadomienia webhook (JWS) — patrz panel
+// Tpay -> Ustawienia -> Powiadomienia, oraz includes/tpay.php (funkcja
+// tpay_verify_webhook_signature) po dokładną instrukcję pobrania
+// certyfikatu weryfikującego.
+define('TPAY_WEBHOOK_SECRET', '');
+
+// --- TRYB SYMULACJI — tylko do testów lokalnych, BEZ konta Tpay ---
+// Gdy true: żadne prawdziwe wywołanie do Tpay się nie wykonuje. Zamiast
+// tego includes/tpay.php generuje fałszywy link płatności i pozwala Ci
+// samodzielnie "wystrzelić" symulowany webhook (patrz README_PHP.md,
+// sekcja o testowaniu płatności) — dzięki temu można przetestować CAŁY
+// przepływ (zapis -> płatność -> webhook -> status w bazie) zanim jeszcze
+// założysz konto Tpay. NIGDY nie ustawiaj na true na serwerze produkcyjnym
+// — instalator (install.php) i tak o tym przypomina, jeśli wykryje, że
+// jest włączony razem z prawdziwym APP_URL.
+define('TPAY_SIMULATE', true);
+
 // --- Konto super-admina (właściciela platformy InnovaGo) tworzone przez
 //     install.php — to jest konto, którym Ty zarządzasz wszystkimi
 //     organizacjami/klientami i ich planami subskrypcji. ---
