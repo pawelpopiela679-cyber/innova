@@ -70,6 +70,14 @@ includes/tenant.php                      current_org(), require_org(), limity pl
 includes/enrollment.php                  potwierdzanie, lista rezerwowa, ODRABIANIE ZAJĘĆ,
                                           status płatności
 includes/sms.php                         punkt integracji z bramką SMS (patrz komentarz w pliku)
+includes/tpay.php                        klient API Tpay — KROK 1 (płatność jednorazowa) +
+                                          KROK 2 (tokenizacja/cykliczne), patrz komentarze w pliku
+platnosc.php, platnosc-powrot.php,
+platnosc-symulacja.php, webhook-tpay.php płatność online za zajęcia (KROK 1) — inicjacja,
+                                          strona powrotna, atrapa do testów (TPAY_SIMULATE),
+                                          odbiornik webhooka (jedyne miejsce ustawiające PAID)
+panel-platnosci.php                      rodzic zarządza zapisanymi kartami (KROK 2)
+cron-platnosci-cykliczne.php             skrypt cron — automatyczne pobieranie zapisaną kartą (KROK 2)
 index.php, cennik.php                    strona marketingowa platformy + cennik planów
 rejestracja-organizacji.php              samoobsługowa rejestracja NOWEGO klienta SaaS-a
 rejestracja.php?org=slug                 rejestracja RODZICA do konkretnej organizacji
@@ -79,14 +87,21 @@ zajecia.php, prowadzacy.php,
 komunikacja.php, godziny.php,
 wyglad.php, abonament.php                panel organizacji (ORG_ADMIN/INSTRUCTOR)
 panel-rodzic.php, panel-dzieci.php,
-panel-zapisy.php                         panel rodzica — w tym odrabianie zajęć
+panel-zapisy.php                         panel rodzica — w tym odrabianie zajęć i płatność online
 ```
 
 ## Czego świadomie brakuje w wersji 1 (jasno nazwane, nie ukryte)
 
-- **Płatności online** (Przelewy24/PayU za zajęcia, kartą za abonament) —
-  status płatności jest dziś ręczny (rodzic płaci przelewem/gotówką, admin
-  klika „Oznacz jako opłacone”). To najbardziej oczywisty następny krok.
+- **Płatności rodziców za zajęcia (Tpay)** — ✅ zrobione: karta/BLIK/przelew
+  online (`platnosc.php`, `webhook-tpay.php`, `includes/tpay.php`) + opcjonalne
+  automatyczne pobieranie zapisaną kartą za kolejne zajęcia
+  (`panel-platnosci.php`, `cron-platnosci-cykliczne.php`) — patrz
+  DEPLOY_HOMEPL.md, sekcja „Płatności online (Tpay)”. Ręczne „Oznacz jako
+  opłacone” (przelew/gotówka) zostaje jako metoda zapasowa dla organizacji,
+  które nie chcą włączać płatności online.
+- **Płatności ZA ABONAMENT** (organizacja płaci Tobie za korzystanie z
+  InnovaGo) — to WCIĄŻ ręczne, inna sprawa niż punkt wyżej. Zmiana planu w
+  `/abonament.php` jest natychmiastowa i nie wymaga potwierdzenia płatności.
 - **SMS** — kod jest gotowy (`includes/sms.php`), ale wymaga Twojego konta
   u dostawcy (SMSAPI.pl i podobne) i wklejenia klucza API.
 - **Własne subdomeny per organizacja** (np. `demo-szkola.innovago.pl`) —
