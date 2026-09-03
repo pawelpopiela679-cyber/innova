@@ -23,6 +23,11 @@
   --nb-green: #3f7d45;
   --nb-coral: #e0607a;
   --nb-gold: #c2a05e;
+  /* Caveat = odręczne nagłówki/napisy na fiszkach, Poppins = zwykły tekst
+     (ustalone z właścicielką pracowni; oba zweryfikowane pod kątem
+     poprawnego renderowania polskich znaków w pogrubieniu). */
+  --nb-font-heading: 'Caveat', cursive;
+  --nb-font-body: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   position: relative;
   background:
     linear-gradient(90deg, transparent 0, transparent 54px, var(--nb-margin) 54px, var(--nb-margin) 56px, transparent 56px),
@@ -37,7 +42,7 @@
      tego minimum ostatnia zakładka ucinała się pod overflow:hidden. */
   min-height: 820px;
   color: var(--nb-ink);
-  font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: var(--nb-font-body);
 }
 .notebook .spiral {
   position: absolute; left: 12px; top: 0; bottom: 0; width: 34px;
@@ -74,14 +79,14 @@
 
 /* ---- Hero ---- */
 .nb-hero { display: grid; grid-template-columns: 1.1fr .9fr; gap: 36px; align-items: start; margin-top: 26px; position: relative; }
-.nb-hero h1 { font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 800; font-size: 2.9rem; color: var(--nb-green); margin: 0 0 8px; text-wrap: balance; }
+.nb-hero h1 { font-family: var(--nb-font-heading); font-weight: 800; font-size: 3.6rem; color: var(--nb-green); margin: 0 0 8px; text-wrap: balance; }
 .nb-hero h1 .hl { position: relative; display: inline-block; }
 .nb-hero h1 .hl svg { position: absolute; left: 0; bottom: -10px; width: 100%; height: 14px; color: var(--nb-coral); }
-.nb-tagline { font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 700; font-size: 1.35rem; color: var(--nb-green); margin: 6px 0 16px; line-height: 1.3; }
+.nb-tagline { font-family: var(--nb-font-heading); font-weight: 700; font-size: 1.7rem; color: var(--nb-green); margin: 6px 0 16px; line-height: 1.3; }
 .nb-hero p.lead { font-size: 1rem; line-height: 1.7; max-width: 46ch; margin: 0 0 22px; }
 .nb-cta-row { display: flex; gap: 14px; flex-wrap: wrap; }
 .nb-btn {
-  font-family: 'Nunito', sans-serif; font-weight: 800; font-size: .92rem; border-radius: 999px; padding: 13px 24px;
+  font-family: var(--nb-font-body); font-weight: 800; font-size: .92rem; border-radius: 999px; padding: 13px 24px;
   border: 2px solid var(--nb-green); background: var(--nb-paper); color: var(--nb-green); cursor: pointer; text-decoration: none;
   display: inline-flex; align-items: center; gap: 8px;
 }
@@ -110,12 +115,12 @@
 
 /* ---- Karty zajęć ---- */
 .nb-section { margin-top: 56px; }
-.nb-section-title { font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 800; font-size: 1.9rem; color: var(--nb-green); text-align: center; margin: 0 0 30px; }
+.nb-section-title { font-family: var(--nb-font-heading); font-weight: 800; font-size: 2.5rem; color: var(--nb-green); text-align: center; margin: 0 0 30px; }
 .nb-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
 .nb-card { position: relative; border-radius: 14px; padding: 22px 18px 20px; border: 1px solid rgba(74,67,38,.12); box-shadow: 2px 4px 0 rgba(74,67,38,.08); text-decoration: none; color: inherit; display: block; }
 .nb-card .nb-tape { top: -10px; left: 24px; transform: rotate(-6deg); }
 .nb-card .nb-icon { width: 56px; height: 56px; margin-bottom: 10px; }
-.nb-card h3 { font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 700; font-size: 1.15rem; margin: 0 0 8px; }
+.nb-card h3 { font-family: var(--nb-font-heading); font-weight: 700; font-size: 1.5rem; margin: 0 0 8px; }
 .nb-card p { font-size: .86rem; line-height: 1.5; margin: 0 0 12px; color: var(--nb-ink); opacity: .85; }
 .nb-card .nb-more { font-weight: 800; font-size: .85rem; }
 /* Karta = gotowa fiszka (obrazek) dostarczona przez właścicielkę pracowni —
@@ -126,7 +131,7 @@
 
 /* ---- Dlaczego INNOVA ---- */
 .nb-why { margin-top: 60px; border-top: 2px dashed var(--nb-rule); padding-top: 26px; }
-.nb-why-head { display: flex; align-items: center; gap: 10px; font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 800; color: var(--nb-green); font-size: 1.2rem; margin-bottom: 22px; }
+.nb-why-head { display: flex; align-items: center; gap: 10px; font-family: var(--nb-font-heading); font-weight: 800; color: var(--nb-green); font-size: 1.6rem; margin-bottom: 22px; }
 .nb-why-head svg { width: 26px; height: 26px; flex: none; }
 .nb-why-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
 .nb-why-item { display: flex; gap: 12px; }
@@ -138,7 +143,7 @@
 .nb-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin-top: 30px; border: 1px solid rgba(74,67,38,.15); border-radius: 16px; overflow: hidden; }
 .nb-two-col > div { padding: 26px 28px; }
 .nb-two-col > div + div { border-left: 1px dashed var(--nb-rule); }
-.nb-step-title { display: flex; align-items: center; justify-content: space-between; font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 800; font-size: 1.3rem; color: var(--nb-green); }
+.nb-step-title { display: flex; align-items: center; justify-content: space-between; font-family: var(--nb-font-heading); font-weight: 800; font-size: 1.7rem; color: var(--nb-green); }
 .nb-step-title .nb-box { width: 20px; height: 20px; border: 2px solid var(--nb-ink); border-radius: 4px; }
 .nb-step-sub { font-size: .85rem; color: var(--nb-muted); margin: 4px 0 18px; }
 .nb-class-row { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--nb-rule); }
@@ -154,7 +159,7 @@
 
 .nb-staff-row { display: flex; align-items: center; gap: 14px; padding: 13px 0; border-bottom: 1px solid var(--nb-rule); text-decoration: none; color: inherit; }
 .nb-staff-row:last-of-type { border-bottom: none; }
-.nb-staff-row .nb-avatar { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 700; font-size: 1.1rem; flex: none; object-fit: cover; }
+.nb-staff-row .nb-avatar { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-family: var(--nb-font-heading); font-weight: 700; font-size: 1.1rem; flex: none; object-fit: cover; }
 .nb-staff-row b { display: block; font-size: .92rem; }
 .nb-staff-row span { font-size: .8rem; color: var(--nb-muted); }
 
@@ -162,7 +167,7 @@
 .nb-grid-wrap { overflow-x: auto; margin-top: 16px; }
 table.nb-week { border-collapse: collapse; width: 100%; min-width: 560px; }
 table.nb-week th, table.nb-week td { border: 1px solid var(--nb-rule); text-align: center; padding: 8px 4px; font-size: .78rem; }
-table.nb-week th { background: #fff8e6; font-family: 'Baloo 2', 'Nunito', sans-serif; color: var(--nb-green); }
+table.nb-week th { background: #fff8e6; font-family: var(--nb-font-heading); color: var(--nb-green); }
 table.nb-week td.nb-time { font-weight: 800; color: var(--nb-muted); background: #fff8e6; }
 .nb-slot { display: flex; flex-direction: column; align-items: center; gap: 2px; text-decoration: none; color: inherit; }
 .nb-slot .nb-dot { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
@@ -172,7 +177,7 @@ table.nb-week td.nb-time { font-weight: 800; color: var(--nb-muted); background:
 .nb-process-item { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; }
 .nb-process-item svg { width: 26px; height: 26px; color: var(--nb-green); flex: none; margin-top: 2px; }
 .nb-callout { margin-top: 18px; background: #fff8e6; border: 1px dashed var(--nb-gold); border-radius: 12px; padding: 16px; }
-.nb-callout b { font-family: 'Baloo 2', 'Nunito', sans-serif; color: var(--nb-green); }
+.nb-callout b { font-family: var(--nb-font-heading); font-size: 1.3rem; color: var(--nb-green); }
 
 /* ---- Formularze (logowanie/rejestracja) w stylu zeszytu ---- */
 .nb-form-wrap { max-width: 440px; margin: 20px auto 0; }
@@ -182,7 +187,7 @@ table.nb-week td.nb-time { font-weight: 800; color: var(--nb-muted); background:
 }
 .nb-form-card .nb-tape { top: -10px; left: 50%; transform: translateX(-50%) rotate(-4deg); }
 .nb-form h1, .nb-form .nb-form-title {
-  font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 800; font-size: 1.6rem; color: var(--nb-green);
+  font-family: var(--nb-font-heading); font-weight: 800; font-size: 2.1rem; color: var(--nb-green);
   margin: 0 0 6px; text-align: center;
 }
 .nb-form .nb-form-sub { text-align: center; color: var(--nb-muted); font-size: .9rem; margin: 0 0 22px; }
@@ -190,7 +195,7 @@ table.nb-week td.nb-time { font-weight: 800; color: var(--nb-muted); background:
 .nb-field label { display: block; font-weight: 700; font-size: .85rem; margin-bottom: 6px; color: var(--nb-ink); }
 .nb-field input {
   width: 100%; box-sizing: border-box; padding: 11px 14px; border-radius: 10px;
-  border: 1.5px solid var(--nb-rule); background: var(--nb-paper); font-family: 'Nunito', sans-serif;
+  border: 1.5px solid var(--nb-rule); background: var(--nb-paper); font-family: var(--nb-font-body);
   font-size: .95rem; color: var(--nb-ink);
 }
 .nb-field input:focus { outline: none; border-color: var(--nb-green); }
@@ -204,7 +209,7 @@ table.nb-week td.nb-time { font-weight: 800; color: var(--nb-muted); background:
 
 /* ---- Stopka wewnątrz zeszytu ---- */
 .nb-foot { margin-top: 56px; text-align: center; position: relative; }
-.nb-foot .nb-join { font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 700; font-size: 1.4rem; color: var(--nb-green); }
+.nb-foot .nb-join { font-family: var(--nb-font-heading); font-weight: 700; font-size: 1.8rem; color: var(--nb-green); }
 .nb-foot p { font-size: .85rem; color: var(--nb-muted); margin: 8px 0 18px; }
 .nb-social { display: flex; justify-content: center; gap: 12px; }
 .nb-social a { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; text-decoration: none; }
