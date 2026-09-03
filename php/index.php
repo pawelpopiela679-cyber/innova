@@ -9,8 +9,9 @@ $notebookActive = 'home';
 require __DIR__ . '/includes/layout_top.php';
 ?>
 <svg class="nb-doodle" style="left:-40px; top:6px; width:30px; height:30px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z"/></svg>
-<svg class="nb-doodle" style="left:180px; top:-4px; width:28px; height:28px; color:var(--nb-gold);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2l2.9 6.3 6.9.7-5.2 4.6 1.6 6.8L12 16.9 5.8 20.4l1.6-6.8L2.2 9l6.9-.7z"/></svg>
-<svg class="nb-doodle" style="left:-52px; top:400px; width:42px; height:20px;" viewBox="0 0 42 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4c8 10 16 12 24 4M20 4l6 4-2 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+<img class="nb-doodle" src="<?= e(url('assets/img/doodles/star.png')) ?>" alt="" style="left:180px; top:-4px; width:34px;">
+<img class="nb-doodle" src="<?= e(url('assets/img/doodles/arrow.png')) ?>" alt="" style="left:-56px; top:400px; width:46px;">
+<img class="nb-doodle" src="<?= e(url('assets/img/doodles/paper-plane.png')) ?>" alt="" style="right:60px; top:60px; left:auto; width:38px;">
 
 <div class="nb-hero">
   <div>
@@ -29,28 +30,30 @@ require __DIR__ . '/includes/layout_top.php';
     </div>
   </div>
   <div class="nb-photo-block">
-    <div class="nb-photo-frame">
-      <div class="nb-photo-placeholder">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10.5" r="1.5"/><path d="M3 16l4.5-4.5a1 1 0 011.4 0L14 16.5M14 15l2-2a1 1 0 011.4 0L21 16.5"/></svg>
-        <span>miejsce na zdjęcie z zajęć</span>
-      </div>
-    </div>
-    <div class="nb-photo-caption">wgraj prawdziwe zdjęcie w panelu „Wygląd”</div>
-    <div class="nb-sticky">U nas nauka<br>zamienia się<br>w przygodę! 💚</div>
+    <img src="<?= e(url('assets/img/hero-photo.png')) ?>" alt="Dzieci budujące robota na zajęciach INNOVA" class="nb-photo-real">
   </div>
+</div>
+<div class="text-center" style="margin:20px 0 0;">
+  <img src="<?= e(url('assets/img/banners/haslo.png')) ?>" alt="Odkrywaj. Twórz. Rośnij." style="max-width:280px; width:100%; height:auto;">
 </div>
 
 <div class="nb-section">
   <h2 class="nb-section-title">✨ Nasze zajęcia</h2>
   <div class="nb-cards">
-    <?php foreach ($classTypes as $ct): [$bg, $ink] = nb_pastel($ct['key_name']); ?>
-      <a href="<?= e(url('zajecia.php#' . $ct['key_name'])) ?>" class="nb-card" style="background:<?= e($bg) ?>;">
-        <div class="nb-tape"></div>
-        <?= nb_icon_svg($ct['key_name']) ?>
-        <h3 style="color:<?= e($ink) ?>;"><?= e($ct['name']) ?></h3>
-        <p><?= e($ct['description']) ?></p>
-        <span class="nb-more" style="color:<?= e($ink) ?>;">Dowiedz się więcej →</span>
-      </a>
+    <?php foreach ($classTypes as $ct): $art = nb_class_art_url($ct['key_name']); ?>
+      <?php if ($art): ?>
+        <a href="<?= e(url('zajecia.php#' . $ct['key_name'])) ?>" class="nb-card nb-card-art">
+          <img src="<?= e($art) ?>" alt="<?= e($ct['name']) ?>" loading="lazy">
+        </a>
+      <?php else: [$bg, $ink] = nb_pastel($ct['key_name']); ?>
+        <a href="<?= e(url('zajecia.php#' . $ct['key_name'])) ?>" class="nb-card" style="background:<?= e($bg) ?>;">
+          <div class="nb-tape"></div>
+          <?= nb_icon_svg($ct['key_name']) ?>
+          <h3 style="color:<?= e($ink) ?>;"><?= e($ct['name']) ?></h3>
+          <p><?= e($ct['description']) ?></p>
+          <span class="nb-more" style="color:<?= e($ink) ?>;">Dowiedz się więcej →</span>
+        </a>
+      <?php endif; ?>
     <?php endforeach; ?>
   </div>
   <p class="text-center text-muted mt-4">Zajęcia odbywają się 1x w tygodniu. <a href="<?= e(url('zajecia.php')) ?>" style="color:var(--nb-coral); text-decoration:underline;">Zobacz pełny cennik →</a></p>

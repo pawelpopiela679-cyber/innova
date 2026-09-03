@@ -1,10 +1,28 @@
 <?php
 /**
  * Dane i helpery do stylu "Zeszyt szkolny" (assets/notebook.css) — osobne
- * od CLASS_TYPE_ICONS/emoji używanych w reszcie serwisu. Ikonki są rysowane
- * kreską (jak szkic), a nie zdjęciami — patrz rozmowa z właścicielką
- * pracowni o braku prawdziwych grafik/zdjęć do wgrania.
+ * od CLASS_TYPE_ICONS/emoji używanych w reszcie serwisu.
+ *
+ * Prawdziwe grafiki dostarczone przez właścicielkę pracowni (fiszki i
+ * zakładki) mieszkają w assets/img/{tabs,classes,banners}/ — patrz
+ * NB_CLASS_ART poniżej. Matematyka nie miała odpowiednika w dostarczonym
+ * komplecie, więc dla niej (i jako ogólny fallback) zostaje odrysowana
+ * kreską ikonka SVG z NB_SKETCH_ICONS.
  */
+
+/** Prawdziwa grafika fiszki na dany rodzaj zajęć (assets/img/classes/*.png). */
+const NB_CLASS_ART = [
+    'ENGLISH' => 'ENGLISH.png',
+    'ROBOTICS' => 'ROBOTICS.png',
+    'CREATIVE' => 'CREATIVE.png',
+    'SCIENCE' => 'SCIENCE.png',
+    'THEATER' => 'THEATER.png',
+];
+
+function nb_class_art_url(string $key): ?string
+{
+    return isset(NB_CLASS_ART[$key]) ? url('assets/img/classes/' . NB_CLASS_ART[$key]) : null;
+}
 
 /** [tło, kolor kreski/tekstu] — jasna, "papierowa" paleta tej koncepcji. */
 const NB_PASTELS = [
@@ -60,15 +78,14 @@ function nb_tab_defs(): array
     ];
 }
 
-/** Zakładki po prawej krawędzi kartki. */
+/** Zakładki po prawej krawędzi kartki — prawdziwe grafiki (assets/img/tabs). */
 function nb_render_tabs(string $active): string
 {
     $out = '<nav class="nb-tabs">';
     foreach (nb_tab_defs() as $t) {
         $cls = 'nb-tab tab-' . $t['key'] . ($t['key'] === $active ? ' active' : '');
         $out .= '<a href="' . e(url($t['url'])) . '" class="' . $cls . '">'
-            . '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' . $t['icon'] . '</svg>'
-            . '<span class="nb-label">' . e($t['label']) . '</span></a>';
+            . '<img src="' . e(url('assets/img/tabs/' . $t['key'] . '.png')) . '" alt="' . e($t['label']) . '" loading="lazy"></a>';
     }
     return $out . '</nav>';
 }

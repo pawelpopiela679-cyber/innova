@@ -62,7 +62,9 @@ require __DIR__ . '/includes/layout_top.php';
 </div>
 
 <div class="nb-section" id="cennik" style="border-top:2px dashed var(--nb-rule); padding-top:26px;">
-  <h2 class="nb-section-title" style="font-size:1.5rem;">💰 Cennik</h2>
+  <div class="text-center">
+    <img src="<?= e(url('assets/img/banners/cennik.png')) ?>" alt="Cennik — poznaj nasze pakiety i wybierz coś dla siebie!" style="max-width:280px; width:100%; height:auto;">
+  </div>
   <div style="display:flex; flex-direction:column; gap:24px;">
     <?php foreach ($classTypes as $ct):
         [$bg, $ink] = nb_pastel($ct['key_name']);

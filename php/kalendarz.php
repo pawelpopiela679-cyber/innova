@@ -114,12 +114,7 @@ require __DIR__ . '/includes/layout_top.php';
 ?>
 <div class="nb-hero" style="grid-template-columns:1fr 1.4fr; margin-top:0;">
   <div class="nb-photo-block" style="max-width:260px;">
-    <div class="nb-photo-frame">
-      <div class="nb-photo-placeholder" style="aspect-ratio:4/3;">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10.5" r="1.5"/><path d="M3 16l4.5-4.5a1 1 0 011.4 0L14 16.5M14 15l2-2a1 1 0 011.4 0L21 16.5"/></svg>
-        <span style="font-size:.7rem;">miejsce na zdjęcie</span>
-      </div>
-    </div>
+    <img src="<?= e(url('assets/img/banners/grafik.png')) ?>" alt="Grafik — sprawdź aktualne terminy zajęć i zaplanuj swoją przygodę z INNOVA!" style="width:100%; height:auto; filter:drop-shadow(0 8px 16px rgba(74,67,38,.18));">
   </div>
   <div>
     <div class="nb-step-title">3. Sprawdź grafik <span class="nb-box"></span></div>
@@ -169,6 +164,7 @@ require __DIR__ . '/includes/layout_top.php';
     </div>
   </div>
   <div>
+    <img src="<?= e(url('assets/img/banners/zapisz-sie.png')) ?>" alt="Zapisz się już dziś!" style="width:130px; height:auto; display:block; margin:0 auto 16px; transform:rotate(-3deg);">
     <div class="nb-callout">
       <div style="display:flex; gap:10px; align-items:center; margin-bottom:6px;">
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--nb-gold);"><path d="M12 2l2.9 6.3 6.9.7-5.2 4.6 1.6 6.8L12 16.9 5.8 20.4l1.6-6.8L2.2 9l6.9-.7z"/></svg>

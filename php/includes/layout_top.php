@@ -41,7 +41,7 @@ try {
   <div class="notebook">
     <div class="spiral"></div>
     <?= nb_render_tabs($notebookActive) ?>
-    <div style="display:flex; justify-content:flex-end; gap:12px; align-items:center; font-size:.8rem; margin-bottom:8px; flex-wrap:wrap; padding-right:150px;">
+    <div style="display:flex; justify-content:flex-end; gap:12px; align-items:center; font-size:.8rem; margin-bottom:8px; flex-wrap:wrap; padding-right:100px;">
       <?php if ($user): ?>
         <?php if ($isStaff): ?>
           <a href="<?= e(url('admin.php')) ?>" style="color:var(--nb-green,#3f7d45); font-weight:700; text-decoration:none;">Panel prowadzącego</a>

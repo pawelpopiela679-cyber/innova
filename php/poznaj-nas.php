@@ -8,8 +8,10 @@ $notebookTheme = true;
 $notebookActive = 'about';
 require __DIR__ . '/includes/layout_top.php';
 ?>
-<h1 class="nb-section-title" style="font-size:1.8rem;">Poznaj nas</h1>
-<p class="text-center text-muted mt-2">Zespół prowadzących pracowni INNOVA.</p>
+<div class="text-center">
+  <img src="<?= e(url('assets/img/banners/o-nas.png')) ?>" alt="O nas — INNOVA to miejsce, gdzie pasja spotyka się z edukacją." style="max-width:340px; width:100%; height:auto;">
+</div>
+<p class="text-center text-muted mt-4">Zespół prowadzących pracowni INNOVA.</p>
 
 <?php if (!$instructors): ?>
   <p class="text-center text-muted mt-8">Wkrótce pojawi się tu zespół prowadzących.</p>

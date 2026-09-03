@@ -43,24 +43,16 @@
 }
 
 /* ---- Zakładki po prawej: prawdziwe linki do 6 stron ---- */
-.nb-tabs { position: absolute; right: -2px; top: 70px; display: flex; flex-direction: column; gap: 14px; z-index: 30; }
+.nb-tabs { position: absolute; right: 6px; top: 70px; display: flex; flex-direction: column; gap: 10px; z-index: 30; }
 .nb-tab {
-  display: flex; align-items: center; gap: 8px; text-decoration: none;
-  font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 700; font-size: .92rem; color: var(--nb-ink);
-  padding: 11px 16px 11px 14px; border-radius: 10px 4px 4px 10px;
-  box-shadow: 2px 3px 0 rgba(74,67,38,.16);
-  transform: translateX(14px);
-  transition: transform .18s ease;
+  display: block; text-decoration: none;
+  transform: translateX(10px);
+  transition: transform .18s ease, filter .18s ease;
+  filter: drop-shadow(2px 3px 3px rgba(74,67,38,.22));
 }
-.nb-tab svg { width: 18px; height: 18px; flex: none; }
-.nb-tab:hover { transform: translateX(4px); }
-.nb-tab.active { transform: translateX(-6px); box-shadow: 3px 4px 0 rgba(74,67,38,.22); }
-.nb-tab.tab-home { background: #8ecf82; }
-.nb-tab.tab-about { background: #8ec3e2; }
-.nb-tab.tab-classes { background: #7fd0d4; }
-.nb-tab.tab-schedule { background: #eec358; }
-.nb-tab.tab-signup { background: #ec9cc4; }
-.nb-tab.tab-contact { background: #e79579; }
+.nb-tab img { display: block; width: 78px; height: auto; }
+.nb-tab:hover { transform: translateX(2px); }
+.nb-tab.active { transform: translateX(-8px); filter: drop-shadow(3px 4px 4px rgba(74,67,38,.3)); }
 
 /* ---- Górna belka ---- */
 .nb-topbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; margin-bottom: 8px; }
@@ -103,6 +95,9 @@
 }
 .nb-photo-placeholder svg { width: 64px; height: 64px; opacity: .6; }
 .nb-photo-caption { text-align: center; font-size: .72rem; color: var(--nb-muted); margin-top: 6px; font-style: italic; }
+/* Prawdziwe zdjęcie dostarczone przez właścicielkę pracowni — taśma i
+   karteczka są już wypalone w grafice, więc tylko delikatny obrót/cień. */
+.nb-photo-real { display: block; width: 100%; height: auto; filter: drop-shadow(0 10px 20px rgba(74,67,38,.2)); }
 .nb-sticky {
   position: absolute; right: -18px; bottom: -26px; background: #fff8cf; padding: 14px 16px; width: 170px;
   box-shadow: 2px 4px 8px rgba(0,0,0,.15); transform: rotate(-4deg); font-family: 'Caveat', cursive;
@@ -119,6 +114,11 @@
 .nb-card h3 { font-family: 'Baloo 2', 'Nunito', sans-serif; font-weight: 700; font-size: 1.15rem; margin: 0 0 8px; }
 .nb-card p { font-size: .86rem; line-height: 1.5; margin: 0 0 12px; color: var(--nb-ink); opacity: .85; }
 .nb-card .nb-more { font-weight: 800; font-size: .85rem; }
+/* Karta = gotowa fiszka (obrazek) dostarczona przez właścicielkę pracowni —
+   bez własnego tła/ramki, tylko delikatny hover jak reszta kart. */
+.nb-card-art { padding: 0; border: none; box-shadow: none; background: none; transition: transform .15s ease; }
+.nb-card-art img { display: block; width: 100%; height: auto; border-radius: 14px; }
+.nb-card-art:hover { transform: translateY(-4px); }
 
 /* ---- Dlaczego INNOVA ---- */
 .nb-why { margin-top: 60px; border-top: 2px dashed var(--nb-rule); padding-top: 26px; }
@@ -188,9 +188,8 @@ table.nb-week td.nb-time { font-weight: 800; color: var(--nb-muted); background:
   .notebook { padding: 26px 54px 26px 46px; }
   .nb-topbar { padding-right: 52px; }
   .nb-toplinks { display: none; }
-  .nb-tabs { top: 16px; gap: 8px; }
-  .nb-tab { padding: 10px; border-radius: 10px 4px 4px 10px; }
-  .nb-tab .nb-label { display: none; }
+  .nb-tabs { top: 16px; gap: 6px; }
+  .nb-tab img { width: 46px; }
   .nb-hero h1 { font-size: 2.1rem; }
 }
 @media (max-width: 460px) {
