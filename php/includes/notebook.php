@@ -17,6 +17,7 @@ const NB_CLASS_ART = [
     'CREATIVE' => 'CREATIVE.png',
     'SCIENCE' => 'SCIENCE.png',
     'THEATER' => 'THEATER.png',
+    'MATH' => 'MATH.png',
 ];
 
 function nb_class_art_url(string $key): ?string
