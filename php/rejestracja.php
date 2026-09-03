@@ -34,37 +34,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $pageTitle = 'Załóż konto — INNOVA';
+$notebookTheme = true;
+$notebookActive = 'signup';
 require __DIR__ . '/includes/layout_top.php';
 ?>
-<div class="container-sm" style="padding-top:48px; padding-bottom:48px;">
-  <h1 style="font-size:1.6rem;">Załóż konto rodzica</h1>
-  <p class="text-muted">Konto pozwala dodać dzieci i zapisywać je na zajęcia.</p>
+<div class="nb-form-wrap">
+  <div class="nb-form-card nb-form">
+    <div class="nb-tape"></div>
+    <div class="nb-form-title">Załóż konto rodzica</div>
+    <p class="nb-form-sub">Konto pozwala dodać dzieci i zapisywać je na zajęcia.</p>
 
-  <?php if ($error): ?><p class="alert alert-error"><?= e($error) ?></p><?php endif; ?>
+    <?php if ($error): ?><p class="nb-alert-error"><?= e($error) ?></p><?php endif; ?>
 
-  <form method="post" class="mt-6">
-    <?= csrf_field() ?>
-    <input type="hidden" name="next" value="<?= e($next) ?>">
-    <div class="field">
-      <label for="name">Imię i nazwisko</label>
-      <input id="name" name="name" required value="<?= e($_POST['name'] ?? '') ?>">
-    </div>
-    <div class="field">
-      <label for="email">E-mail</label>
-      <input id="email" name="email" type="email" required value="<?= e($_POST['email'] ?? '') ?>">
-    </div>
-    <div class="field">
-      <label for="phone">Telefon (opcjonalnie)</label>
-      <input id="phone" name="phone" value="<?= e($_POST['phone'] ?? '') ?>">
-    </div>
-    <div class="field">
-      <label for="password">Hasło</label>
-      <input id="password" name="password" type="password" required minlength="8" autocomplete="new-password">
-      <p class="field-hint">Co najmniej 8 znaków.</p>
-    </div>
-    <button type="submit" class="btn btn-primary" style="width:100%;">Załóż konto</button>
-  </form>
+    <form method="post">
+      <?= csrf_field() ?>
+      <input type="hidden" name="next" value="<?= e($next) ?>">
+      <div class="nb-field">
+        <label for="name">Imię i nazwisko</label>
+        <input id="name" name="name" required value="<?= e($_POST['name'] ?? '') ?>">
+      </div>
+      <div class="nb-field">
+        <label for="email">E-mail</label>
+        <input id="email" name="email" type="email" required value="<?= e($_POST['email'] ?? '') ?>">
+      </div>
+      <div class="nb-field">
+        <label for="phone">Telefon (opcjonalnie)</label>
+        <input id="phone" name="phone" value="<?= e($_POST['phone'] ?? '') ?>">
+      </div>
+      <div class="nb-field">
+        <label for="password">Hasło</label>
+        <input id="password" name="password" type="password" required minlength="8" autocomplete="new-password">
+        <p class="nb-field-hint">Co najmniej 8 znaków.</p>
+      </div>
+      <button type="submit" class="nb-btn solid" style="width:100%; justify-content:center; box-sizing:border-box;">Załóż konto</button>
+    </form>
 
-  <p class="mt-6 text-muted">Masz już konto? <a href="<?= e(url('logowanie.php')) ?>" style="text-decoration:underline;">Zaloguj się</a></p>
+    <p class="nb-form-foot">Masz już konto? <a href="<?= e(url('logowanie.php')) ?>">Zaloguj się</a></p>
+  </div>
 </div>
 <?php require __DIR__ . '/includes/layout_bottom.php'; ?>

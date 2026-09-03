@@ -29,28 +29,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $pageTitle = 'Zaloguj się — INNOVA';
+$notebookTheme = true;
+$notebookActive = 'signup';
 require __DIR__ . '/includes/layout_top.php';
 ?>
-<div class="container-sm" style="padding-top:48px; padding-bottom:48px;">
-  <h1 style="font-size:1.6rem;">Zaloguj się</h1>
-  <p class="text-muted">Zaloguj się, aby zapisać dziecko na zajęcia lub sprawdzić swoje zapisy.</p>
+<div class="nb-form-wrap">
+  <div class="nb-form-card nb-form">
+    <div class="nb-tape"></div>
+    <div class="nb-form-title">Zaloguj się</div>
+    <p class="nb-form-sub">Zaloguj się, aby zapisać dziecko na zajęcia lub sprawdzić swoje zapisy.</p>
 
-  <?php if ($error): ?><p class="alert alert-error"><?= e($error) ?></p><?php endif; ?>
+    <?php if ($error): ?><p class="nb-alert-error"><?= e($error) ?></p><?php endif; ?>
 
-  <form method="post" class="mt-6">
-    <?= csrf_field() ?>
-    <input type="hidden" name="next" value="<?= e($next) ?>">
-    <div class="field">
-      <label for="email">E-mail</label>
-      <input id="email" name="email" type="email" required autocomplete="email">
-    </div>
-    <div class="field">
-      <label for="password">Hasło</label>
-      <input id="password" name="password" type="password" required autocomplete="current-password">
-    </div>
-    <button type="submit" class="btn btn-primary" style="width:100%;">Zaloguj się</button>
-  </form>
+    <form method="post">
+      <?= csrf_field() ?>
+      <input type="hidden" name="next" value="<?= e($next) ?>">
+      <div class="nb-field">
+        <label for="email">E-mail</label>
+        <input id="email" name="email" type="email" required autocomplete="email">
+      </div>
+      <div class="nb-field">
+        <label for="password">Hasło</label>
+        <input id="password" name="password" type="password" required autocomplete="current-password">
+      </div>
+      <button type="submit" class="nb-btn solid" style="width:100%; justify-content:center; box-sizing:border-box;">Zaloguj się</button>
+    </form>
 
-  <p class="mt-6 text-muted">Nie masz jeszcze konta? <a href="<?= e(url('rejestracja.php')) ?>" style="text-decoration:underline;">Zarejestruj się</a></p>
+    <p class="nb-form-foot">Nie masz jeszcze konta? <a href="<?= e(url('rejestracja.php')) ?>">Zarejestruj się</a></p>
+  </div>
 </div>
 <?php require __DIR__ . '/includes/layout_bottom.php'; ?>
