@@ -25,6 +25,7 @@ require_once __DIR__ . '/theme.php';
 require_once __DIR__ . '/upload.php';
 require_once __DIR__ . '/availability.php';
 require_once __DIR__ . '/enrollment.php';
+require_once __DIR__ . '/notebook.php';
 
 /** Wersja parse_base_path() bezpieczna do wywołania przed załadowaniem helpers.php. */
 function parse_base_path_early(): string

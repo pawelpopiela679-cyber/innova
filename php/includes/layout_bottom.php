@@ -1,4 +1,8 @@
 </main>
+<?php if (!empty($notebookTheme)): ?>
+  </div><!-- .notebook -->
+</div><!-- .notebook-wrap -->
+<?php endif; ?>
 <footer class="site-footer">
   <div style="margin-bottom:16px; display:flex; justify-content:center;"><?= render_logo('sm') ?></div>
   <div class="footer-links">
