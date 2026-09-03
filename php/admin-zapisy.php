@@ -37,6 +37,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!$target || (int) $target['class_type_id'] !== (int) $e['class_type_id']) {
             redirect_with('admin-zapisy.php', ['error' => 'Wybrana grupa nie należy do tego samego rodzaju zajęć.']);
         }
+
+        // Limit miejsc obowiązuje też przy ręcznym potwierdzaniu przez admina —
+        // bez tego sprawdzenia kolejne kliknięcia "Potwierdź" mogłyby po cichu
+        // przepełnić grupę ponad capacity (np. 11/10). Zgłoszenie, które jest
+        // już CONFIRMED w tej samej grupie (zmiana np. tylko innych pól), się
+        // nie liczy podwójnie do własnego limitu.
+        $countStmt = db()->prepare(
+            "SELECT COUNT(*) c FROM enrollments WHERE session_id = ? AND status = 'CONFIRMED' AND id != ?"
+        );
+        $countStmt->execute([$targetSessionId, $enrollmentId]);
+        $confirmedCount = (int) $countStmt->fetch()['c'];
+        if ($confirmedCount >= (int) $target['capacity']) {
+            redirect_with('admin-zapisy.php', ['error' => 'Wybrana grupa jest już pełna (' . $confirmedCount . '/' . (int) $target['capacity'] . ') — przypisz na listę rezerwową albo wybierz inną grupę.']);
+        }
+
         db()->prepare("UPDATE enrollments SET status='CONFIRMED', session_id=?, confirmed_at=CURRENT_TIMESTAMP WHERE id=?")
             ->execute([$targetSessionId, $enrollmentId]);
 
