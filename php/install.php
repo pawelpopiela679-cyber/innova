@@ -43,10 +43,10 @@ try {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Instalacja — INNOVA</title>
 <style>
-  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;max-width:720px;margin:40px auto;padding:0 20px;line-height:1.6;color:#4a4326;background:#efe4cf}
-  .card{background:#f8f3e6;border:1px solid #e2d3ac;border-radius:16px;padding:24px;margin-bottom:20px}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;max-width:720px;margin:40px auto;padding:0 20px;line-height:1.6;color:#4a4326;background:#f6efdf}
+  .card{background:#fdfaf2;border:1px solid #e9dcb8;border-radius:16px;padding:24px;margin-bottom:20px}
   h1{margin-top:0}
-  code{background:#e2d3ac;padding:2px 6px;border-radius:4px}
+  code{background:#e9dcb8;padding:2px 6px;border-radius:4px}
   pre{background:#33301f;color:#f1ead9;padding:16px;border-radius:10px;overflow-x:auto;white-space:pre-wrap}
   .ok{color:#2f7a4f;font-weight:bold}
   .err{color:#b0413e;font-weight:bold}

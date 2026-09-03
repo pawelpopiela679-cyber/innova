@@ -4,10 +4,10 @@
  *  identycznymi jak w wersji Next.js (oliwkowy/beżowy/pudrowy róż). */
 
 const DEFAULT_THEME = [
-    'background' => '#efe4cf',
+    'background' => '#f6efdf',
     'foreground' => '#4a4326',
-    'surface' => '#f8f3e6',
-    'border' => '#e2d3ac',
+    'surface' => '#fdfaf2',
+    'border' => '#e9dcb8',
     'primary' => '#7d7a4a',
     'primaryLight' => '#b3af86',
     'accent' => '#c9848a',
