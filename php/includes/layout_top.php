@@ -30,7 +30,7 @@ try {
 <meta name="description" content="Miejsce rozwoju dla Twojego dziecka. Zajęcia z angielskiego, scenicznych, robotyki, kreatywne, matematyki i eksperymentatorium w Czechowicach-Dziedzicach i online.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@600;700&family=Caveat:wght@600;700;800&family=Poppins:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@600;700&family=Caveat:wght@600;700&family=Poppins:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="<?= e(url('assets/style.css')) ?>">
 <?php if ($notebookTheme): ?><link rel="stylesheet" href="<?= e(url('assets/notebook.css')) ?>"><?php endif; ?>
 <style><?= theme_css_vars($theme) ?></style>

@@ -58,3 +58,4 @@ next-env.d.ts
 /php/uploads/instructors/*
 !/php/uploads/instructors/.gitkeep
 /php/logo.png
+/php/logo-naklejka-nieuzywane.png
