@@ -1,5 +1,10 @@
 /* Paleta i typografia — 1:1 z wersją Next.js (src/app/globals.css):
-   oliwkowy / beżowy / pudrowy róż, czcionki Fredoka/Quicksand/Caveat/Nunito. */
+   oliwkowy / beżowy / pudrowy róż, czcionki Quicksand/Caveat/Nunito.
+   Fredoka usunięta z nagłówków: jej wariant "latin-ext" (polskie znaki)
+   ma bardzo ubogo zaprojektowane pogrubione ę/ś/ć/ą (plik ~4,5 KB, dla
+   porównania Nunito latin-ext to ~35 KB) — w boldzie te litery wyglądają
+   jak inny, cieńszy font niż reszta słowa. Nunito ma pełne, spójne
+   pogrubienie dla wszystkich polskich znaków. */
 
 :root {
   --background: #f6efdf;
@@ -18,7 +23,7 @@
   --logo-pink: #d99a9f;
   --logo-gold: #c9a768;
 
-  --font-heading: 'Fredoka', 'Nunito', sans-serif;
+  --font-heading: 'Nunito', sans-serif;
   --font-logo: 'Quicksand', 'Nunito', sans-serif;
   --font-script: 'Caveat', cursive;
   --font-sans: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -43,7 +48,7 @@ body {
 }
 main { flex: 1 0 auto; }
 a { color: inherit; }
-h1, h2, h3 { font-family: var(--font-heading); font-weight: 700; margin: 0; }
+h1, h2, h3 { font-family: var(--font-heading); font-weight: 800; margin: 0; }
 img { max-width: 100%; }
 
 .container { max-width: 1152px; margin: 0 auto; padding: 0 16px; }
