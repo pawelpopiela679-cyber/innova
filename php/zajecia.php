@@ -18,7 +18,7 @@ require __DIR__ . '/includes/layout_top.php';
 <p class="text-muted" style="max-width:640px;">Zajęcia odbywają się 1x w tygodniu, w małych grupach (maks. 10 dzieci). Pełny terminarz i wolne miejsca znajdziesz w <a href="<?= e(url('kalendarz.php')) ?>" style="color:var(--nb-coral); text-decoration:underline;">grafiku</a>.</p>
 <div class="nb-cta-row">
   <a href="#cennik" class="nb-btn solid uppercase big">Zobacz cennik →</a>
-  <a href="<?= e(url('rejestracja.php')) ?>" class="nb-btn uppercase big">Zapisz się na zajęcia →</a>
+  <a href="<?= e(signup_url()) ?>" class="nb-btn uppercase big">Zapisz się na zajęcia →</a>
 </div>
 
 <div class="nb-two-col">
@@ -104,7 +104,7 @@ require __DIR__ . '/includes/layout_top.php';
         </div>
         <?php endif; ?>
         <p class="text-muted mt-4">Wiek uczestników: <?= (int) $ct['age_min'] ?>–<?= (int) $ct['age_max'] ?> lat</p>
-        <a href="<?= e(url('kalendarz.php?classType=' . $ct['id'])) ?>" class="nb-btn solid">Zobacz terminy →</a>
+        <a href="<?= e(url('kalendarz.php')) ?>" class="nb-btn solid">Zobacz terminy →</a>
       </section>
     <?php endforeach; ?>
   </div>

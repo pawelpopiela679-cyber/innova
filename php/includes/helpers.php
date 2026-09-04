@@ -164,4 +164,23 @@ function render_logo(string $size = 'md', bool $withSubtitle = false): string
         . $sub . '</span>';
 }
 
+/**
+ * Ścieżka (względna, BEZ przepuszczenia przez url()), pod którą mają
+ * prowadzić przyciski "Zapisz się"/"Zapisz dziecko": zalogowanego rodzica
+ * od razu do formularza zapisu, a gościa najpierw do założenia konta
+ * (z powrotem do zapisu zaraz po rejestracji/logowaniu). Osobno od
+ * signup_url() — bo nb_tab_defs() sam przepuszcza wszystkie adresy zakładek
+ * przez url(), więc potrzebuje surowej ścieżki, a nie gotowego URL-a.
+ */
+function signup_path(): string
+{
+    return current_user() ? 'zapisz.php' : 'rejestracja.php?next=' . urlencode(url('zapisz.php'));
+}
+
+/** Gotowy URL (przepuszczony przez url()) do użycia bezpośrednio w href. */
+function signup_url(): string
+{
+    return url(signup_path());
+}
+
 /** Pobiera aktualnie zalogowanego użytkownika (albo null) — patrz auth.php. */

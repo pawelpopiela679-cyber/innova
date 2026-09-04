@@ -72,7 +72,7 @@ function nb_tab_defs(): array
             'icon' => '<path d="M4 5.5C4 4.7 4.7 4 5.5 4H12v16H5.5A1.5 1.5 0 014 18.5v-13z"/><path d="M20 5.5c0-.8-.7-1.5-1.5-1.5H12v16h6.5a1.5 1.5 0 001.5-1.5v-13z"/>'],
         ['key' => 'schedule', 'label' => 'Grafik', 'url' => 'kalendarz.php',
             'icon' => '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>'],
-        ['key' => 'signup', 'label' => 'Zapisy', 'url' => 'rejestracja.php',
+        ['key' => 'signup', 'label' => 'Zapisy', 'url' => signup_path(),
             'icon' => '<path d="M4 20l1.2-4.2L16.6 4.4a1.5 1.5 0 012.1 0l1 1a1.5 1.5 0 010 2.1L8.3 18.8 4 20z"/>'],
         ['key' => 'contact', 'label' => 'Kontakt', 'url' => 'kontakt.php',
             'icon' => '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 6l9 7 9-7"/>'],

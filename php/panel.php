@@ -32,16 +32,16 @@ require __DIR__ . '/includes/layout_top.php';
       <p style="font-size:2rem; font-weight:800;"><?= $childrenCount ?></p>
       <p style="color:var(--primary);">Zarządzaj dziećmi →</p>
     </a>
-    <a href="<?= e(url('kalendarz.php')) ?>" class="card" style="text-decoration:none; color:inherit;">
+    <a href="<?= e(url('zapisz.php')) ?>" class="card" style="text-decoration:none; color:inherit;">
       <p class="text-muted">Zapisz na nowe zajęcia</p>
       <p style="font-size:2rem;">📅</p>
-      <p style="color:var(--primary);">Otwórz kalendarz →</p>
+      <p style="color:var(--primary);">Zapisz dziecko →</p>
     </a>
   </div>
 
   <h2 class="mt-8" style="font-size:1.1rem;">Najbliższe zajęcia</h2>
   <?php if (!$upcoming): ?>
-    <p class="text-muted mt-2">Brak nadchodzących zapisów. <a href="<?= e(url('kalendarz.php')) ?>" style="color:var(--primary); text-decoration:underline;">Zapisz dziecko na zajęcia</a>.</p>
+    <p class="text-muted mt-2">Brak nadchodzących zapisów. <a href="<?= e(url('zapisz.php')) ?>" style="color:var(--primary); text-decoration:underline;">Zapisz dziecko na zajęcia</a>.</p>
   <?php else: ?>
     <div class="mt-4" style="display:flex; flex-direction:column; gap:8px;">
       <?php foreach ($upcoming as $e): ?>

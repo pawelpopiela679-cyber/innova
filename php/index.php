@@ -22,7 +22,7 @@ require __DIR__ . '/includes/layout_top.php';
       <u>wyjątkowe</u> — pomagamy mu rozkwitać.</p>
     <div class="nb-cta-row">
       <a href="<?= e(url('zajecia.php')) ?>" class="nb-btn">Poznaj ofertę →</a>
-      <a href="<?= e(url('rejestracja.php')) ?>" class="nb-btn coral">Zapisz dziecko →</a>
+      <a href="<?= e(signup_url()) ?>" class="nb-btn coral">Zapisz dziecko →</a>
     </div>
     <div class="flex flex-wrap gap-2 mt-6" style="font-size:.82rem;">
       <span class="nb-callout" style="display:inline-block; padding:6px 14px; margin:0;">⭐ Dzień otwarty: 12.09.2026</span>
