@@ -24,6 +24,7 @@ $basePath = 'admin.php';
 $extraParams = $classTypeId ? ['classType' => $classTypeId] : [];
 
 $pageTitle = 'Dostępność terminów — INNOVA';
+$notebookTheme = true;
 require __DIR__ . '/includes/layout_top.php';
 ?>
 <div class="container" style="padding:40px 16px;">

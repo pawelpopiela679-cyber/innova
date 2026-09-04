@@ -10,7 +10,8 @@ $target = $target->fetch();
 if (!$target || $target['role'] !== 'INSTRUCTOR') {
     http_response_code(404);
     $pageTitle = 'Nie znaleziono — INNOVA';
-    require __DIR__ . '/includes/layout_top.php';
+    $notebookTheme = true;
+require __DIR__ . '/includes/layout_top.php';
     echo '<div class="container-sm text-center" style="padding:64px 16px;"><h1>404</h1><p class="text-muted">Nie znaleziono takiego prowadzącego.</p></div>';
     require __DIR__ . '/includes/layout_bottom.php';
     exit;
@@ -70,6 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $pageTitle = 'Edytuj prowadzącego — INNOVA';
+$notebookTheme = true;
 require __DIR__ . '/includes/layout_top.php';
 ?>
 <div class="container-sm" style="padding:40px 16px;">

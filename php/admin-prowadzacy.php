@@ -66,6 +66,7 @@ $staff = db()->query("SELECT * FROM users WHERE role IN ('ADMIN','INSTRUCTOR') O
 $roleLabel = ['ADMIN' => 'Właściciel (master admin)', 'INSTRUCTOR' => 'Prowadzący'];
 
 $pageTitle = 'Prowadzący i konta — INNOVA';
+$notebookTheme = true;
 require __DIR__ . '/includes/layout_top.php';
 ?>
 <div class="container-md" style="padding:40px 16px;">

@@ -42,6 +42,7 @@ $stmt->execute([$user['id']]);
 $children = $stmt->fetchAll();
 
 $pageTitle = 'Moje dzieci — INNOVA';
+$notebookTheme = true;
 require __DIR__ . '/includes/layout_top.php';
 ?>
 <div class="container-md" style="padding:40px 16px;">

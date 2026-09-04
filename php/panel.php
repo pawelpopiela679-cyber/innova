@@ -19,6 +19,7 @@ $upcoming = $stmt->fetchAll();
 $firstName = explode(' ', $user['name'])[0];
 
 $pageTitle = 'Panel rodzica — INNOVA';
+$notebookTheme = true;
 require __DIR__ . '/includes/layout_top.php';
 ?>
 <div class="container-md" style="padding:40px 16px;">

@@ -38,6 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $theme = get_theme();
 
 $pageTitle = 'Wygląd — INNOVA';
+$notebookTheme = true;
 require __DIR__ . '/includes/layout_top.php';
 ?>
 <div class="container-sm" style="padding:40px 16px;">

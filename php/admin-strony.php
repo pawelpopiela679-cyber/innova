@@ -42,6 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $pages = db()->query('SELECT * FROM pages ORDER BY sort_order ASC')->fetchAll();
 
 $pageTitle = 'Strony — INNOVA';
+$notebookTheme = true;
 require __DIR__ . '/includes/layout_top.php';
 ?>
 <div class="container-md" style="padding:40px 16px;">

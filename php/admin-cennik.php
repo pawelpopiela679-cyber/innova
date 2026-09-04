@@ -58,6 +58,7 @@ $classTypes = db()->query('SELECT * FROM class_types ORDER BY id ASC')->fetchAll
 $tiersStmt = db()->prepare('SELECT * FROM pricing_tiers WHERE class_type_id = ? ORDER BY sort_order ASC');
 
 $pageTitle = 'Cennik — INNOVA';
+$notebookTheme = true;
 require __DIR__ . '/includes/layout_top.php';
 ?>
 <div class="container" style="padding:40px 16px;">

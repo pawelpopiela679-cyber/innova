@@ -16,7 +16,8 @@ $e = $stmt->fetch();
 if (!$e || (int) $e['parent_id'] !== (int) $user['id']) {
     http_response_code(404);
     $pageTitle = 'Nie znaleziono — INNOVA';
-    require __DIR__ . '/includes/layout_top.php';
+    $notebookTheme = true;
+require __DIR__ . '/includes/layout_top.php';
     echo '<div class="container-sm text-center" style="padding:64px 16px;"><h1>404</h1></div>';
     require __DIR__ . '/includes/layout_bottom.php';
     exit;
@@ -27,6 +28,7 @@ $waitlisted = $e['status'] === 'WAITLIST';
 $confirmed = $e['status'] === 'CONFIRMED';
 
 $pageTitle = 'Potwierdzenie zgłoszenia — INNOVA';
+$notebookTheme = true;
 require __DIR__ . '/includes/layout_top.php';
 ?>
 <div class="container-sm text-center" style="padding:64px 16px;">
@@ -62,7 +64,7 @@ require __DIR__ . '/includes/layout_top.php';
 
   <div class="mt-8 flex" style="justify-content:center; gap:12px;">
     <a href="<?= e(url('panel-zapisy.php')) ?>" class="btn btn-primary">Moje zapisy</a>
-    <a href="<?= e(url('kalendarz.php')) ?>" class="btn btn-outline">Zapisz na kolejne zajęcia</a>
+    <a href="<?= e(url('zapisz.php')) ?>" class="btn btn-outline">Zapisz na kolejne zajęcia</a>
   </div>
 </div>
 <?php require __DIR__ . '/includes/layout_bottom.php'; ?>

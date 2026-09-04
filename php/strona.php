@@ -9,7 +9,8 @@ $page = $stmt->fetch();
 if (!$page) {
     http_response_code(404);
     $pageTitle = 'Nie znaleziono strony — INNOVA';
-    require __DIR__ . '/includes/layout_top.php';
+    $notebookTheme = true;
+require __DIR__ . '/includes/layout_top.php';
     echo '<div class="container-sm text-center" style="padding:64px 16px;"><h1>404</h1><p class="text-muted">Nie znaleziono takiej strony.</p></div>';
     require __DIR__ . '/includes/layout_bottom.php';
     exit;
@@ -18,6 +19,7 @@ if (!$page) {
 $paragraphs = preg_split('/\n\s*\n/', trim($page['content']));
 
 $pageTitle = e($page['title']) . ' — INNOVA';
+$notebookTheme = true;
 require __DIR__ . '/includes/layout_top.php';
 ?>
 <div class="container-sm" style="padding:48px 16px;">

@@ -31,6 +31,7 @@ $statusLabel = ['PENDING' => 'Oczekuje na potwierdzenie', 'CONFIRMED' => 'Potwie
 $statusBadge = ['PENDING' => 'badge-pending', 'CONFIRMED' => 'badge-confirmed', 'WAITLIST' => 'badge-waitlist', 'CANCELED' => 'badge-canceled'];
 
 $pageTitle = 'Moje zapisy — INNOVA';
+$notebookTheme = true;
 require __DIR__ . '/includes/layout_top.php';
 ?>
 <div class="container-md" style="padding:40px 16px;">

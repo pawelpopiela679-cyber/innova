@@ -32,6 +32,27 @@
      wysokość wiersza (patrz "linia tekstu" niżej), żeby wiersze faktycznie
      siadały na liniach w tle, jak w prawdziwym zeszycie w linie. */
   --nb-line: 33px;
+  /* Przemapowanie ogólnych tokenów motywu (assets/style.css / theme.php) na
+     paletę zeszytu. Panel rodzica i panel prowadzącego/admina wciąż używają
+     "starych", generycznych klas (.card, .btn, .field, .alert, table, ...)
+     zamiast dedykowanych nb-*, więc dzięki temu przemapowaniu też wyglądają
+     spójnie z resztą serwisu — bez przepisywania ich znaczników na nowo.
+     Działa, bo .notebook dostaje te zmienne WPROST (nie przez dziedziczenie
+     z :root), więc wygrywa z inline'owym <style> z theme_css_vars(),
+     niezależnie od kolejności w dokumencie. */
+  --background: var(--nb-paper);
+  --foreground: var(--nb-ink);
+  --surface: var(--nb-surface);
+  --border: rgba(74,67,38,.16);
+  --primary: var(--nb-green);
+  --primary-foreground: #ffffff;
+  --sage: var(--nb-green);
+  --sage-light: #9fb08a;
+  --coral: var(--nb-coral);
+  --mustard: var(--nb-gold);
+  --muted: var(--nb-muted);
+  --font-heading: var(--nb-font-heading);
+  --font-sans: var(--nb-font-body);
   position: relative;
   background:
     linear-gradient(90deg, transparent 0, transparent 54px, var(--nb-margin) 54px, var(--nb-margin) 56px, transparent 56px),
@@ -230,6 +251,23 @@ table.nb-week td.nb-time { font-weight: 700; color: var(--nb-muted); background:
   background: #fbecec; border: 1px solid #e6b8b8; color: #8a2f2f; border-radius: 10px;
   padding: 10px 14px; font-size: .88rem; margin-bottom: 16px;
 }
+
+/* ---- Panel rodzica / panel prowadzącego-admina: dopieszczenie ogólnych
+   klas (.card, .btn, .field, table, .alert, ...) pod motyw zeszytu — patrz
+   przemapowanie zmiennych w .notebook{} wyżej. Same kolory/czcionki już
+   działają przez zmienne; tu tylko rzeczy, których zmienne nie załatwią. */
+.notebook h1, .notebook h2, .notebook h3 {
+  /* Caveat ma wgrane wagi tylko do 700 (patrz historia z Fredoką/font-weight
+     800 gdzie indziej w tym pliku) — bez tej poprawki nagłówki z generycznych
+     stron (panel, admin) wracałyby do awaryjnego, nieodręcznego kroju. */
+  font-weight: 700;
+}
+.notebook .card, .notebook .session-card, .notebook .cal-cell, .notebook .cal-day-card {
+  box-shadow: 2px 4px 0 rgba(74,67,38,.08);
+}
+.notebook table th { color: var(--nb-muted); }
+.notebook table td { border-top-color: var(--nb-rule); }
+.notebook .badge-nav { background: var(--nb-coral); }
 
 /* ---- Stopka wewnątrz zeszytu ---- */
 .nb-foot { margin-top: 56px; text-align: center; position: relative; }

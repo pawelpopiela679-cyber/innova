@@ -52,6 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $classTypes = db()->query('SELECT * FROM class_types ORDER BY id ASC')->fetchAll();
 
 $pageTitle = 'Nowe zajęcia — INNOVA';
+$notebookTheme = true;
 require __DIR__ . '/includes/layout_top.php';
 ?>
 <div class="container-md" style="padding:40px 16px;">

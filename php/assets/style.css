@@ -145,8 +145,12 @@ a.card-top-accent h3 { transition: color .15s ease; }
 
 /* --- Formularze --- */
 label { font-size: 0.9rem; font-weight: 600; display: block; margin-bottom: 4px; }
-input[type=text], input[type=email], input[type=password], input[type=date],
-input[type=time], input[type=number], input[type=tel], input[type=color],
+/* Negatywna lista zamiast wymieniania każdego input[type=...] osobno — kilka
+   formularzy (np. admin-zajecia-nowe.php) ma <input> bez jawnego type="text"
+   (przeglądarka i tak traktuje to jako tekstowe pole), a selektor atrybutowy
+   input[type=text] NIE łapie takich pól bez jawnego atrybutu, więc wcześniej
+   wychodziły nieostylowane, białe. */
+input:not([type=checkbox]):not([type=radio]):not([type=submit]):not([type=button]):not([type=file]),
 select, textarea {
   width: 100%; padding: 9px 12px; border-radius: 10px; border: 1px solid var(--border);
   background: var(--background); color: var(--foreground); font: inherit;
