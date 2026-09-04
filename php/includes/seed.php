@@ -208,7 +208,12 @@ function run_seed(): array
         // zgłoszenia — pozwala bezpiecznie podmienić cały grafik (dni/godziny)
         // na nowy, bez ręcznego kasowania w panelu i BEZ ryzyka utraty
         // prawdziwych zgłoszeń rodziców (te sesje zawsze zostają nietknięte).
-        $pdo->prepare('DELETE FROM class_sessions WHERE class_type_id = ? AND id NOT IN (SELECT DISTINCT session_id FROM enrollments)')
+        // Zgłoszenie chroni termin na dwa sposoby: staro (session_id — sprzed
+        // wprowadzenia grup) i dziś (group_id — dziecko przypisane w panelu
+        // grup do GRUPY, nie do jednego konkretnego tygodnia tej grupy).
+        $pdo->prepare('DELETE FROM class_sessions WHERE class_type_id = ?
+            AND id NOT IN (SELECT DISTINCT session_id FROM enrollments WHERE session_id IS NOT NULL)
+            AND (group_id IS NULL OR group_id NOT IN (SELECT DISTINCT group_id FROM enrollments WHERE group_id IS NOT NULL))')
             ->execute([$classTypeId]);
 
         // Cennik zakładamy TYLKO przy pierwszym utworzeniu tego rodzaju zajęć.
