@@ -182,7 +182,6 @@ function ensure_schema(): void
         FOREIGN KEY (parent_id) REFERENCES users(id) ON DELETE CASCADE
     )$engine");
     create_index_if_missing($pdo, 'idx_enrollments_parent', 'enrollments', 'parent_id');
-    create_index_if_missing($pdo, 'idx_enrollments_group', 'enrollments', 'group_id');
     // session_id był kiedyś wymagany (rodzic wybierał konkretny termin z
     // kalendarza) — teraz zgłoszenie wiąże się z rodzajem zajęć (class_type_id),
     // a dopiero po przydzieleniu do grupy dostaje group_id. session_id
@@ -190,6 +189,11 @@ function ensure_schema(): void
     modify_column($pdo, 'enrollments', 'session_id', 'INT NULL');
     add_column_if_missing($pdo, 'enrollments', 'class_type_id', 'INT NULL');
     add_column_if_missing($pdo, 'enrollments', 'group_id', 'INT NULL');
+    // Indeks na group_id MUSI powstać PO dołożeniu tej kolumny wyżej — na
+    // istniejącej (produkcyjnej) tabeli enrollments group_id nie istnieje,
+    // dopóki add_column_if_missing go nie doda (CREATE TABLE IF NOT EXISTS
+    // nic tu nie zmienia, bo tabela już istnieje).
+    create_index_if_missing($pdo, 'idx_enrollments_group', 'enrollments', 'group_id');
 
     $pdo->exec("CREATE TABLE IF NOT EXISTS site_settings (
         id VARCHAR(20) PRIMARY KEY,
