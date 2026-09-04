@@ -8,7 +8,7 @@ $isMasterAdmin = $user['role'] === 'ADMIN';
     Zgłoszenia
     <?php if ($pendingCount > 0): ?><span class="badge-nav"><?= $pendingCount ?></span><?php endif; ?>
   </a>
-  <a href="<?= e(url('admin.php')) ?>" style="border-radius:999px; padding:6px 16px;">Dostępność terminów</a>
+  <a href="<?= e(url('admin.php')) ?>" style="border-radius:999px; padding:6px 16px;">Zaplanowane zajęcia</a>
   <a href="<?= e(url('admin-zajecia-nowe.php')) ?>" style="border-radius:999px; padding:6px 16px;">+ Nowe zajęcia</a>
   <a href="<?= e(url('admin-profil.php')) ?>" style="border-radius:999px; padding:6px 16px;">Mój profil</a>
   <?php if ($isMasterAdmin): ?>
