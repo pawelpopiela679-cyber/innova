@@ -159,6 +159,14 @@ function format_session_when(string $startsAt, string $endsAt): string
     return format_pl_date($startsAt, true, true) . ' – ' . h_m($endsAt);
 }
 
+/** Cotygodniowy rytm grupy jako tekst, np. "poniedziałki, 13:00–14:00". */
+function format_group_schedule(int $dayOfWeek, string $startTime, string $endTime): string
+{
+    $days = ['poniedziałki', 'wtorki', 'środy', 'czwartki', 'piątki', 'soboty', 'niedziele'];
+    $label = $days[$dayOfWeek - 1] ?? '?';
+    return "$label, $startTime–$endTime";
+}
+
 // ---------------------------------------------------------------------
 // Szablony e-maili — odpowiedniki funkcji z src/lib/mailer.ts.
 // ---------------------------------------------------------------------
@@ -193,10 +201,74 @@ function send_enrollment_pending_email(array $p): void
     send_mail($p['parentEmail'], $subject, $html, $text);
 }
 
+/**
+ * Wysyłany do rodzica od razu po zgłoszeniu chęci zapisu na RODZAJ zajęć —
+ * konkretnej grupy/terminu jeszcze nie ma, przydzieli ją pracownia (patrz
+ * admin-grupy.php), po czym idzie osobny e-mail: send_enrollment_confirmation_email.
+ */
+function send_signup_request_email(array $p): void
+{
+    $subject = "Zgłoszenie przyjęte: {$p['classTypeName']} ({$p['childName']})";
+
+    $text = "Cześć {$p['parentName']},\n\n"
+        . "Dziękujemy za zgłoszenie! Sprawdzimy dostępność miejsc i dobierzemy właściwą grupę wiekową\n"
+        . "dla dziecka. Gdy tylko to zrobimy, wyślemy kolejnego e-maila z potwierdzeniem, przypisaną\n"
+        . "grupą i dniem/godziną zajęć.\n\n"
+        . "Zgłoszone zajęcia: {$p['classTypeName']}\n"
+        . "Dziecko: {$p['childName']}\n\n"
+        . "INNOVA — Pracownia kreatywno-edukacyjna";
+
+    $html = '<div style="font-family: sans-serif; max-width: 480px;">'
+        . '<p>Cześć ' . esc_html_mail($p['parentName']) . ',</p>'
+        . '<p>Dziękujemy za zgłoszenie! Sprawdzimy dostępność miejsc i dobierzemy właściwą grupę '
+        . 'wiekową dla dziecka. Gdy tylko to zrobimy, wyślemy kolejnego e-maila z potwierdzeniem, '
+        . 'przypisaną grupą i dniem/godziną zajęć.</p>'
+        . '<table style="border-collapse: collapse; margin: 16px 0;">'
+        . '<tr><td style="padding:4px 12px 4px 0; color:#666;">Zajęcia</td><td><strong>' . esc_html_mail($p['classTypeName']) . '</strong></td></tr>'
+        . '<tr><td style="padding:4px 12px 4px 0; color:#666;">Dziecko</td><td>' . esc_html_mail($p['childName']) . '</td></tr>'
+        . '</table>'
+        . '<p style="color:#999; font-size: 12px;">INNOVA — Pracownia kreatywno-edukacyjna</p></div>';
+
+    send_mail($p['parentEmail'], $subject, $html, $text);
+}
+
+/** Powiadomienie dla pracowni o nowym zgłoszeniu chęci zapisu (bez przypisanej jeszcze grupy). */
+function send_studio_new_request_notification(array $p): void
+{
+    if (empty(STUDIO_NOTIFY_EMAIL)) {
+        return;
+    }
+    $age = calculate_age($p['childBirthDate']);
+    $subject = "Nowe zgłoszenie — czeka na przydzielenie grupy: {$p['childName']} ($age lat) → {$p['classTypeName']}";
+
+    $text = "Nowe zgłoszenie chęci zapisu — czeka w puli na przydzielenie grupy!\n\n"
+        . "Zajęcia: {$p['classTypeName']}\n"
+        . "Dziecko: {$p['childName']} — WIEK: $age lat (ur. " . format_pl_date($p['childBirthDate']) . ")\n"
+        . "Rodzic/opiekun: {$p['parentName']}\n"
+        . "E-mail: {$p['parentEmail']}\n"
+        . "Telefon: " . ($p['parentPhone'] ?: 'brak') . "\n\n"
+        . "Przydziel grupę w panelu: " . APP_URL . "/admin-grupy.php";
+
+    $html = '<div style="font-family: sans-serif; max-width: 480px;">'
+        . '<p><strong>Nowe zgłoszenie chęci zapisu — czeka w puli na przydzielenie grupy!</strong></p>'
+        . '<p>Zajęcia: ' . esc_html_mail($p['classTypeName']) . '</p>'
+        . '<p>Dziecko: ' . esc_html_mail($p['childName']) . ' — <strong>wiek: ' . $age . ' lat</strong> (ur. ' . esc_html_mail(format_pl_date($p['childBirthDate'])) . ')<br>'
+        . 'Rodzic/opiekun: ' . esc_html_mail($p['parentName']) . '<br>'
+        . 'E-mail: ' . esc_html_mail($p['parentEmail']) . '<br>'
+        . 'Telefon: ' . esc_html_mail($p['parentPhone'] ?: 'brak') . '</p>'
+        . '<p><a href="' . esc_html_mail(APP_URL . '/admin-grupy.php') . '">Przydziel grupę →</a></p></div>';
+
+    $recipients = array_map('trim', explode(',', STUDIO_NOTIFY_EMAIL));
+    send_mail($recipients, $subject, $html, $text);
+}
+
 /** Potwierdzenie zapisu (albo lista rezerwowa, gdy $p['waitlisted'] = true). */
 function send_enrollment_confirmation_email(array $p): void
 {
-    $when = format_session_when($p['startsAt'], $p['endsAt']);
+    // 'when' — gotowy tekst terminu (np. z format_group_schedule dla grupy,
+    // rytm cotygodniowy, nie jedna data) — albo, dla starszych wywołań,
+    // policzony ze konkretnej daty startsAt/endsAt.
+    $when = $p['when'] ?? format_session_when($p['startsAt'], $p['endsAt']);
     $waitlisted = !empty($p['waitlisted']);
     $statusLine = $waitlisted
         ? 'Grupa jest obecnie pełna — dziecko zostało zapisane na listę rezerwową. Odezwiemy się, jeśli zwolni się miejsce.'
@@ -235,17 +307,18 @@ function send_enrollment_confirmation_email(array $p): void
     send_mail($p['parentEmail'], $subject, $html, $text);
 }
 
-/** Wysyłany, gdy pracownia odrzuci/anuluje zgłoszenie. */
+/** Wysyłany, gdy pracownia odrzuci/anuluje zgłoszenie. 'sessionTitle' opcjonalne (np. odrzucenie z puli, przed przydzieleniem grupy). */
 function send_enrollment_declined_email(array $p): void
 {
-    $subject = "Zgłoszenie nie zostało przyjęte: {$p['sessionTitle']} ({$p['childName']})";
+    $classLabel = $p['classTypeName'] . (!empty($p['sessionTitle']) ? ' — ' . $p['sessionTitle'] : '');
+    $subject = "Zgłoszenie nie zostało przyjęte: {$classLabel} ({$p['childName']})";
     $text = "Cześć {$p['parentName']},\n\n"
-        . "Niestety nie możemy przyjąć zgłoszenia dziecka ({$p['childName']}) na zajęcia: {$p['classTypeName']} — {$p['sessionTitle']}.\n"
+        . "Niestety nie możemy przyjąć zgłoszenia dziecka ({$p['childName']}) na zajęcia: {$classLabel}.\n"
         . "Zachęcamy do sprawdzenia innych terminów w kalendarzu lub kontaktu z nami.\n\n"
         . "INNOVA — Pracownia kreatywno-edukacyjna";
     $html = '<div style="font-family: sans-serif; max-width: 480px;">'
         . '<p>Cześć ' . esc_html_mail($p['parentName']) . ',</p>'
-        . '<p>Niestety nie możemy przyjąć zgłoszenia dziecka (' . esc_html_mail($p['childName']) . ') na zajęcia: <strong>' . esc_html_mail($p['classTypeName']) . ' — ' . esc_html_mail($p['sessionTitle']) . '</strong>.</p>'
+        . '<p>Niestety nie możemy przyjąć zgłoszenia dziecka (' . esc_html_mail($p['childName']) . ') na zajęcia: <strong>' . esc_html_mail($classLabel) . '</strong>.</p>'
         . '<p>Zachęcamy do sprawdzenia innych terminów w kalendarzu lub kontaktu z nami.</p>'
         . '<p style="color:#999; font-size: 12px;">INNOVA — Pracownia kreatywno-edukacyjna</p></div>';
     send_mail($p['parentEmail'], $subject, $html, $text);

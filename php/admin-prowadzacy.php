@@ -11,6 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email = trim(strtolower((string) ($_POST['email'] ?? '')));
         $password = (string) ($_POST['password'] ?? '');
         $bio = trim((string) ($_POST['bio'] ?? ''));
+        $canManageGroups = !empty($_POST['canManageGroups']) ? 1 : 0;
 
         if (mb_strlen($name) < 2) {
             redirect_with('admin-prowadzacy.php', ['error' => 'Podaj imię i nazwisko.']);
@@ -27,8 +28,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             redirect_with('admin-prowadzacy.php', ['error' => 'Konto z tym adresem e-mail już istnieje.']);
         }
 
-        db()->prepare('INSERT INTO users (name, email, bio, password_hash, role) VALUES (?,?,?,?,?)')
-            ->execute([$name, $email, $bio ?: null, hash_password($password), 'INSTRUCTOR']);
+        db()->prepare('INSERT INTO users (name, email, bio, password_hash, role, can_manage_groups) VALUES (?,?,?,?,?,?)')
+            ->execute([$name, $email, $bio ?: null, hash_password($password), 'INSTRUCTOR', $canManageGroups]);
         $newId = db_last_id(db());
 
         if (!empty($_FILES['photo']['name'])) {
@@ -93,7 +94,9 @@ require __DIR__ . '/includes/layout_top.php';
             <div class="avatar-placeholder"><?= e(mb_substr($u['name'], 0, 1)) ?></div>
           <?php endif; ?>
           <div>
-            <p style="font-weight:700;"><?= e($u['name']) ?> <span class="badge" style="background:color-mix(in srgb, var(--sage) 20%, var(--background)); color:var(--sage);"><?= $roleLabel[$u['role']] ?? $u['role'] ?></span></p>
+            <p style="font-weight:700;"><?= e($u['name']) ?> <span class="badge" style="background:color-mix(in srgb, var(--sage) 20%, var(--background)); color:var(--sage);"><?= $roleLabel[$u['role']] ?? $u['role'] ?></span>
+              <?php if ($u['role'] === 'INSTRUCTOR' && $u['can_manage_groups']): ?><span class="badge" style="background:color-mix(in srgb, var(--coral) 22%, var(--background)); color:var(--coral);">Dostęp do grup</span><?php endif; ?>
+            </p>
             <p class="text-muted"><?= e($u['email']) ?></p>
           </div>
         </div>
@@ -138,6 +141,9 @@ require __DIR__ . '/includes/layout_top.php';
       <div class="field" style="grid-column:1/-1;">
         <label for="bio">Krótka notka na stronę „Poznaj nas” (opcjonalnie)</label>
         <textarea id="bio" name="bio" rows="2" maxlength="600"></textarea>
+      </div>
+      <div class="field" style="grid-column:1/-1;">
+        <label class="checkbox-row"><input type="checkbox" name="canManageGroups"> Rozszerzone uprawnienia — panel zarządzania grupami</label>
       </div>
       <div style="grid-column:1/-1;">
         <button type="submit" class="btn btn-sm" style="background:var(--sage); color:#fff;">Utwórz konto prowadzącego</button>

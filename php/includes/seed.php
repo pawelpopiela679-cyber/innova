@@ -40,6 +40,33 @@ function seed_upsert_user(PDO $pdo, string $email, array $createData, array $upd
     return db_last_id($pdo);
 }
 
+/**
+ * Zakłada grupę (class_groups), jeśli nie istnieje jeszcze grupa o takiej
+ * nazwie w tym rodzaju zajęć — w przeciwnym razie aktualizuje dzień/godzinę/
+ * prowadzącego/limit (na wypadek poprawek w grafiku), ale NIE rusza listy
+ * przypisanych do niej dzieci (te żyją w enrollments.group_id, osobno).
+ */
+function seed_upsert_group(PDO $pdo, int $classTypeId, string $name, array $data): int
+{
+    $existing = $pdo->prepare('SELECT id FROM class_groups WHERE class_type_id = ? AND name = ?');
+    $existing->execute([$classTypeId, $name]);
+    $row = $existing->fetch();
+    if ($row) {
+        $pdo->prepare('UPDATE class_groups SET instructor_id=?, instructor_name=?, day_of_week=?, start_time=?, end_time=?, capacity=?, meeting_url=? WHERE id=?')
+            ->execute([
+                $data['instructor_id'], $data['instructor_name'], $data['day_of_week'],
+                $data['start_time'], $data['end_time'], $data['capacity'], $data['meeting_url'], $row['id'],
+            ]);
+        return (int) $row['id'];
+    }
+    $pdo->prepare('INSERT INTO class_groups (class_type_id, name, instructor_id, instructor_name, day_of_week, start_time, end_time, capacity, meeting_url) VALUES (?,?,?,?,?,?,?,?,?)')
+        ->execute([
+            $classTypeId, $name, $data['instructor_id'], $data['instructor_name'], $data['day_of_week'],
+            $data['start_time'], $data['end_time'], $data['capacity'], $data['meeting_url'],
+        ]);
+    return db_last_id($pdo);
+}
+
 /** @return array{0:int,1:bool} [id klasy, czy dopiero co utworzona] */
 function seed_upsert_class_type(PDO $pdo, string $key, array $data): array
 {
@@ -199,8 +226,18 @@ function run_seed(): array
         $total = 0;
         foreach ($def['groups'] as $g) {
             $title = $g['label'] ? "{$g['label']} — {$g['age_label']}" : $g['age_label'];
+            $startTime = sprintf('%02d:%02d', $g['h'], $g['m']);
             $anchor = new DateTime(SEMESTER_START);
             $anchor->modify('+' . $g['day'] . ' days');
+            $endsAnchor = (clone $anchor)->setTime($g['h'], $g['m'])->modify('+' . $g['duration'] . ' minutes');
+            $endTime = $endsAnchor->format('H:i');
+
+            $groupId = seed_upsert_group($pdo, $classTypeId, $title, [
+                'instructor_id' => $instructorId, 'instructor_name' => $instructorName,
+                'day_of_week' => (int) $anchor->format('N'), 'start_time' => $startTime, 'end_time' => $endTime,
+                'capacity' => MAX_GROUP_SIZE, 'meeting_url' => 'https://meet.innova-pracownia.pl/demo-room',
+            ]);
+
             for ($w = 0; $w < $weeksToGenerate; $w++) {
                 $starts = clone $anchor;
                 $starts->modify('+' . $w . ' weeks');
@@ -212,10 +249,14 @@ function run_seed(): array
                 $check = $pdo->prepare('SELECT id FROM class_sessions WHERE class_type_id = ? AND title = ? AND starts_at = ?');
                 $check->execute([$classTypeId, $title, $startsStr]);
                 if ($check->fetch()) {
+                    // Sesja już istnieje (np. z czasów sprzed wprowadzenia grup) —
+                    // dopinamy jej group_id, gdyby jeszcze go nie miała.
+                    $pdo->prepare('UPDATE class_sessions SET group_id = ? WHERE class_type_id = ? AND title = ? AND starts_at = ? AND group_id IS NULL')
+                        ->execute([$groupId, $classTypeId, $title, $startsStr]);
                     continue;
                 }
-                $pdo->prepare('INSERT INTO class_sessions (class_type_id, title, starts_at, ends_at, capacity, meeting_url, instructor_id, instructor_name) VALUES (?,?,?,?,?,?,?,?)')
-                    ->execute([$classTypeId, $title, $startsStr, $ends->format('Y-m-d H:i:s'), MAX_GROUP_SIZE, 'https://meet.innova-pracownia.pl/demo-room', $instructorId, $instructorName]);
+                $pdo->prepare('INSERT INTO class_sessions (class_type_id, group_id, title, starts_at, ends_at, capacity, meeting_url, instructor_id, instructor_name) VALUES (?,?,?,?,?,?,?,?,?)')
+                    ->execute([$classTypeId, $groupId, $title, $startsStr, $ends->format('Y-m-d H:i:s'), MAX_GROUP_SIZE, 'https://meet.innova-pracownia.pl/demo-room', $instructorId, $instructorName]);
                 $total++;
             }
         }
@@ -269,6 +310,19 @@ function run_seed(): array
         }
     }
     $log[] = 'Demo rodzic: rodzic@example.com / Haslo123!';
+
+    // --- Dowiąż group_id/class_type_id do STARYCH zgłoszeń (sprzed grup) ---
+    // Każde zgłoszenie sprzed tej zmiany (i powyższy demo-zapis) ma tylko
+    // session_id — zajętość grupy liczy się teraz po group_id (patrz
+    // get_sessions_with_availability), więc bez tego backfillu prawdziwe,
+    // już potwierdzone zapisy z produkcji wyglądałyby, jakby ich zajęcia
+    // były puste. Nie rusza zgłoszeń, które już mają group_id (np.
+    // przydzielonych ręcznie w panelu grup).
+    $pdo->exec('UPDATE enrollments SET group_id = (SELECT cs.group_id FROM class_sessions cs WHERE cs.id = enrollments.session_id)
+                WHERE group_id IS NULL AND session_id IS NOT NULL');
+    $pdo->exec('UPDATE enrollments SET class_type_id = (SELECT cs.class_type_id FROM class_sessions cs WHERE cs.id = enrollments.session_id)
+                WHERE class_type_id IS NULL AND session_id IS NOT NULL');
+
     $log[] = 'Seed zakończony.';
 
     return $log;

@@ -4,11 +4,9 @@ require_once __DIR__ . '/includes/bootstrap.php';
 /**
  * Uproszczone zgłoszenie chęci zapisu — zastępuje dawny wybór konkretnego
  * terminu w kalendarzu. Rodzic wybiera tylko dziecko + rodzaj zajęć;
- * konkretny termin (session_id, wymagany przez schemat) dobierany jest
- * automatycznie spośród najbliższych zaplanowanych zajęć tego rodzaju —
- * i tak, jak już mówi podpis pod formularzem, to pracownia dobiera
- * właściwą grupę wiekową i potwierdza mailem, więc wybrany tu termin nie
- * jest wiążący.
+ * zgłoszenie trafia do puli oczekujących (status PENDING, bez group_id) —
+ * to pracownia w panelu grup (admin-grupy.php) przydziela dziecko do
+ * konkretnej grupy (dnia/godziny/prowadzącego) i potwierdza e-mailem.
  */
 $user = require_login('zapisz.php');
 
@@ -29,58 +27,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $child->execute([$childId]);
     $child = $child->fetch();
 
+    $classType = db()->prepare('SELECT * FROM class_types WHERE id = ?');
+    $classType->execute([$classTypeId]);
+    $classType = $classType->fetch();
+
     if (!$child || (int) $child['parent_id'] !== (int) $user['id']) {
         $error = 'Wybierz dziecko z listy.';
+    } elseif (!$classType) {
+        $error = 'Wybierz rodzaj zajęć z listy.';
     } else {
-        $session = db()->prepare(
-            "SELECT cs.*, ct.name AS ct_name FROM class_sessions cs JOIN class_types ct ON ct.id = cs.class_type_id
-             WHERE cs.class_type_id = ? AND cs.status = 'SCHEDULED' AND cs.starts_at >= ?
-             ORDER BY cs.starts_at ASC LIMIT 1"
-        );
-        $session->execute([$classTypeId, date('Y-m-d H:i:s')]);
-        $session = $session->fetch();
+        $already = db()->prepare("SELECT * FROM enrollments WHERE child_id = ? AND class_type_id = ? AND status != 'CANCELED'");
+        $already->execute([$childId, $classTypeId]);
+        $already = $already->fetch();
 
-        if (!$session) {
-            $error = 'Chwilowo brak zaplanowanych terminów dla tych zajęć — napisz do nas, a znajdziemy termin.';
-        } else {
-            $sessionId = (int) $session['id'];
-            $already = db()->prepare('SELECT * FROM enrollments WHERE session_id = ? AND child_id = ?');
-            $already->execute([$sessionId, $childId]);
-            $already = $already->fetch();
-
-            if ($already && $already['status'] !== 'CANCELED') {
-                redirect_with('panel-zapisy.php', ['info' => 'Dziecko ma już zgłoszenie na te zajęcia.']);
-            }
-
-            if ($already) {
-                db()->prepare("UPDATE enrollments SET status='PENDING', canceled_at=NULL, confirmed_at=NULL WHERE id=?")->execute([$already['id']]);
-                $enrollmentId = (int) $already['id'];
-            } else {
-                db()->prepare('INSERT INTO enrollments (session_id, child_id, parent_id, status) VALUES (?,?,?,?)')
-                    ->execute([$sessionId, $childId, $user['id'], 'PENDING']);
-                $enrollmentId = db_last_id(db());
-            }
-
-            $countStmt = db()->prepare("SELECT COUNT(*) c FROM enrollments WHERE session_id = ? AND status = 'CONFIRMED'");
-            $countStmt->execute([$sessionId]);
-            $confirmedCount = (int) $countStmt->fetch()['c'];
-
-            send_enrollment_pending_email([
-                'parentEmail' => $user['email'], 'parentName' => $user['name'],
-                'childName' => $child['first_name'] . ' ' . $child['last_name'],
-                'classTypeName' => $session['ct_name'], 'sessionTitle' => $session['title'],
-                'startsAt' => $session['starts_at'], 'endsAt' => $session['ends_at'],
-            ]);
-            send_studio_new_signup_notification([
-                'childName' => $child['first_name'] . ' ' . $child['last_name'], 'childBirthDate' => $child['birth_date'],
-                'parentName' => $user['name'], 'parentEmail' => $user['email'], 'parentPhone' => $user['phone'] ?? '',
-                'classTypeName' => $session['ct_name'], 'sessionTitle' => $session['title'],
-                'startsAt' => $session['starts_at'], 'endsAt' => $session['ends_at'],
-                'confirmedCount' => $confirmedCount, 'capacity' => $session['capacity'],
-            ]);
-
-            redirect('panel-zapisy-potwierdzenie.php?id=' . $enrollmentId);
+        if ($already) {
+            redirect_with('panel-zapisy.php', ['info' => 'Dziecko ma już zgłoszenie na te zajęcia.']);
         }
+
+        db()->prepare('INSERT INTO enrollments (child_id, parent_id, class_type_id, status) VALUES (?,?,?,?)')
+            ->execute([$childId, $user['id'], $classTypeId, 'PENDING']);
+        $enrollmentId = db_last_id(db());
+
+        send_signup_request_email([
+            'parentEmail' => $user['email'], 'parentName' => $user['name'],
+            'childName' => $child['first_name'] . ' ' . $child['last_name'],
+            'classTypeName' => $classType['name'],
+        ]);
+        send_studio_new_request_notification([
+            'childName' => $child['first_name'] . ' ' . $child['last_name'], 'childBirthDate' => $child['birth_date'],
+            'parentName' => $user['name'], 'parentEmail' => $user['email'], 'parentPhone' => $user['phone'] ?? '',
+            'classTypeName' => $classType['name'],
+        ]);
+
+        redirect('panel-zapisy-potwierdzenie.php?id=' . $enrollmentId);
     }
 }
 

@@ -79,8 +79,16 @@ function month_grid_days(DateTime $anchor): array
  */
 function get_sessions_with_availability(DateTime $from, DateTime $to, ?int $classTypeId = null): array
 {
+    // Zajętość liczona po grupie (cs.group_id), nie po pojedynczym terminie —
+    // grupa ma stałą listę dzieci, każde jej cotygodniowe wystąpienie w
+    // kalendarzu pokazuje tę samą zajętość. Dla terminów bez grupy (stare
+    // dane sprzed grup, np. Dzień otwarty) liczymy po staremu, po session_id.
     $sql = "SELECT cs.*, ct.name AS ct_name, ct.color AS ct_color, ct.key_name AS ct_key,
-                   (SELECT COUNT(*) FROM enrollments e WHERE e.session_id = cs.id AND e.status = 'CONFIRMED') AS confirmed_count
+                   (SELECT COUNT(*) FROM enrollments e
+                    WHERE e.status = 'CONFIRMED'
+                      AND ((cs.group_id IS NOT NULL AND e.group_id = cs.group_id)
+                        OR (cs.group_id IS NULL AND e.session_id = cs.id))
+                   ) AS confirmed_count
             FROM class_sessions cs
             JOIN class_types ct ON ct.id = cs.class_type_id
             WHERE cs.starts_at >= ? AND cs.starts_at < ?";

@@ -57,8 +57,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $avatarUrl = null;
     }
 
-    $sql = 'UPDATE users SET name=?, email=?, bio=?, avatar_url=?';
-    $params = [$name, $email, $bio ?: null, $avatarUrl];
+    $canManageGroups = !empty($_POST['canManageGroups']) ? 1 : 0;
+
+    $sql = 'UPDATE users SET name=?, email=?, bio=?, avatar_url=?, can_manage_groups=?';
+    $params = [$name, $email, $bio ?: null, $avatarUrl, $canManageGroups];
     if ($newPassword !== '') {
         $sql .= ', password_hash=?';
         $params[] = hash_password($newPassword);
@@ -114,6 +116,10 @@ require __DIR__ . '/includes/layout_top.php';
     <div class="field">
       <label for="newPassword">Nowe hasło (zostaw puste, żeby nie zmieniać)</label>
       <input id="newPassword" name="newPassword" type="password" minlength="8" autocomplete="new-password">
+    </div>
+    <div class="field" style="border-top:1px solid var(--border); padding-top:16px;">
+      <label class="checkbox-row"><input type="checkbox" name="canManageGroups" <?= $target['can_manage_groups'] ? 'checked' : '' ?>> Rozszerzone uprawnienia — panel zarządzania grupami</label>
+      <p class="field-hint">Odblokowuje osobną zakładkę „Grupy” (przydzielanie dzieci do grup, e-mail do całej grupy). Reszta panelu (edycja/odwoływanie zajęć) zostaje bez zmian dla każdego prowadzącego.</p>
     </div>
 
     <div class="flex gap-2 mt-4">

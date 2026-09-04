@@ -92,6 +92,13 @@ const PL_DAYS_SHORT = [
     'Mon' => 'Pon', 'Tue' => 'Wt', 'Wed' => 'Śr', 'Thu' => 'Czw', 'Fri' => 'Pt', 'Sat' => 'Sob', 'Sun' => 'Nd',
 ];
 
+/** Nazwa dnia tygodnia po numerze ISO-8601 (1=poniedziałek..7=niedziela) — dzień grupy w class_groups.day_of_week. */
+function weekday_name_iso(int $isoDay): string
+{
+    $names = array_values(PL_DAYS); // PL_DAYS jest zdefiniowane pon..nd, więc kolejność wstawiania = ISO 1..7
+    return $names[$isoDay - 1] ?? '?';
+}
+
 /** "14 września 2026" — bez zależności od rozszerzenia intl (nie zawsze
  *  włączone na hostingu współdzielonym). */
 function format_pl_date(string $datetime, bool $withDayName = false, bool $withTime = false): string

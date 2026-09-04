@@ -6,14 +6,19 @@ $childrenCountStmt = db()->prepare('SELECT COUNT(*) c FROM children WHERE parent
 $childrenCountStmt->execute([$user['id']]);
 $childrenCount = (int) $childrenCountStmt->fetch()['c'];
 
-$stmt = db()->prepare("SELECT e.*, c.first_name, c.last_name, cs.starts_at, cs.title AS session_title, ct.name AS ct_name
+// LEFT JOIN — zgłoszenie czekające w puli nie ma jeszcze grupy (pokazujemy
+// je i tak, bez konkretnej daty); next_starts_at to najbliższe cotygodniowe
+// wystąpienie przydzielonej grupy w kalendarzu.
+$stmt = db()->prepare("SELECT e.*, c.first_name, c.last_name, ct.name AS ct_name, g.name AS group_name,
+        (SELECT MIN(cs.starts_at) FROM class_sessions cs WHERE cs.group_id = e.group_id AND cs.starts_at >= ?) AS next_starts_at
     FROM enrollments e
     JOIN children c ON c.id = e.child_id
-    JOIN class_sessions cs ON cs.id = e.session_id
-    JOIN class_types ct ON ct.id = cs.class_type_id
-    WHERE e.parent_id = ? AND e.status IN ('PENDING','CONFIRMED','WAITLIST') AND cs.starts_at >= ?
-    ORDER BY cs.starts_at ASC LIMIT 5");
-$stmt->execute([$user['id'], date('Y-m-d H:i:s')]);
+    LEFT JOIN class_groups g ON g.id = e.group_id
+    LEFT JOIN class_types ct ON ct.id = COALESCE(e.class_type_id, g.class_type_id)
+    WHERE e.parent_id = ? AND e.status IN ('PENDING','CONFIRMED','WAITLIST')
+    ORDER BY (next_starts_at IS NULL) ASC, next_starts_at ASC, e.created_at DESC
+    LIMIT 5");
+$stmt->execute([date('Y-m-d H:i:s'), $user['id']]);
 $upcoming = $stmt->fetchAll();
 
 $firstName = explode(' ', $user['name'])[0];
@@ -48,8 +53,8 @@ require __DIR__ . '/includes/layout_top.php';
       <?php foreach ($upcoming as $e): ?>
         <div class="card flex items-center justify-between" style="justify-content:space-between; padding:16px;">
           <div>
-            <p style="font-weight:700;"><?= e($e['ct_name']) ?> — <?= e($e['first_name'] . ' ' . $e['last_name']) ?></p>
-            <p class="text-muted"><?= e(format_pl_date($e['starts_at'], true, true)) ?></p>
+            <p style="font-weight:700;"><?= e($e['ct_name']) ?><?= $e['group_name'] ? ' — ' . e($e['group_name']) : '' ?> — <?= e($e['first_name'] . ' ' . $e['last_name']) ?></p>
+            <p class="text-muted"><?= $e['next_starts_at'] ? e(format_pl_date($e['next_starts_at'], true, true)) : 'Czeka na przydzielenie grupy' ?></p>
           </div>
           <?php if ($e['status'] === 'WAITLIST'): ?><span class="badge badge-waitlist">Lista rezerwowa</span><?php endif; ?>
           <?php if ($e['status'] === 'PENDING'): ?><span class="badge badge-pending">Oczekuje na potwierdzenie</span><?php endif; ?>

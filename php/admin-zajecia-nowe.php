@@ -26,6 +26,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $instructorId = ($user['role'] === 'INSTRUCTOR' || $user['role'] === 'ADMIN') ? $user['id'] : null;
         $anchor = new DateTime($date);
+
+        // Grupa — trwały byt (nazwa, dzień/godzina, prowadzący, limit) —
+        // niezależny od pojedynczych "wystąpień" w kalendarzu (class_sessions
+        // niżej). Dzieci zapisują się DO GRUPY (patrz admin-grupy.php), nie
+        // do konkretnego tygodnia.
+        $groupId = db()->prepare(
+            'INSERT INTO class_groups (class_type_id, name, instructor_id, instructor_name, day_of_week, start_time, end_time, capacity, meeting_url) VALUES (?,?,?,?,?,?,?,?,?)'
+        );
+        $groupId->execute([
+            $classTypeId, $title, $instructorId, $instructorName,
+            (int) $anchor->format('N'), $startTime, $endTime, $capacity, $meetingUrl ?: null,
+        ]);
+        $groupId = db_last_id(db());
+
         $added = 0;
         for ($w = 0; $w < $weeksCount; $w++) {
             $starts = clone $anchor;
@@ -37,9 +51,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $ends->modify("+$w weeks");
             $ends->setTime((int) $eh, (int) $em);
 
-            db()->prepare('INSERT INTO class_sessions (class_type_id, title, description, starts_at, ends_at, capacity, meeting_url, instructor_id, instructor_name) VALUES (?,?,?,?,?,?,?,?,?)')
+            db()->prepare('INSERT INTO class_sessions (class_type_id, group_id, title, description, starts_at, ends_at, capacity, meeting_url, instructor_id, instructor_name) VALUES (?,?,?,?,?,?,?,?,?,?)')
                 ->execute([
-                    $classTypeId, $title, $description ?: null,
+                    $classTypeId, $groupId, $title, $description ?: null,
                     $starts->format('Y-m-d H:i:s'), $ends->format('Y-m-d H:i:s'),
                     $capacity, $meetingUrl ?: null, $instructorId, $instructorName,
                 ]);
@@ -58,11 +72,11 @@ require __DIR__ . '/includes/layout_top.php';
 <div class="container-md" style="padding:40px 16px;">
   <?php include __DIR__ . '/includes/partials/admin-nav.php'; ?>
 
-  <h1 style="font-size:1.6rem;">Nowe zajęcia</h1>
+  <h1 style="font-size:1.6rem;">Nowa grupa</h1>
   <p class="text-muted mt-2">
-    Podaj dzień i godzinę pierwszych zajęć — jeśli to cykl cotygodniowy (np. „co środę o 17:00
-    przez 10 tygodni”), ustaw liczbę tygodni poniżej, a resztę terminów dodamy automatycznie
-    w tych samych godzinach.
+    Tworzy nową, stałą grupę (dzień/godzina/prowadzący/limit miejsc) i od razu dopina jej
+    cotygodniowe terminy w kalendarzu. Dzieci przypisujesz do utworzonej grupy w
+    <a href="<?= e(url('admin-grupy.php')) ?>" style="color:var(--primary); text-decoration:underline;">panelu grup</a>.
   </p>
 
   <?php if ($error): ?><p class="alert alert-error"><?= e($error) ?></p><?php endif; ?>
@@ -76,8 +90,8 @@ require __DIR__ . '/includes/layout_top.php';
       </select>
     </div>
     <div class="field" style="grid-column:1/-1;">
-      <label for="title">Nazwa zajęć</label>
-      <input id="title" name="title" required placeholder="np. Robotyka — grupa online">
+      <label for="title">Nazwa grupy</label>
+      <input id="title" name="title" required placeholder="np. Robotyka „1” — grupa online">
     </div>
     <div class="field">
       <label for="date">Data pierwszych zajęć</label>

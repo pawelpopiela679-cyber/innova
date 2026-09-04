@@ -70,3 +70,22 @@ function require_admin(): array
 {
     return require_role(['ADMIN'], 'admin.php');
 }
+
+/** Właścicielka zawsze, prowadzący tylko z włączonym can_manage_groups (patrz admin-prowadzacy-edytuj.php). */
+function user_can_manage_groups(?array $user): bool
+{
+    if (!$user) {
+        return false;
+    }
+    return $user['role'] === 'ADMIN' || !empty($user['can_manage_groups']);
+}
+
+/** Jak require_staff(), ale tylko dla uprawnionych do panelu grup. */
+function require_group_manager(): array
+{
+    $user = require_staff();
+    if (!user_can_manage_groups($user)) {
+        redirect('admin.php');
+    }
+    return $user;
+}

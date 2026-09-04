@@ -2,6 +2,17 @@
 require_once __DIR__ . '/includes/bootstrap.php';
 $user = require_staff();
 
+/**
+ * ZASTĄPIONE przez admin-grupy.php (panel grup — pula oczekujących +
+ * przydzielanie do grup przeciągnij-i-upuść). Ta strona zakładała, że
+ * zgłoszenie ma session_id (konkretny termin) — od wprowadzenia grup nowe
+ * zgłoszenia mają class_type_id i group_id zamiast tego, więc zapytanie
+ * niżej (INNER JOIN po session_id) przestałoby je widzieć. Zamiast to
+ * naprawiać, strona zostaje tylko jako nieużywany backup starego
+ * mechanizmu — przekierowujemy na nowy panel.
+ */
+redirect('admin-grupy.php');
+
 function fetch_enrollment_full(int $id): ?array
 {
     $stmt = db()->prepare("SELECT e.*, c.first_name, c.last_name, c.birth_date,
