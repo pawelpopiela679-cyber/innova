@@ -7,8 +7,14 @@
  * php/storage/mail.log — wygodne przy testach bez prawdziwej skrzynki.
  */
 
-/** Niski poziom: wysyła jeden e-mail (tekst + HTML) przez SMTP albo do logu. */
-function send_mail(string|array $to, string $subject, string $html, string $text): void
+/**
+ * Niski poziom: wysyła jeden e-mail (tekst + HTML) przez SMTP albo do logu.
+ * $replyTo — opcjonalnie: prywatna skrzynka prowadzącego, żeby odpowiedź
+ * rodzica na potwierdzenie zapisu trafiła prosto do niego, a nie na główną
+ * skrzynkę wysyłającą (SMTP_FROM_EMAIL). Wysyłka i tak zawsze idzie z
+ * głównej skrzynki — Reply-To zmienia tylko adres, na który leci odpowiedź.
+ */
+function send_mail(string|array $to, string $subject, string $html, string $text, ?string $replyTo = null): void
 {
     $recipients = is_array($to) ? $to : [$to];
     $recipients = array_map('trim', $recipients);
@@ -19,9 +25,10 @@ function send_mail(string|array $to, string $subject, string $html, string $text
             @mkdir($logDir, 0775, true);
         }
         $line = sprintf(
-            "[%s] (SMTP nieskonfigurowane, e-mail NIE wysłany)\nDo: %s\nTemat: %s\n---\n%s\n---\n\n",
+            "[%s] (SMTP nieskonfigurowane, e-mail NIE wysłany)\nDo: %s\nOdpowiedź do: %s\nTemat: %s\n---\n%s\n---\n\n",
             date('Y-m-d H:i:s'),
             implode(', ', $recipients),
+            $replyTo ?: '(główna skrzynka)',
             $subject,
             $text
         );
@@ -30,7 +37,7 @@ function send_mail(string|array $to, string $subject, string $html, string $text
     }
 
     try {
-        smtp_send($recipients, $subject, $html, $text);
+        smtp_send($recipients, $subject, $html, $text, $replyTo);
     } catch (Throwable $e) {
         error_log('[INNOVA] Błąd wysyłki e-maila: ' . $e->getMessage());
     }
@@ -38,7 +45,7 @@ function send_mail(string|array $to, string $subject, string $html, string $text
 
 /** Minimalny klient SMTP (EHLO/STARTTLS/AUTH LOGIN/DATA) — wystarcza dla
  *  typowego serwera pocztowego home.pl albo Gmaila/innej zewnętrznej usługi. */
-function smtp_send(array $recipients, string $subject, string $html, string $text): void
+function smtp_send(array $recipients, string $subject, string $html, string $text, ?string $replyTo = null): void
 {
     $host = SMTP_HOST;
     $port = (int) SMTP_PORT;
@@ -122,6 +129,9 @@ function smtp_send(array $recipients, string $subject, string $html, string $tex
         'Content-Type: multipart/alternative; boundary="' . $boundary . '"',
         'Date: ' . date(DATE_RFC2822),
     ];
+    if ($replyTo) {
+        $headers[] = 'Reply-To: ' . $replyTo;
+    }
 
     $body = implode("\r\n", $headers) . "\r\n\r\n"
         . "--$boundary\r\n"
@@ -278,18 +288,21 @@ function send_enrollment_confirmation_email(array $p): void
         : "Potwierdzenie zapisu: {$p['sessionTitle']} ({$p['childName']})";
 
     $meetingLine = ($p['meetingUrl'] ?? null) && !$waitlisted ? "Link do zajęć online: {$p['meetingUrl']}\n" : '';
+    $instructorLine = $p['instructorName'] . (!empty($p['instructorEmail']) ? " ({$p['instructorEmail']})" : '');
 
     $text = "Cześć {$p['parentName']},\n\n$statusLine\n\n"
         . "Zajęcia: {$p['classTypeName']} — {$p['sessionTitle']}\n"
         . "Dziecko: {$p['childName']}\n"
         . "Termin: $when\n"
-        . "Prowadzący: {$p['instructorName']}\n"
+        . "Prowadzący: $instructorLine\n"
         . $meetingLine
         . "\nDo zobaczenia na zajęciach!\n\nINNOVA — Pracownia kreatywno-edukacyjna";
 
     $meetingRow = ($p['meetingUrl'] ?? null) && !$waitlisted
         ? '<tr><td style="padding:4px 12px 4px 0; color:#666;">Link online</td><td><a href="' . esc_html_mail($p['meetingUrl']) . '">' . esc_html_mail($p['meetingUrl']) . '</a></td></tr>'
         : '';
+    $instructorCell = esc_html_mail($p['instructorName'])
+        . (!empty($p['instructorEmail']) ? ' — <a href="mailto:' . esc_html_mail($p['instructorEmail']) . '">' . esc_html_mail($p['instructorEmail']) . '</a>' : '');
 
     $html = '<div style="font-family: sans-serif; max-width: 480px;">'
         . '<p>Cześć ' . esc_html_mail($p['parentName']) . ',</p>'
@@ -298,13 +311,16 @@ function send_enrollment_confirmation_email(array $p): void
         . '<tr><td style="padding:4px 12px 4px 0; color:#666;">Zajęcia</td><td><strong>' . esc_html_mail($p['classTypeName']) . ' — ' . esc_html_mail($p['sessionTitle']) . '</strong></td></tr>'
         . '<tr><td style="padding:4px 12px 4px 0; color:#666;">Dziecko</td><td>' . esc_html_mail($p['childName']) . '</td></tr>'
         . '<tr><td style="padding:4px 12px 4px 0; color:#666;">Termin</td><td>' . esc_html_mail($when) . '</td></tr>'
-        . '<tr><td style="padding:4px 12px 4px 0; color:#666;">Prowadzący</td><td>' . esc_html_mail($p['instructorName']) . '</td></tr>'
+        . '<tr><td style="padding:4px 12px 4px 0; color:#666;">Prowadzący</td><td>' . $instructorCell . '</td></tr>'
         . $meetingRow
         . '</table>'
         . '<p>Do zobaczenia na zajęciach!</p>'
         . '<p style="color:#999; font-size: 12px;">INNOVA — Pracownia kreatywno-edukacyjna</p></div>';
 
-    send_mail($p['parentEmail'], $subject, $html, $text);
+    // Reply-To na prywatną skrzynkę prowadzącego (jeśli podana) — odpowiedź
+    // rodzica na potwierdzenie trafia prosto do niego, nie na skrzynkę
+    // wysyłającą.
+    send_mail($p['parentEmail'], $subject, $html, $text, $p['instructorEmail'] ?? null);
 }
 
 /** Wysyłany, gdy pracownia odrzuci/anuluje zgłoszenie. 'sessionTitle' opcjonalne (np. odrzucenie z puli, przed przydzieleniem grupy). */

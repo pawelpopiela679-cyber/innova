@@ -40,7 +40,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($action === 'assign') {
         $groupId = (int) ($_POST['groupId'] ?? 0);
-        $group = db()->prepare('SELECT g.*, ct.name AS ct_name FROM class_groups g JOIN class_types ct ON ct.id = g.class_type_id WHERE g.id = ?');
+        $group = db()->prepare('SELECT g.*, ct.name AS ct_name, u.email AS instructor_email
+            FROM class_groups g JOIN class_types ct ON ct.id = g.class_type_id
+            LEFT JOIN users u ON u.id = g.instructor_id
+            WHERE g.id = ?');
         $group->execute([$groupId]);
         $group = $group->fetch();
 
@@ -82,8 +85,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'childName' => $child['first_name'] . ' ' . $child['last_name'],
             'classTypeName' => $group['ct_name'], 'sessionTitle' => $group['name'],
             'when' => format_group_schedule((int) $group['day_of_week'], $group['start_time'], $group['end_time']),
-            'instructorName' => $group['instructor_name'], 'meetingUrl' => $group['meeting_url'],
-            'waitlisted' => $isFull,
+            'instructorName' => $group['instructor_name'], 'instructorEmail' => $group['instructor_email'],
+            'meetingUrl' => $group['meeting_url'], 'waitlisted' => $isFull,
         ]);
 
         redirect('admin-grupy.php?assigned=1');

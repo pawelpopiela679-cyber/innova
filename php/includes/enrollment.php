@@ -28,7 +28,10 @@ function promote_next_waitlisted(int $groupId): void
     db()->prepare("UPDATE enrollments SET status = 'CONFIRMED', confirmed_at = CURRENT_TIMESTAMP WHERE id = ?")
         ->execute([$next['id']]);
 
-    $group = db()->prepare('SELECT g.*, ct.name AS ct_name FROM class_groups g JOIN class_types ct ON ct.id = g.class_type_id WHERE g.id = ?');
+    $group = db()->prepare('SELECT g.*, ct.name AS ct_name, u.email AS instructor_email
+        FROM class_groups g JOIN class_types ct ON ct.id = g.class_type_id
+        LEFT JOIN users u ON u.id = g.instructor_id
+        WHERE g.id = ?');
     $group->execute([$groupId]);
     $g = $group->fetch();
 
@@ -40,6 +43,7 @@ function promote_next_waitlisted(int $groupId): void
         'sessionTitle' => $g['name'],
         'when' => format_group_schedule((int) $g['day_of_week'], $g['start_time'], $g['end_time']),
         'instructorName' => $g['instructor_name'],
+        'instructorEmail' => $g['instructor_email'],
         'meetingUrl' => $g['meeting_url'],
         'waitlisted' => false,
     ]);
