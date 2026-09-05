@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/includes/bootstrap.php';
-$user = require_admin();
+$user = require_staff_manager();
+$isMasterAdmin = $user['role'] === 'ADMIN';
 
 $targetId = (int) ($_GET['id'] ?? $_POST['userId'] ?? 0);
 $target = db()->prepare('SELECT * FROM users WHERE id = ?');
@@ -57,10 +58,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $avatarUrl = null;
     }
 
-    $canManageGroups = !empty($_POST['canManageGroups']) ? 1 : 0;
+    // Tylko właścicielka może zmieniać rozszerzone uprawnienia — prowadzący
+    // z can_manage_staff może edytować konta, ale nie dokładać uprawnień
+    // sobie ani innym (nawet wysyłając ten formularz ręcznie, z pominięciem
+    // ukrytego w HTML pola).
+    $canManageGroups = $isMasterAdmin ? (!empty($_POST['canManageGroups']) ? 1 : 0) : (int) $target['can_manage_groups'];
+    $canManageStaff = $isMasterAdmin ? (!empty($_POST['canManageStaff']) ? 1 : 0) : (int) $target['can_manage_staff'];
 
-    $sql = 'UPDATE users SET name=?, email=?, bio=?, avatar_url=?, can_manage_groups=?';
-    $params = [$name, $email, $bio ?: null, $avatarUrl, $canManageGroups];
+    $sql = 'UPDATE users SET name=?, email=?, bio=?, avatar_url=?, can_manage_groups=?, can_manage_staff=?';
+    $params = [$name, $email, $bio ?: null, $avatarUrl, $canManageGroups, $canManageStaff];
     if ($newPassword !== '') {
         $sql .= ', password_hash=?';
         $params[] = hash_password($newPassword);
@@ -117,10 +123,18 @@ require __DIR__ . '/includes/layout_top.php';
       <label for="newPassword">Nowe hasło (zostaw puste, żeby nie zmieniać)</label>
       <input id="newPassword" name="newPassword" type="password" minlength="8" autocomplete="new-password">
     </div>
-    <div class="field" style="border-top:1px solid var(--border); padding-top:16px;">
-      <label class="checkbox-row"><input type="checkbox" name="canManageGroups" <?= $target['can_manage_groups'] ? 'checked' : '' ?>> Rozszerzone uprawnienia — panel zarządzania grupami</label>
-      <p class="field-hint">Odblokowuje osobną zakładkę „Grupy” (przydzielanie dzieci do grup, e-mail do całej grupy). Reszta panelu (edycja/odwoływanie zajęć) zostaje bez zmian dla każdego prowadzącego.</p>
-    </div>
+    <?php if ($isMasterAdmin): ?>
+      <div class="field" style="border-top:1px solid var(--border); padding-top:16px;">
+        <label class="checkbox-row"><input type="checkbox" name="canManageGroups" <?= $target['can_manage_groups'] ? 'checked' : '' ?>> Rozszerzone uprawnienia — panel zarządzania grupami</label>
+        <p class="field-hint">Odblokowuje osobną zakładkę „Grupy” (przydzielanie dzieci do grup, e-mail do całej grupy). Reszta panelu (edycja/odwoływanie zajęć) zostaje bez zmian dla każdego prowadzącego.</p>
+      </div>
+      <div class="field">
+        <label class="checkbox-row"><input type="checkbox" name="canManageStaff" <?= $target['can_manage_staff'] ? 'checked' : '' ?>> Rozszerzone uprawnienia — zarządzanie kontami prowadzących</label>
+        <p class="field-hint">Odblokowuje tę stronę (zakładanie/edycja/usuwanie kont prowadzących) — bez możliwości nadawania dalszych uprawnień innym kontom.</p>
+      </div>
+    <?php else: ?>
+      <p class="text-muted mt-2" style="font-size:0.82rem;">Rozszerzone uprawnienia (dostęp do grup / zarządzanie kontami) może zmieniać wyłącznie właścicielka pracowni.</p>
+    <?php endif; ?>
 
     <div class="flex gap-2 mt-4">
       <button type="submit" class="btn btn-primary">Zapisz zmiany</button>

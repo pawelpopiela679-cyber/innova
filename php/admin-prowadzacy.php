@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/includes/bootstrap.php';
-$user = require_admin();
+$user = require_staff_manager();
+$isMasterAdmin = $user['role'] === 'ADMIN';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_check();
@@ -11,7 +12,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email = trim(strtolower((string) ($_POST['email'] ?? '')));
         $password = (string) ($_POST['password'] ?? '');
         $bio = trim((string) ($_POST['bio'] ?? ''));
-        $canManageGroups = !empty($_POST['canManageGroups']) ? 1 : 0;
+        // Rozszerzone uprawnienia (grupy / zarządzanie kontami) może nadawać
+        // tylko właścicielka — prowadzący z can_manage_staff mogą zakładać i
+        // usuwać konta, ale nie sami sobie/innym dokładać uprawnień.
+        $canManageGroups = ($isMasterAdmin && !empty($_POST['canManageGroups'])) ? 1 : 0;
+        $canManageStaff = ($isMasterAdmin && !empty($_POST['canManageStaff'])) ? 1 : 0;
 
         if (mb_strlen($name) < 2) {
             redirect_with('admin-prowadzacy.php', ['error' => 'Podaj imię i nazwisko.']);
@@ -28,8 +33,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             redirect_with('admin-prowadzacy.php', ['error' => 'Konto z tym adresem e-mail już istnieje.']);
         }
 
-        db()->prepare('INSERT INTO users (name, email, bio, password_hash, role, can_manage_groups) VALUES (?,?,?,?,?,?)')
-            ->execute([$name, $email, $bio ?: null, hash_password($password), 'INSTRUCTOR', $canManageGroups]);
+        db()->prepare('INSERT INTO users (name, email, bio, password_hash, role, can_manage_groups, can_manage_staff) VALUES (?,?,?,?,?,?,?)')
+            ->execute([$name, $email, $bio ?: null, hash_password($password), 'INSTRUCTOR', $canManageGroups, $canManageStaff]);
         $newId = db_last_id(db());
 
         if (!empty($_FILES['photo']['name'])) {
@@ -75,8 +80,9 @@ require __DIR__ . '/includes/layout_top.php';
 
   <h1 style="font-size:1.6rem;">Prowadzący i konta</h1>
   <p class="text-muted mt-2">
-    Jako właściciel pracowni (master admin) możesz zakładać, edytować i usuwać konta prowadzących —
-    po zalogowaniu każdy prowadzący sam dodaje swój grafik w <strong>+ Nowe zajęcia</strong>.
+    Możesz tu zakładać, edytować i usuwać konta prowadzących — po zalogowaniu każdy prowadzący sam
+    dodaje swój grafik w <strong>+ Nowa grupa</strong>.
+    <?php if (!$isMasterAdmin): ?>Rozszerzone uprawnienia (dostęp do grup / do tej strony) może nadawać wyłącznie właścicielka pracowni.<?php endif; ?>
   </p>
 
   <?php if (isset($_GET['error'])): ?><p class="alert alert-error"><?= e($_GET['error']) ?></p><?php endif; ?>
@@ -96,6 +102,7 @@ require __DIR__ . '/includes/layout_top.php';
           <div>
             <p style="font-weight:700;"><?= e($u['name']) ?> <span class="badge" style="background:color-mix(in srgb, var(--sage) 20%, var(--background)); color:var(--sage);"><?= $roleLabel[$u['role']] ?? $u['role'] ?></span>
               <?php if ($u['role'] === 'INSTRUCTOR' && $u['can_manage_groups']): ?><span class="badge" style="background:color-mix(in srgb, var(--coral) 22%, var(--background)); color:var(--coral);">Dostęp do grup</span><?php endif; ?>
+              <?php if ($u['role'] === 'INSTRUCTOR' && $u['can_manage_staff']): ?><span class="badge" style="background:color-mix(in srgb, var(--mustard) 28%, var(--background)); color:#7a5a12;">Zarządza kontami</span><?php endif; ?>
             </p>
             <p class="text-muted"><?= e($u['email']) ?></p>
           </div>
@@ -142,9 +149,14 @@ require __DIR__ . '/includes/layout_top.php';
         <label for="bio">Krótka notka na stronę „Poznaj nas” (opcjonalnie)</label>
         <textarea id="bio" name="bio" rows="2" maxlength="600"></textarea>
       </div>
-      <div class="field" style="grid-column:1/-1;">
-        <label class="checkbox-row"><input type="checkbox" name="canManageGroups"> Rozszerzone uprawnienia — panel zarządzania grupami</label>
-      </div>
+      <?php if ($isMasterAdmin): ?>
+        <div class="field" style="grid-column:1/-1;">
+          <label class="checkbox-row"><input type="checkbox" name="canManageGroups"> Rozszerzone uprawnienia — panel zarządzania grupami</label>
+        </div>
+        <div class="field" style="grid-column:1/-1;">
+          <label class="checkbox-row"><input type="checkbox" name="canManageStaff"> Rozszerzone uprawnienia — zarządzanie kontami prowadzących (ta strona)</label>
+        </div>
+      <?php endif; ?>
       <div style="grid-column:1/-1;">
         <button type="submit" class="btn btn-sm" style="background:var(--sage); color:#fff;">Utwórz konto prowadzącego</button>
       </div>

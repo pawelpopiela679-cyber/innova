@@ -99,13 +99,6 @@
 
 /* ---- Górna belka ---- */
 .nb-topbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; margin-bottom: 8px; }
-.nb-toplinks { display: flex; gap: 26px; font-weight: 700; font-size: .95rem; flex-wrap: wrap; }
-.nb-toplinks a { color: var(--nb-ink); text-decoration: none; position: relative; padding-bottom: 4px; }
-.nb-toplinks a.current { color: var(--nb-green); }
-.nb-toplinks a.current::after {
-  content: ""; position: absolute; left: -2px; right: -2px; bottom: -2px; height: 5px;
-  background: var(--nb-coral); opacity: .55; border-radius: 3px; transform: rotate(-1deg);
-}
 
 /* ---- Doodle ozdoby ---- */
 .nb-doodle { position: absolute; color: var(--nb-green); opacity: .85; pointer-events: none; }
@@ -286,7 +279,6 @@ table.nb-week td.nb-time { font-weight: 700; color: var(--nb-muted); background:
 @media (max-width: 700px) {
   .notebook { padding: 26px 54px 26px 46px; }
   .nb-topbar { padding-right: 52px; }
-  .nb-toplinks { display: none; }
   .nb-tabs { top: 16px; gap: 6px; }
   .nb-tab img { width: 46px; }
   .nb-hero h1 { font-size: 2.1rem; }

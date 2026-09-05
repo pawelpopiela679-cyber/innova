@@ -72,11 +72,18 @@ function ensure_schema(): void
         avatar_url VARCHAR(255) NULL,
         bio TEXT NULL,
         can_manage_groups TINYINT(1) NOT NULL DEFAULT 0,
+        can_manage_staff TINYINT(1) NOT NULL DEFAULT 0,
         created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
     )$engine");
     // Na istniejącej (produkcyjnej) bazie tabela users już jest — dokładamy
-    // kolumnę uprawnień, jeśli jeszcze jej nie ma.
+    // kolumny uprawnień, jeśli jeszcze ich nie ma.
     add_column_if_missing($pdo, 'users', 'can_manage_groups', 'TINYINT(1) NOT NULL DEFAULT 0');
+    add_column_if_missing($pdo, 'users', 'can_manage_staff', 'TINYINT(1) NOT NULL DEFAULT 0');
+    // Z prośby właścicielki: te dwa konkretne konta prowadzących mają od razu
+    // dostęp do zarządzania kontami prowadzących (dodawanie/usuwanie) —
+    // niedestrukcyjne (tylko włącza flagę na koncie, jeśli już istnieje;
+    // nic nie robi, jeśli konto o tym adresie jeszcze nie zostało założone).
+    $pdo->prepare("UPDATE users SET can_manage_staff = 1 WHERE email IN ('marzenawypych@innova-pracownia.pl', 'dominikapopiela@innova-pracownia.pl')")->execute();
 
     $pdo->exec("CREATE TABLE IF NOT EXISTS class_types (
         id $pk,
@@ -213,6 +220,20 @@ function ensure_schema(): void
         muted VARCHAR(20) NOT NULL,
         updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
     )$engine");
+
+    // Aktualności — newsy/nowinki z życia pracowni, mogą dodawać wszyscy
+    // prowadzący (nie tylko właścicielka), widoczne publicznie na aktualnosci.php.
+    $pdo->exec("CREATE TABLE IF NOT EXISTS news_posts (
+        id $pk,
+        title VARCHAR(190) NOT NULL,
+        content TEXT NOT NULL,
+        author_id INT NULL,
+        author_name VARCHAR(190) NOT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE SET NULL
+    )$engine");
+    create_index_if_missing($pdo, 'idx_news_created', 'news_posts', 'created_at');
 
     $pdo->exec("CREATE TABLE IF NOT EXISTS pages (
         id $pk,

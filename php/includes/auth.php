@@ -33,10 +33,42 @@ function logout_user(): void
     session_destroy();
 }
 
-/** Aktualny użytkownik z sesji, albo null. */
+/**
+ * Aktualny użytkownik — dociąga ŚWIEŻY wiersz z bazy (nie tylko to, co
+ * zapisano w sesji przy logowaniu), bo sesja trzyma tylko id/name/email/role.
+ * Bez tego zmiana uprawnień (can_manage_groups/can_manage_staff) albo
+ * profilu przez właścicielkę nie było widać u już zalogowanego prowadzącego,
+ * dopóki się nie wylogował i zalogował ponownie. Wynik cache'owany w
+ * pamięci na czas jednego requestu (funkcja wywoływana wielokrotnie na
+ * stronie — layout, admin-nav, sama strona).
+ */
 function current_user(): ?array
 {
-    return $_SESSION['user'] ?? null;
+    static $cached = null;
+    static $fetched = false;
+    if ($fetched) {
+        return $cached;
+    }
+    $fetched = true;
+
+    $sessionUser = $_SESSION['user'] ?? null;
+    if (!$sessionUser) {
+        return null;
+    }
+    try {
+        $stmt = db()->prepare('SELECT * FROM users WHERE id = ?');
+        $stmt->execute([$sessionUser['id']]);
+        $fresh = $stmt->fetch();
+        if ($fresh) {
+            unset($fresh['password_hash']);
+            $cached = $fresh;
+            return $cached;
+        }
+    } catch (Throwable $e) {
+        // Baza jeszcze niedostępna (np. przed install.php) — użyj danych z sesji.
+    }
+    $cached = $sessionUser;
+    return $cached;
 }
 
 /** Wymaga zalogowania — inaczej przekierowuje na logowanie z powrotem do $next. */
@@ -85,6 +117,30 @@ function require_group_manager(): array
 {
     $user = require_staff();
     if (!user_can_manage_groups($user)) {
+        redirect('admin.php');
+    }
+    return $user;
+}
+
+/**
+ * Właścicielka zawsze, plus dokładnie te konta prowadzących, którym włączono
+ * can_manage_staff (patrz admin-prowadzacy-edytuj.php) — osobne uprawnienie
+ * od can_manage_groups, bo dodawanie/usuwanie kont to coś innego niż
+ * przydzielanie dzieci do grup.
+ */
+function user_can_manage_staff(?array $user): bool
+{
+    if (!$user) {
+        return false;
+    }
+    return $user['role'] === 'ADMIN' || !empty($user['can_manage_staff']);
+}
+
+/** Jak require_staff(), ale tylko dla uprawnionych do zarządzania kontami prowadzących. */
+function require_staff_manager(): array
+{
+    $user = require_staff();
+    if (!user_can_manage_staff($user)) {
         redirect('admin.php');
     }
     return $user;

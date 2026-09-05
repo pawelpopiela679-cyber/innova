@@ -59,7 +59,6 @@ try {
     </div>
     <div class="nb-topbar">
       <a href="<?= e(url('index.php')) ?>" style="text-decoration:none;"><?= render_logo('md', true) ?></a>
-      <?= nb_render_toplinks($notebookActive) ?>
     </div>
 <?php else: ?>
 <header class="navbar">

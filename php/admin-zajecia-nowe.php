@@ -65,6 +65,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $classTypes = db()->query('SELECT * FROM class_types ORDER BY id ASC')->fetchAll();
 
+// Podstawione z kliknięcia komórki w admin-grafik.php (dzień + godzina) —
+// żeby nie trzeba było ręcznie wpisywać tego, co już wybrano na siatce.
+$prefillDate = (string) ($_GET['date'] ?? '');
+$prefillStart = (string) ($_GET['startTime'] ?? '');
+$prefillEnd = (string) ($_GET['endTime'] ?? '');
+
 $pageTitle = 'Nowe zajęcia — INNOVA';
 $notebookTheme = true;
 require __DIR__ . '/includes/layout_top.php';
@@ -95,7 +101,7 @@ require __DIR__ . '/includes/layout_top.php';
     </div>
     <div class="field">
       <label for="date">Data pierwszych zajęć</label>
-      <input id="date" name="date" type="date" required>
+      <input id="date" name="date" type="date" required value="<?= e($prefillDate) ?>">
     </div>
     <div class="field">
       <label for="capacity">Liczba miejsc (maks. 10)</label>
@@ -103,11 +109,11 @@ require __DIR__ . '/includes/layout_top.php';
     </div>
     <div class="field">
       <label for="startTime">Godzina rozpoczęcia</label>
-      <input id="startTime" name="startTime" type="time" required>
+      <input id="startTime" name="startTime" type="time" required value="<?= e($prefillStart) ?>">
     </div>
     <div class="field">
       <label for="endTime">Godzina zakończenia</label>
-      <input id="endTime" name="endTime" type="time" required>
+      <input id="endTime" name="endTime" type="time" required value="<?= e($prefillEnd) ?>">
     </div>
     <div class="field" style="grid-column:1/-1;">
       <label for="weeksCount">Powtórz co tydzień, przez ile tygodni?</label>

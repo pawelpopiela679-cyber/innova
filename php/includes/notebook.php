@@ -91,13 +91,3 @@ function nb_render_tabs(string $active): string
     return $out . '</nav>';
 }
 
-/** Zwykłe linki nawigacyjne w górnej belce (te same 6 stron). */
-function nb_render_toplinks(string $active): string
-{
-    $out = '<div class="nb-toplinks">';
-    foreach (nb_tab_defs() as $t) {
-        $cls = $t['key'] === $active ? ' class="current"' : '';
-        $out .= '<a href="' . e(url($t['url'])) . '"' . $cls . '>' . e($t['label']) . '</a>';
-    }
-    return $out . '</div>';
-}
