@@ -195,17 +195,19 @@
   overflow-x: auto; margin-top: 16px;
   /* Bez własnego tła tabela siadała bezpośrednio na liniaturze zeszytu —
      linie z tła przebijały przez cienkie obramowania komórek i całość była
-     mało czytelna. Jasna "kartka" pod spodem to naprawia. */
-  background: var(--nb-surface);
-  border: 1px solid rgba(74,67,38,.12);
+     mało czytelna. Prawdziwa biel pod spodem (nie --nb-surface — to tylko
+     odcień kremu #fffcf4, ledwo różni się od tła kartki #f8f2e0 i "biała
+     kartka" była w praktyce niewidoczna). */
+  background: #ffffff;
+  border: 1px solid rgba(74,67,38,.15);
   border-radius: 14px;
-  box-shadow: 2px 4px 0 rgba(74,67,38,.08);
+  box-shadow: 0 6px 16px rgba(74,67,38,.15);
   padding: 14px;
 }
 table.nb-week { border-collapse: collapse; width: 100%; min-width: 560px; }
 table.nb-week th, table.nb-week td { border: 1px solid var(--nb-rule); text-align: center; padding: 8px 4px; font-size: .78rem; }
 table.nb-week th { background: #fff8e6; font-family: var(--nb-font-heading); color: var(--nb-green); }
-table.nb-week td { background: var(--nb-surface); }
+table.nb-week td { background: #ffffff; }
 table.nb-week td.nb-time { font-weight: 700; color: var(--nb-muted); background: #fff8e6; }
 .nb-slot { display: flex; flex-direction: column; align-items: center; gap: 2px; text-decoration: none; color: inherit; }
 .nb-slot .nb-dot { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }

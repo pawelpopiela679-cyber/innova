@@ -13,6 +13,7 @@
     <a href="https://innova-pracownia.pl">🌐 www.innova-pracownia.pl</a>
   </div>
   <p class="text-muted mt-4">© <?= date('Y') ?> INNOVA — Pracownia kreatywno-edukacyjna</p>
+  <p class="text-muted" style="font-size:0.65rem; opacity:0.5;">wersja plików: <?= e(defined('APP_BUILD') ? APP_BUILD : '?') ?></p>
 </footer>
 </body>
 </html>

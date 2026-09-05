@@ -40,6 +40,11 @@ if (!defined('AUTH_SECRET') || AUTH_SECRET === 'ZMIEN-MNIE-NA-DLUGI-LOSOWY-CIAG-
     error_log('[INNOVA] UWAGA: AUTH_SECRET nie został zmieniony na własną wartość w config.local.php!');
 }
 
+// Znacznik wersji plików — widoczny w stopce strony, żeby dało się od razu
+// sprawdzić (bez przeglądania dat plików na serwerze), czy wgrana paczka
+// aktualizacyjna faktycznie zastąpiła stare pliki.
+define('APP_BUILD', '20260905-2');
+
 define('UPLOAD_MAX_BYTES', 3 * 1024 * 1024); // 3 MB, jak w wersji Next.js
 define('MAX_GROUP_SIZE', 10); // twarda zasada pracowni: max 10 dzieci na grupę
 define('SEMESTER_START', '2026-09-14'); // poniedziałek — start realnego semestru
