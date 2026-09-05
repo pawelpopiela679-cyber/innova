@@ -87,10 +87,13 @@ require __DIR__ . '/includes/layout_top.php';
             ?>
               <td style="padding:4px; vertical-align:top; border:1px solid var(--nb-border, #e6ddc0); min-width:120px;">
                 <?php foreach ($cellSessions as $s): [$bg, $ink] = nb_pastel($s['ct_key']); ?>
-                  <a href="<?= e(url('admin-zajecia-edytuj.php?id=' . $s['id'])) ?>" class="nb-grafik-chip" title="<?= e($s['title']) ?>" style="display:block; background:<?= e($bg) ?>; color:<?= e($ink) ?>; border-radius:8px; padding:4px 6px; margin-bottom:4px; font-size:0.76rem; text-decoration:none;">
-                    <strong><?= e($s['ct_name']) ?></strong>
-                    <?php if ($s['title'] !== $s['ct_name']): ?><br><?= e($s['title']) ?><?php endif; ?>
-                    <br><?= h_m($s['starts_at']) ?>–<?= h_m($s['ends_at']) ?>
+                  <a href="<?= e(url('admin-zajecia-edytuj.php?id=' . $s['id'])) ?>" class="nb-grafik-chip" title="<?= e($s['title']) ?>" style="display:flex; gap:6px; align-items:flex-start; background:<?= e($bg) ?>; color:<?= e($ink) ?>; border-radius:8px; padding:4px 6px; margin-bottom:4px; font-size:0.76rem; text-decoration:none;">
+                    <span style="flex:none; width:16px; height:16px; margin-top:1px;"><?= nb_icon_svg($s['ct_key'], '') ?></span>
+                    <span>
+                      <strong><?= e($s['ct_name']) ?></strong>
+                      <?php if ($s['title'] !== $s['ct_name']): ?><br><?= e($s['title']) ?><?php endif; ?>
+                      <br><?= h_m($s['starts_at']) ?>–<?= h_m($s['ends_at']) ?>
+                    </span>
                   </a>
                 <?php endforeach; ?>
                 <a href="<?= e($addUrl) ?>" class="nb-grafik-add" title="Dodaj zajęcia — <?= e($dayLabels[$dayIndex]) ?> <?= sprintf('%02d:00', $h) ?>">+ dodaj</a>
@@ -109,5 +112,6 @@ require __DIR__ . '/includes/layout_top.php';
   }
   .nb-grafik-add:hover { background:var(--nb-surface,#fdfaf0); color:var(--nb-green,#3f7d45); border-color:var(--nb-green,#3f7d45); }
   .nb-grafik-chip:hover { filter:brightness(0.95); }
+  .nb-grafik-chip svg { width:16px; height:16px; display:block; }
 </style>
 <?php require __DIR__ . '/includes/layout_bottom.php'; ?>
