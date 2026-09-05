@@ -49,8 +49,10 @@ require __DIR__ . '/includes/layout_top.php';
           <td class="nb-time"><?= e($hour) ?></td>
           <?php foreach (['PON', 'WT', 'ŚR', 'CZW', 'PT'] as $d): ?>
             <td>
-              <?php foreach ($days[$d] ?? [] as $s): [$bg, $ink] = nb_pastel($s['ct_key']); ?>
-                <a href="<?= e(url('zajecia.php#cennik-' . $s['ct_key'])) ?>" class="nb-slot" title="<?= e($s['ct_name']) ?>">
+              <?php foreach ($days[$d] ?? [] as $s): [$bg, $ink] = nb_pastel($s['ct_key']);
+                  $slotHref = $s['group_id'] ? signup_url((int) $s['group_id']) : url('zajecia.php#cennik-' . $s['ct_key']);
+              ?>
+                <a href="<?= e($slotHref) ?>" class="nb-slot" title="<?= e($s['ct_name']) ?> — kliknij, żeby zapisać dziecko na ten termin">
                   <span class="nb-dot" style="background:<?= e($bg) ?>;"><?= nb_icon_svg($s['ct_key'], '') ?></span>
                   <small><?= h_m($s['starts_at']) ?></small>
                 </a>

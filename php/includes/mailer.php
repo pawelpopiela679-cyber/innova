@@ -172,9 +172,7 @@ function format_session_when(string $startsAt, string $endsAt): string
 /** Cotygodniowy rytm grupy jako tekst, np. "poniedziałki, 13:00–14:00". */
 function format_group_schedule(int $dayOfWeek, string $startTime, string $endTime): string
 {
-    $days = ['poniedziałki', 'wtorki', 'środy', 'czwartki', 'piątki', 'soboty', 'niedziele'];
-    $label = $days[$dayOfWeek - 1] ?? '?';
-    return "$label, $startTime–$endTime";
+    return weekday_name_plural_iso($dayOfWeek) . ", {$startTime}–{$endTime}";
 }
 
 // ---------------------------------------------------------------------
@@ -212,29 +210,33 @@ function send_enrollment_pending_email(array $p): void
 }
 
 /**
- * Wysyłany do rodzica od razu po zgłoszeniu chęci zapisu na RODZAJ zajęć —
- * konkretnej grupy/terminu jeszcze nie ma, przydzieli ją pracownia (patrz
- * admin-grupy.php), po czym idzie osobny e-mail: send_enrollment_confirmation_email.
+ * Wysyłany do rodzica od razu po zgłoszeniu chęci zapisu na KONKRETNY
+ * termin (grupę) — dziecko czeka jeszcze na potwierdzenie miejsca przez
+ * pracownię, po czym idzie osobny e-mail: send_enrollment_confirmation_email.
  */
 function send_signup_request_email(array $p): void
 {
-    $subject = "Zgłoszenie przyjęte: {$p['classTypeName']} ({$p['childName']})";
+    $subject = "Zgłoszenie przyjęte: {$p['groupName']} ({$p['childName']})";
 
     $text = "Cześć {$p['parentName']},\n\n"
-        . "Dziękujemy za zgłoszenie! Sprawdzimy dostępność miejsc i dobierzemy właściwą grupę wiekową\n"
-        . "dla dziecka. Gdy tylko to zrobimy, wyślemy kolejnego e-maila z potwierdzeniem, przypisaną\n"
-        . "grupą i dniem/godziną zajęć.\n\n"
-        . "Zgłoszone zajęcia: {$p['classTypeName']}\n"
+        . "Dziękujemy za zgłoszenie! Sprawdzimy dostępność miejsc w wybranym terminie.\n"
+        . "Gdy tylko to zrobimy, wyślemy kolejnego e-maila z ostatecznym potwierdzeniem\n"
+        . "(albo informacją o liście rezerwowej, jeśli termin akurat się zapełnił).\n\n"
+        . "Zgłoszone zajęcia: {$p['classTypeName']} — {$p['groupName']}\n"
+        . "Termin: {$p['when']}\n"
+        . "Prowadzący: {$p['instructorName']}\n"
         . "Dziecko: {$p['childName']}\n\n"
         . "INNOVA — Pracownia kreatywno-edukacyjna";
 
     $html = '<div style="font-family: sans-serif; max-width: 480px;">'
         . '<p>Cześć ' . esc_html_mail($p['parentName']) . ',</p>'
-        . '<p>Dziękujemy za zgłoszenie! Sprawdzimy dostępność miejsc i dobierzemy właściwą grupę '
-        . 'wiekową dla dziecka. Gdy tylko to zrobimy, wyślemy kolejnego e-maila z potwierdzeniem, '
-        . 'przypisaną grupą i dniem/godziną zajęć.</p>'
+        . '<p>Dziękujemy za zgłoszenie! Sprawdzimy dostępność miejsc w wybranym terminie. Gdy tylko '
+        . 'to zrobimy, wyślemy kolejnego e-maila z ostatecznym potwierdzeniem (albo informacją o liście '
+        . 'rezerwowej, jeśli termin akurat się zapełnił).</p>'
         . '<table style="border-collapse: collapse; margin: 16px 0;">'
-        . '<tr><td style="padding:4px 12px 4px 0; color:#666;">Zajęcia</td><td><strong>' . esc_html_mail($p['classTypeName']) . '</strong></td></tr>'
+        . '<tr><td style="padding:4px 12px 4px 0; color:#666;">Zajęcia</td><td><strong>' . esc_html_mail($p['classTypeName']) . ' — ' . esc_html_mail($p['groupName']) . '</strong></td></tr>'
+        . '<tr><td style="padding:4px 12px 4px 0; color:#666;">Termin</td><td>' . esc_html_mail($p['when']) . '</td></tr>'
+        . '<tr><td style="padding:4px 12px 4px 0; color:#666;">Prowadzący</td><td>' . esc_html_mail($p['instructorName']) . '</td></tr>'
         . '<tr><td style="padding:4px 12px 4px 0; color:#666;">Dziecko</td><td>' . esc_html_mail($p['childName']) . '</td></tr>'
         . '</table>'
         . '<p style="color:#999; font-size: 12px;">INNOVA — Pracownia kreatywno-edukacyjna</p></div>';
@@ -242,31 +244,42 @@ function send_signup_request_email(array $p): void
     send_mail($p['parentEmail'], $subject, $html, $text);
 }
 
-/** Powiadomienie dla pracowni o nowym zgłoszeniu chęci zapisu (bez przypisanej jeszcze grupy). */
+/** Powiadomienie dla pracowni o nowym zgłoszeniu chęci zapisu na konkretny termin (grupę). */
 function send_studio_new_request_notification(array $p): void
 {
     if (empty(STUDIO_NOTIFY_EMAIL)) {
         return;
     }
     $age = calculate_age($p['childBirthDate']);
-    $subject = "Nowe zgłoszenie — czeka na przydzielenie grupy: {$p['childName']} ($age lat) → {$p['classTypeName']}";
+    $subject = "Nowe zgłoszenie — czeka na potwierdzenie: {$p['childName']} ($age lat) → {$p['groupName']}";
 
-    $text = "Nowe zgłoszenie chęci zapisu — czeka w puli na przydzielenie grupy!\n\n"
-        . "Zajęcia: {$p['classTypeName']}\n"
+    $noteText = trim($p['note'] ?? '') !== '' ? "\nWiadomość od rodzica: {$p['note']}\n" : '';
+    $noteHtml = trim($p['note'] ?? '') !== ''
+        ? '<p>Wiadomość od rodzica: <em>' . nl2br(esc_html_mail($p['note'])) . '</em></p>'
+        : '';
+
+    $text = "Nowe zgłoszenie chęci zapisu — czeka w puli na potwierdzenie!\n\n"
+        . "Zajęcia: {$p['classTypeName']} — {$p['groupName']}\n"
+        . "Termin: {$p['when']}\n"
+        . "Zajętość wybranego terminu: {$p['confirmedCount']}/{$p['capacity']}\n\n"
         . "Dziecko: {$p['childName']} — WIEK: $age lat (ur. " . format_pl_date($p['childBirthDate']) . ")\n"
         . "Rodzic/opiekun: {$p['parentName']}\n"
         . "E-mail: {$p['parentEmail']}\n"
-        . "Telefon: " . ($p['parentPhone'] ?: 'brak') . "\n\n"
-        . "Przydziel grupę w panelu: " . APP_URL . "/admin-grupy.php";
+        . "Telefon: " . ($p['parentPhone'] ?: 'brak') . "\n"
+        . $noteText
+        . "\nPotwierdź zgłoszenie w panelu: " . APP_URL . "/admin-grupy.php";
 
     $html = '<div style="font-family: sans-serif; max-width: 480px;">'
-        . '<p><strong>Nowe zgłoszenie chęci zapisu — czeka w puli na przydzielenie grupy!</strong></p>'
-        . '<p>Zajęcia: ' . esc_html_mail($p['classTypeName']) . '</p>'
+        . '<p><strong>Nowe zgłoszenie chęci zapisu — czeka w puli na potwierdzenie!</strong></p>'
+        . '<p>Zajęcia: ' . esc_html_mail($p['classTypeName']) . ' — ' . esc_html_mail($p['groupName']) . '<br>'
+        . 'Termin: ' . esc_html_mail($p['when']) . '<br>'
+        . 'Zajętość wybranego terminu: ' . (int) $p['confirmedCount'] . '/' . (int) $p['capacity'] . '</p>'
         . '<p>Dziecko: ' . esc_html_mail($p['childName']) . ' — <strong>wiek: ' . $age . ' lat</strong> (ur. ' . esc_html_mail(format_pl_date($p['childBirthDate'])) . ')<br>'
         . 'Rodzic/opiekun: ' . esc_html_mail($p['parentName']) . '<br>'
         . 'E-mail: ' . esc_html_mail($p['parentEmail']) . '<br>'
         . 'Telefon: ' . esc_html_mail($p['parentPhone'] ?: 'brak') . '</p>'
-        . '<p><a href="' . esc_html_mail(APP_URL . '/admin-grupy.php') . '">Przydziel grupę →</a></p></div>';
+        . $noteHtml
+        . '<p><a href="' . esc_html_mail(APP_URL . '/admin-grupy.php') . '">Potwierdź zgłoszenie →</a></p></div>';
 
     $recipients = array_map('trim', explode(',', STUDIO_NOTIFY_EMAIL));
     send_mail($recipients, $subject, $html, $text);

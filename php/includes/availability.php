@@ -111,6 +111,28 @@ function get_sessions_with_availability(DateTime $from, DateTime $to, ?int $clas
     return $rows;
 }
 
+/**
+ * Aktywne grupy z policzoną zajętością — używane w zapisz.php, żeby rodzic
+ * mógł wybrać KONKRETNY dzień/godzinę zajęć (grupę), a nie tylko rodzaj
+ * zajęć, który potem był narzucany odgórnie przez pracownię.
+ */
+function get_groups_with_availability(): array
+{
+    $sql = "SELECT g.*, ct.id AS class_type_id, ct.name AS ct_name, ct.key_name AS ct_key,
+                   (SELECT COUNT(*) FROM enrollments e WHERE e.group_id = g.id AND e.status = 'CONFIRMED') AS confirmed_count
+            FROM class_groups g
+            JOIN class_types ct ON ct.id = g.class_type_id
+            WHERE g.active = 1
+            ORDER BY ct.id ASC, g.day_of_week ASC, g.start_time ASC";
+    $rows = db()->query($sql)->fetchAll();
+    foreach ($rows as &$row) {
+        $row['confirmed_count'] = (int) $row['confirmed_count'];
+        $row['spots_left'] = max(0, (int) $row['capacity'] - $row['confirmed_count']);
+        $row['is_full'] = $row['spots_left'] <= 0;
+    }
+    return $rows;
+}
+
 /** Buduje URL kalendarza z podmienionym widokiem/datą, zachowując inne parametry GET. */
 function calendar_href(string $basePath, string $view, DateTime $date, array $extra = []): string
 {

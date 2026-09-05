@@ -99,6 +99,18 @@ function weekday_name_iso(int $isoDay): string
     return $names[$isoDay - 1] ?? '?';
 }
 
+/**
+ * Nazwa dnia tygodnia W LICZBIE MNOGIEJ, po numerze ISO-8601 — do opisu
+ * cotygodniowego rytmu grupy ("zajęcia w każdy ..."). Liczba mnoga po
+ * polsku nie powstaje przez doklejenie "i" do weekday_name_iso() (to dawało
+ * błędne formy typu "wtoreki", "środai", "sobotai") — stąd osobna, jawna lista.
+ */
+function weekday_name_plural_iso(int $isoDay): string
+{
+    $plural = ['poniedziałki', 'wtorki', 'środy', 'czwartki', 'piątki', 'soboty', 'niedziele'];
+    return $plural[$isoDay - 1] ?? '?';
+}
+
 /** "14 września 2026" — bez zależności od rozszerzenia intl (nie zawsze
  *  włączone na hostingu współdzielonym). */
 function format_pl_date(string $datetime, bool $withDayName = false, bool $withTime = false): string
@@ -178,16 +190,20 @@ function render_logo(string $size = 'md', bool $withSubtitle = false): string
  * (z powrotem do zapisu zaraz po rejestracji/logowaniu). Osobno od
  * signup_url() — bo nb_tab_defs() sam przepuszcza wszystkie adresy zakładek
  * przez url(), więc potrzebuje surowej ścieżki, a nie gotowego URL-a.
+ * $groupId — opcjonalnie: od razu podświetl/wybierz konkretną grupę (dzień +
+ * godzinę zajęć) w formularzu zapisu, gdy rodzic klika w konkretny termin
+ * w grafiku, zamiast dopiero wybierać go z listy.
  */
-function signup_path(): string
+function signup_path(?int $groupId = null): string
 {
-    return current_user() ? 'zapisz.php' : 'rejestracja.php?next=' . urlencode(url('zapisz.php'));
+    $target = 'zapisz.php' . ($groupId ? '?group=' . $groupId : '');
+    return current_user() ? $target : 'rejestracja.php?next=' . urlencode(url($target));
 }
 
 /** Gotowy URL (przepuszczony przez url()) do użycia bezpośrednio w href. */
-function signup_url(): string
+function signup_url(?int $groupId = null): string
 {
-    return url(signup_path());
+    return url(signup_path($groupId));
 }
 
 /** Pobiera aktualnie zalogowanego użytkownika (albo null) — patrz auth.php. */

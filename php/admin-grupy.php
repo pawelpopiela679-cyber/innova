@@ -115,12 +115,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// --- Pula: zgłoszenia czekające, bez grupy ---
-$pool = db()->query("SELECT e.*, c.first_name, c.last_name, c.birth_date, ct.id AS class_type_id, ct.name AS ct_name, ct.key_name AS ct_key
+// --- Pula: zgłoszenia czekające na potwierdzenie ---
+// Rodzic w zapisz.php wybiera już konkretny termin (grupę), więc tu
+// dociągamy jej dzień/godzinę/zajętość — pracownia tylko potwierdza (albo,
+// jeśli chce, przydziela dziecko do innej grupy tego samego rodzaju zajęć).
+// LEFT JOIN + requested_group_id na wypadek starszych zgłoszeń sprzed tej
+// zmiany, które mogły trafić do puli jeszcze bez wybranej grupy.
+$pool = db()->query("SELECT e.*, c.first_name, c.last_name, c.birth_date, ct.id AS class_type_id, ct.name AS ct_name, ct.key_name AS ct_key,
+        e.group_id AS requested_group_id, g.name AS requested_group_name, g.day_of_week AS requested_day, g.start_time AS requested_start, g.end_time AS requested_end,
+        (SELECT COUNT(*) FROM enrollments e2 WHERE e2.group_id = e.group_id AND e2.status = 'CONFIRMED') AS requested_confirmed_count, g.capacity AS requested_capacity
     FROM enrollments e
     JOIN children c ON c.id = e.child_id
     JOIN class_types ct ON ct.id = e.class_type_id
-    WHERE e.status = 'PENDING' AND e.group_id IS NULL
+    LEFT JOIN class_groups g ON g.id = e.group_id
+    WHERE e.status = 'PENDING'
     ORDER BY e.created_at ASC")->fetchAll();
 
 // --- Grupy + ich obecny skład ---
@@ -163,8 +171,10 @@ require __DIR__ . '/includes/layout_top.php';
 
   <h1 style="font-size:1.6rem;">Grupy</h1>
   <p class="text-muted mt-2">
-    Przeciągnij dziecko z puli na kartę grupy, żeby je przydzielić — albo wybierz grupę z listy przy
-    kafelku i kliknij „Przydziel”. Nową grupę utworzysz w <a href="<?= e(url('admin-zajecia-nowe.php')) ?>" style="color:var(--primary); text-decoration:underline;">+ Nowa grupa</a>.
+    Rodzic sam wybiera termin przy zgłoszeniu — tu tylko potwierdzasz (przycisk „Potwierdź”, sprawdzi
+    zajętość i zapisze albo doda na listę rezerwową) albo, jeśli trzeba, przenosisz dziecko do innej
+    grupy: przeciągnij kafelek z puli na kartę innej grupy, albo wybierz ją z listy i kliknij „Przydziel”.
+    Nową grupę utworzysz w <a href="<?= e(url('admin-zajecia-nowe.php')) ?>" style="color:var(--primary); text-decoration:underline;">+ Nowa grupa</a>.
   </p>
 
   <?php if ($error): ?><p class="alert alert-error"><?= e($error) ?></p><?php endif; ?>
@@ -184,6 +194,18 @@ require __DIR__ . '/includes/layout_top.php';
             <strong><?= e($p['first_name'] . ' ' . $p['last_name']) ?></strong>
             <span class="text-muted" style="font-size:0.78rem;">(<?= calculate_age($p['birth_date']) ?> lat)</span>
             <p class="text-muted mt-2" style="font-size:0.82rem;"><?= e($p['ct_name']) ?></p>
+            <?php if ($p['requested_group_id']): ?>
+              <p class="mt-2" style="font-size:0.8rem;">
+                Zgłoszenie na: <strong><?= e($p['requested_group_name']) ?></strong><br>
+                <?= e(ucfirst(weekday_name_plural_iso((int) $p['requested_day']))) ?> <?= e($p['requested_start']) ?>–<?= e($p['requested_end']) ?>
+                — zajętość <?= (int) $p['requested_confirmed_count'] ?>/<?= (int) $p['requested_capacity'] ?>
+              </p>
+            <?php else: ?>
+              <p class="text-muted mt-2" style="font-size:0.78rem;">Zgłoszenie bez wybranego terminu (starsze zgłoszenie) — wybierz grupę ręcznie.</p>
+            <?php endif; ?>
+            <?php if (!empty($p['note'])): ?>
+              <p class="mt-2" style="font-size:0.78rem; background:#fbf6e3; border-radius:8px; padding:6px 8px;">💬 <?= nl2br(e($p['note'])) ?></p>
+            <?php endif; ?>
             <form method="post" class="mt-2 nb-tile-form">
               <?= csrf_field() ?>
               <input type="hidden" name="enrollmentId" value="<?= (int) $p['id'] ?>">
@@ -192,11 +214,11 @@ require __DIR__ . '/includes/layout_top.php';
                 <?php foreach ($groups as $g): if ((int) $g['class_type_id'] !== (int) $p['class_type_id']) {
                     continue;
                 } ?>
-                  <option value="<?= (int) $g['id'] ?>"><?= e($g['name']) ?> (<?= e(weekday_name_iso((int) $g['day_of_week'])) ?> <?= e($g['start_time']) ?>)</option>
+                  <option value="<?= (int) $g['id'] ?>" <?= (int) $p['requested_group_id'] === (int) $g['id'] ? 'selected' : '' ?>><?= e($g['name']) ?> (<?= e(weekday_name_iso((int) $g['day_of_week'])) ?> <?= e($g['start_time']) ?>)</option>
                 <?php endforeach; ?>
               </select>
               <div class="flex gap-2">
-                <button type="submit" name="_action" value="assign" class="btn btn-primary btn-sm">Przydziel</button>
+                <button type="submit" name="_action" value="assign" class="btn btn-primary btn-sm"><?= $p['requested_group_id'] ? 'Potwierdź' : 'Przydziel' ?></button>
                 <button type="submit" name="_action" value="decline" class="btn btn-danger btn-sm" onclick="return confirm('Na pewno odrzucić to zgłoszenie?')">Odrzuć</button>
               </div>
             </form>
@@ -220,7 +242,7 @@ require __DIR__ . '/includes/layout_top.php';
               <span style="font-weight:700; color:<?= count($confirmed) >= (int) $g['capacity'] ? '#b0413e' : '#1f7a4d' ?>;"><?= count($confirmed) ?>/<?= (int) $g['capacity'] ?></span>
             </div>
             <p class="text-muted mt-2" style="font-size:0.82rem;">
-              <?= e(weekday_name_iso((int) $g['day_of_week'])) ?>i, <?= e($g['start_time']) ?>–<?= e($g['end_time']) ?> · <?= e($g['instructor_name']) ?>
+              <?= e(weekday_name_plural_iso((int) $g['day_of_week'])) ?>, <?= e($g['start_time']) ?>–<?= e($g['end_time']) ?> · <?= e($g['instructor_name']) ?>
             </p>
             <?php if ($mailto): ?>
               <p class="mt-2"><a href="<?= e($mailto) ?>" style="font-size:0.8rem; color:var(--primary);">✉️ Wyślij e-mail do grupy</a></p>

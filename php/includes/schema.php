@@ -173,6 +173,7 @@ function ensure_schema(): void
         child_id INT NOT NULL,
         parent_id INT NOT NULL,
         status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+        note TEXT NULL,
         created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         confirmed_at DATETIME NULL,
         canceled_at DATETIME NULL,
@@ -189,6 +190,10 @@ function ensure_schema(): void
     modify_column($pdo, 'enrollments', 'session_id', 'INT NULL');
     add_column_if_missing($pdo, 'enrollments', 'class_type_id', 'INT NULL');
     add_column_if_missing($pdo, 'enrollments', 'group_id', 'INT NULL');
+    // Opcjonalna wiadomość rodzica do prowadzących przy zgłoszeniu (np.
+    // "dziecko nie mówi jeszcze dobrze po polsku", "alergia na X") — widoczna
+    // dla pracowni w panelu grup i w mailu z powiadomieniem o zgłoszeniu.
+    add_column_if_missing($pdo, 'enrollments', 'note', 'TEXT NULL');
     // Indeks na group_id MUSI powstać PO dołożeniu tej kolumny wyżej — na
     // istniejącej (produkcyjnej) tabeli enrollments group_id nie istnieje,
     // dopóki add_column_if_missing go nie doda (CREATE TABLE IF NOT EXISTS

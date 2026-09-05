@@ -3,7 +3,7 @@
 $isMasterAdmin = $user['role'] === 'ADMIN';
 $canManageGroups = user_can_manage_groups($user);
 $poolCount = $canManageGroups
-    ? (int) db()->query("SELECT COUNT(*) c FROM enrollments WHERE status = 'PENDING' AND group_id IS NULL")->fetch()['c']
+    ? (int) db()->query("SELECT COUNT(*) c FROM enrollments WHERE status = 'PENDING'")->fetch()['c']
     : 0;
 ?>
 <nav class="mt-2" style="margin-bottom:32px; display:flex; flex-wrap:wrap; gap:8px; border-radius:999px; border:1px solid var(--border); background:var(--surface); padding:4px; width:fit-content; font-size:0.9rem;">

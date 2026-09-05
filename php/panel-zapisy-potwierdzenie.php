@@ -58,7 +58,7 @@ require __DIR__ . '/includes/layout_top.php';
   </h1>
   <p class="text-muted mt-2">
     <?php if ($pending): ?>
-      Twoje zgłoszenie czeka w puli — sprawdzimy dostępność i dobierzemy właściwą grupę wiekową. Wyślemy e-mail, gdy tylko to zrobimy.
+      Twoje zgłoszenie czeka na potwierdzenie — sprawdzimy dostępność miejsc w wybranym terminie. Wyślemy e-mail, gdy tylko to zrobimy.
     <?php elseif ($waitlisted): ?>
       Grupa jest obecnie pełna. Odezwiemy się, jeśli zwolni się miejsce.
     <?php else: ?>
