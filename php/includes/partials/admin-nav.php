@@ -21,5 +21,6 @@ $poolCount = $canManageGroups
     <a href="<?= e(url('admin-cennik.php')) ?>" style="border-radius:999px; padding:6px 16px;">Cennik</a>
     <a href="<?= e(url('admin-strony.php')) ?>" style="border-radius:999px; padding:6px 16px;">Strony</a>
     <a href="<?= e(url('admin-wyglad.php')) ?>" style="border-radius:999px; padding:6px 16px;">Wygląd</a>
+    <a href="<?= e(url('admin-test-email.php')) ?>" style="border-radius:999px; padding:6px 16px;">Test e-maila</a>
   <?php endif; ?>
 </nav>
