@@ -2,6 +2,13 @@
 require_once __DIR__ . '/includes/bootstrap.php';
 $user = require_admin();
 
+// Wymuś świeże wczytanie plików (na hostingu opcache PHP potrafi trzymać
+// starą wersję plików nawet po ich podmianie na serwerze) — ta strona
+// służy do diagnozy, więc zawsze powinna działać na aktualnym kodzie.
+if (function_exists('opcache_reset')) {
+    opcache_reset();
+}
+
 /**
  * Diagnostyka wysyłki e-maili — bo próba wysyłki z normalnego formularza
  * (zapisz.php) NIE pokazuje błędu SMTP użytkownikowi: send_mail() łapie
