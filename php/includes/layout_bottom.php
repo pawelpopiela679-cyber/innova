@@ -6,7 +6,6 @@
 <footer class="site-footer">
   <div style="margin-bottom:16px; display:flex; justify-content:center;"><?= render_logo('sm') ?></div>
   <div class="footer-links">
-    <a href="<?= e(url('aktualnosci.php')) ?>">📰 Aktualności</a>
     <span>📍 ul. Kolejowa, Czechowice-Dziedzice</span>
     <a href="tel:+48790250363">📞 790 250 363</a>
     <a href="https://facebook.com/innova.pracownia">📘 fb /innova.pracownia</a>

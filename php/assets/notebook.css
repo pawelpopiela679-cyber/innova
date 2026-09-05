@@ -64,10 +64,10 @@
      tekstu też startował zgodnie z rytmem liniatury w tle. */
   padding: 33px clamp(60px, 8vw, 84px);
   overflow: hidden;
-  /* Zakładki po prawej potrzebują ~800px, żeby wszystkie 6 się zmieściło
+  /* Zakładki po prawej potrzebują ~990px, żeby wszystkie 7 się zmieściło
      (patrz .nb-tabs) — na krótkich stronach (logowanie, rejestracja) bez
      tego minimum ostatnia zakładka ucinała się pod overflow:hidden. */
-  min-height: 820px;
+  min-height: 1000px;
   color: var(--nb-ink);
   font-family: var(--nb-font-body);
 }

@@ -59,7 +59,7 @@ function nb_icon_svg(string $key, string $class = 'nb-icon'): string
     return '<svg class="' . e($class) . '" viewBox="0 0 24 24" fill="none" stroke="' . e($ink) . '" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' . $paths . '</svg>';
 }
 
-/** Definicja 6 realnych zakładek — jedna lista, żeby nawigacja była spójna
+/** Definicja realnych zakładek — jedna lista, żeby nawigacja była spójna
  *  na wszystkich stronach ze stylem "zeszytu". */
 function nb_tab_defs(): array
 {
@@ -76,6 +76,8 @@ function nb_tab_defs(): array
             'icon' => '<path d="M4 20l1.2-4.2L16.6 4.4a1.5 1.5 0 012.1 0l1 1a1.5 1.5 0 010 2.1L8.3 18.8 4 20z"/>'],
         ['key' => 'contact', 'label' => 'Kontakt', 'url' => 'kontakt.php',
             'icon' => '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 6l9 7 9-7"/>'],
+        ['key' => 'news', 'label' => 'Aktualności', 'url' => 'aktualnosci.php',
+            'icon' => '<path d="M4 4h13a2 2 0 012 2v12a2 2 0 01-2 2H7a3 3 0 01-3-3V4z"/><rect x="7" y="7" width="5" height="5"/><path d="M14 8h4M14 11h4M7 15h11"/>'],
     ];
 }
 

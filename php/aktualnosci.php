@@ -5,6 +5,7 @@ $posts = db()->query('SELECT * FROM news_posts ORDER BY created_at DESC')->fetch
 
 $pageTitle = 'Aktualności — INNOVA';
 $notebookTheme = true;
+$notebookActive = 'news';
 require __DIR__ . '/includes/layout_top.php';
 ?>
 <div class="container-sm" style="padding:48px 16px;">
