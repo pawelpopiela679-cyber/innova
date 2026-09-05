@@ -50,8 +50,8 @@ require __DIR__ . '/includes/layout_top.php';
 
   <h1 style="font-size:1.6rem;">Grafik tygodniowy</h1>
   <p class="text-muted mt-2">
-    Kliknij „+” w pustej komórce, żeby dodać zajęcia w tym dniu i o tej godzinie. Kliknij w istniejące
-    zajęcia, żeby je edytować albo odwołać.
+    Kliknij pustą komórkę, żeby dodać zajęcia w tym dniu i o tej godzinie. Kliknij w istniejące zajęcia,
+    żeby je edytować albo odwołać.
   </p>
 
   <div class="flex items-center gap-2 mt-4" style="font-size:0.9rem;">
@@ -63,13 +63,13 @@ require __DIR__ . '/includes/layout_top.php';
     <?= e(format_pl_date($days[0]->format('Y-m-d'))) ?> – <?= e(format_pl_date($days[6]->format('Y-m-d'))) ?>
   </p>
 
-  <div class="mt-4" style="overflow-x:auto;">
-    <table class="nb-grafik-table" style="width:100%; border-collapse:collapse; min-width:900px;">
+  <div class="nb-grid-wrap mt-4">
+    <table class="nb-week nb-grafik-week">
       <thead>
         <tr>
           <th style="width:70px;"></th>
           <?php foreach ($days as $d): ?>
-            <th style="padding:6px; text-align:left; font-size:0.85rem;">
+            <th>
               <?= e($dayLabels[(int) $d->format('N') - 1]) ?><br>
               <span class="text-muted" style="font-weight:400;"><?= e($d->format('d.m')) ?></span>
             </th>
@@ -79,16 +79,16 @@ require __DIR__ . '/includes/layout_top.php';
       <tbody>
         <?php foreach ($hours as $h): ?>
           <tr>
-            <td class="text-muted" style="padding:6px; font-size:0.82rem; vertical-align:top; white-space:nowrap;"><?= sprintf('%02d:00', $h) ?></td>
+            <td class="nb-time"><?= sprintf('%02d:00', $h) ?></td>
             <?php foreach ($days as $dayIndex => $d):
                 $cellSessions = $cellMap[$dayIndex][$h] ?? [];
                 $cellDate = $d->format('Y-m-d');
                 $addUrl = url('admin-zajecia-nowe.php?date=' . $cellDate . '&startTime=' . sprintf('%02d:00', $h) . '&endTime=' . sprintf('%02d:00', $h + 1));
             ?>
-              <td style="padding:4px; vertical-align:top; border:1px solid var(--nb-border, #e6ddc0); min-width:120px;">
+              <td class="nb-grafik-cell">
                 <?php foreach ($cellSessions as $s): [$bg, $ink] = nb_pastel($s['ct_key']); ?>
-                  <a href="<?= e(url('admin-zajecia-edytuj.php?id=' . $s['id'])) ?>" class="nb-grafik-chip" title="<?= e($s['title']) ?>" style="display:flex; gap:6px; align-items:flex-start; background:<?= e($bg) ?>; color:<?= e($ink) ?>; border-radius:8px; padding:4px 6px; margin-bottom:4px; font-size:0.76rem; text-decoration:none;">
-                    <span style="flex:none; width:16px; height:16px; margin-top:1px;"><?= nb_icon_svg($s['ct_key'], '') ?></span>
+                  <a href="<?= e(url('admin-zajecia-edytuj.php?id=' . $s['id'])) ?>" class="nb-grafik-chip" title="<?= e($s['title']) ?>" style="background:<?= e($bg) ?>; color:<?= e($ink) ?>;">
+                    <span class="nb-grafik-chip-icon"><?= nb_icon_svg($s['ct_key'], '') ?></span>
                     <span>
                       <strong><?= e($s['ct_name']) ?></strong>
                       <?php if ($s['title'] !== $s['ct_name']): ?><br><?= e($s['title']) ?><?php endif; ?>
@@ -96,7 +96,9 @@ require __DIR__ . '/includes/layout_top.php';
                     </span>
                   </a>
                 <?php endforeach; ?>
-                <a href="<?= e($addUrl) ?>" class="nb-grafik-add" title="Dodaj zajęcia — <?= e($dayLabels[$dayIndex]) ?> <?= sprintf('%02d:00', $h) ?>">+ dodaj</a>
+                <?php if (!$cellSessions): ?>
+                  <a href="<?= e($addUrl) ?>" class="nb-grafik-empty" title="Dodaj zajęcia — <?= e($dayLabels[$dayIndex]) ?> <?= sprintf('%02d:00', $h) ?>"></a>
+                <?php endif; ?>
               </td>
             <?php endforeach; ?>
           </tr>
@@ -106,12 +108,23 @@ require __DIR__ . '/includes/layout_top.php';
   </div>
 </div>
 <style>
-  .nb-grafik-add {
-    display:block; text-align:center; font-size:0.72rem; color:var(--nb-muted,#8a7f5c);
-    border:1px dashed var(--nb-border,#d8cfa8); border-radius:8px; padding:5px; text-decoration:none;
+  table.nb-grafik-week { min-width:900px; }
+  /* Puste komórki: całe pole klikalne (bez widocznego przycisku) — najedź,
+     żeby zobaczyć delikatne podświetlenie i "+", kliknij gdziekolwiek w
+     komórce, żeby dodać zajęcia o tej godzinie/dniu. */
+  table.nb-grafik-week td.nb-grafik-cell { padding:0; vertical-align:top; min-width:120px; height:52px; }
+  .nb-grafik-empty { display:block; width:100%; height:100%; min-height:52px; text-decoration:none; position:relative; }
+  .nb-grafik-empty:hover { background:color-mix(in srgb, var(--nb-green,#3f7d45) 8%, transparent); }
+  .nb-grafik-empty:hover::after {
+    content:"+"; position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    color:var(--nb-green,#3f7d45); font-size:1.3rem; font-weight:700;
   }
-  .nb-grafik-add:hover { background:var(--nb-surface,#fdfaf0); color:var(--nb-green,#3f7d45); border-color:var(--nb-green,#3f7d45); }
+  .nb-grafik-chip {
+    display:flex; gap:6px; align-items:flex-start; border-radius:8px; padding:4px 6px;
+    margin:4px; font-size:0.76rem; text-decoration:none;
+  }
   .nb-grafik-chip:hover { filter:brightness(0.95); }
-  .nb-grafik-chip svg { width:16px; height:16px; display:block; }
+  .nb-grafik-chip-icon { flex:none; width:16px; height:16px; margin-top:1px; }
+  .nb-grafik-chip-icon svg { width:16px; height:16px; display:block; }
 </style>
 <?php require __DIR__ . '/includes/layout_bottom.php'; ?>
