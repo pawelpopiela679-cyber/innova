@@ -9,6 +9,18 @@
  * poniżej) — patrz README_PHP.md.
  */
 
+// Wymuszamy czyszczenie DWÓCH oddzielnych, niezależnych cache'y PHP, ZANIM
+// cokolwiek wczyta config.local.php — samo czyszczenie opcache (skompilowany
+// kod) okazało się niewystarczające: PHP osobno cache'uje też "statystyki"
+// pliku (data modyfikacji, rozmiar itp. — tzw. realpath/stat cache), żeby
+// nie odpytywać dysku sieciowego przy każdym żądaniu. Jeśli ten drugi cache
+// trzyma starą datę modyfikacji, opcache może uznać (błędnie), że plik się
+// nie zmienił, i dalej serwować starą, skompilowaną wersję.
+clearstatcache(true);
+if (function_exists('opcache_reset')) {
+    opcache_reset();
+}
+
 require_once __DIR__ . '/includes/bootstrap.php';
 require_once __DIR__ . '/includes/schema.php';
 require_once __DIR__ . '/includes/seed.php';
