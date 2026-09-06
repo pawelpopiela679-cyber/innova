@@ -42,6 +42,8 @@ try {
 // od razu zobaczyć, czy to literówka w loginie/nazwie bazy, stary plik, czy
 // coś innego.
 $configLocalFile = __DIR__ . '/config.local.php';
+$configLocalRealPath = realpath($configLocalFile) ?: $configLocalFile;
+$installRealPath = realpath(__FILE__) ?: __FILE__;
 $configLocalExists = file_exists($configLocalFile);
 $configLocalMtime = $configLocalExists ? filemtime($configLocalFile) : null;
 $configLocalCachedMtime = null;
@@ -95,6 +97,8 @@ $dbPassHasWhitespace = $dbPassRaw !== '' && trim($dbPassRaw) !== $dbPassRaw;
     <div class="warn">
       <strong>Diagnostyka — co PHP naprawdę wczytał z config.local.php na serwerze</strong>
       <table style="margin-top:10px; font-size:0.85rem; border-collapse:collapse; width:100%;">
+        <tr><td style="padding:3px 12px 3px 0;">Ten plik (install.php) leży w</td><td><code style="word-break:break-all;"><?= e($installRealPath) ?></code></td></tr>
+        <tr><td style="padding:3px 12px 3px 0;">Szukany config.local.php to</td><td><code style="word-break:break-all;"><?= e($configLocalRealPath) ?></code></td></tr>
         <tr><td style="padding:3px 12px 3px 0;">Plik config.local.php istnieje</td><td><code><?= $configLocalExists ? 'TAK' : 'NIE — to jest problem!' ?></code></td></tr>
         <?php if ($configLocalExists): ?>
         <tr><td style="padding:3px 12px 3px 0;">Ostatnio zmodyfikowany</td><td><code><?= e(date('Y-m-d H:i:s', $configLocalMtime)) ?></code></td></tr>
