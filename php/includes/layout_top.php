@@ -8,6 +8,10 @@
 $theme = get_theme();
 $user = current_user();
 $isStaff = $user && in_array($user['role'], ['ADMIN', 'INSTRUCTOR'], true);
+
+// Licznik odwiedzin — liczymy tylko "prawdziwych" gości/rodziców, nie
+// zalogowany personel (żeby nasza własna praca w panelu nie zawyżała liczby).
+$visitCount = $isStaff ? get_visit_count() : record_visit_and_get_count();
 // Strony publiczne mogą ustawić $notebookTheme = true i $notebookActive =
 // '<klucz zakładki>' PRZED dołączeniem tego pliku, żeby dostać styl
 // "zeszytu szkolnego" (spirala, zakładki po prawej) zamiast zwykłego navbara.

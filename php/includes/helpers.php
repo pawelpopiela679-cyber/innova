@@ -156,6 +156,39 @@ function in_placeholders(array $values): string
 }
 
 /**
+ * Licznik odwiedzin strony — jeden wspólny licznik w tabeli site_stats
+ * (wiersz 'site_visits'). Wywoływana raz na wczytanie strony publicznej
+ * (patrz layout_top.php) — pomija zalogowanych prowadzących/admina, żeby
+ * nasza własna praca w panelu nie zawyżała liczby "odwiedzin".
+ * Zwraca aktualną (już zwiększoną) wartość licznika.
+ */
+function record_visit_and_get_count(): int
+{
+    $pdo = db();
+    try {
+        $pdo->exec("UPDATE site_stats SET stat_value = stat_value + 1 WHERE stat_key = 'site_visits'");
+        $row = $pdo->query("SELECT stat_value FROM site_stats WHERE stat_key = 'site_visits'")->fetch();
+        return $row ? (int) $row['stat_value'] : 0;
+    } catch (Throwable $e) {
+        // Strona ma działać nawet gdyby np. install.php jeszcze nie stworzył
+        // tej tabeli na starszej instalacji — licznik to dodatek, nie coś
+        // krytycznego.
+        return 0;
+    }
+}
+
+/** Sam odczyt licznika, bez zwiększania — do użytku w panelu admina. */
+function get_visit_count(): int
+{
+    try {
+        $row = db()->query("SELECT stat_value FROM site_stats WHERE stat_key = 'site_visits'")->fetch();
+        return $row ? (int) $row['stat_value'] : 0;
+    } catch (Throwable $e) {
+        return 0;
+    }
+}
+
+/**
  * Wyświetla logo — jeśli w php/logo.png jest prawdziwy plik (wgrany ręcznie,
  * patrz README_PHP.md), pokazuje dokładnie ten plik. W przeciwnym razie
  * (i tylko wtedy) pokazuje odtworzony w CSS wordmark "INNOVA". W PHP, w

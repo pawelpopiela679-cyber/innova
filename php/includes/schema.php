@@ -245,4 +245,16 @@ function ensure_schema(): void
         created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
     )$engine");
+
+    // Prosty licznik odwiedzin strony — jeden wiersz na "licznik" (na razie
+    // tylko 'site_visits'), żeby łatwo dało się dodać kolejne w przyszłości
+    // (np. osobno per podstrona) bez zmiany struktury tabeli.
+    $pdo->exec("CREATE TABLE IF NOT EXISTS site_stats (
+        stat_key VARCHAR(64) NOT NULL PRIMARY KEY,
+        stat_value INT NOT NULL DEFAULT 0
+    )$engine");
+    $seedStat = $mysql
+        ? "INSERT IGNORE INTO site_stats (stat_key, stat_value) VALUES ('site_visits', 0)"
+        : "INSERT OR IGNORE INTO site_stats (stat_key, stat_value) VALUES ('site_visits', 0)";
+    $pdo->exec($seedStat);
 }
