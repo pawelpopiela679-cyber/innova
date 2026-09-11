@@ -69,7 +69,7 @@ require __DIR__ . '/includes/layout_top.php';
       <button type="submit" class="nb-btn solid" style="width:100%; justify-content:center; box-sizing:border-box;">Załóż konto</button>
     </form>
 
-    <p class="nb-form-foot">Masz już konto? <a href="<?= e(url('logowanie.php')) ?>">Zaloguj się</a></p>
+    <p class="nb-form-foot">Masz już konto? <a href="<?= e(url('logowanie.php' . ($next !== '' ? '?next=' . urlencode($next) : ''))) ?>">Zaloguj się</a></p>
   </div>
 </div>
 <?php require __DIR__ . '/includes/layout_bottom.php'; ?>
