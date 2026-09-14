@@ -237,6 +237,41 @@ function get_visit_count(): int
 }
 
 /**
+ * Odczyt edytowalnego tekstu strony (patrz admin-tresci.php i tabela
+ * site_content). Zwraca $default, jeśli klucz nie był jeszcze nigdy
+ * zapisany (świeża instalacja) albo w razie błędu bazy — strona ma zawsze
+ * wyglądać sensownie, nawet zanim ktoś cokolwiek edytował w panelu.
+ */
+function get_content(string $key, string $default = ''): string
+{
+    static $cache = [];
+    if (array_key_exists($key, $cache)) {
+        return $cache[$key];
+    }
+    try {
+        $stmt = db()->prepare('SELECT content_value FROM site_content WHERE content_key = ?');
+        $stmt->execute([$key]);
+        $row = $stmt->fetch();
+        return $cache[$key] = ($row !== false && $row['content_value'] !== '') ? $row['content_value'] : $default;
+    } catch (Throwable $e) {
+        return $default;
+    }
+}
+
+/** Zapis (upsert) jednego klucza treści — używane przez admin-tresci.php. */
+function set_content(string $key, string $value): void
+{
+    $pdo = db();
+    if (db_is_mysql()) {
+        $stmt = $pdo->prepare("INSERT INTO site_content (content_key, content_value, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP)
+            ON DUPLICATE KEY UPDATE content_value = VALUES(content_value), updated_at = CURRENT_TIMESTAMP");
+    } else {
+        $stmt = $pdo->prepare("INSERT OR REPLACE INTO site_content (content_key, content_value, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP)");
+    }
+    $stmt->execute([$key, $value]);
+}
+
+/**
  * Wyświetla logo — jeśli w php/logo.png jest prawdziwy plik (wgrany ręcznie,
  * patrz README_PHP.md), pokazuje dokładnie ten plik. W przeciwnym razie
  * (i tylko wtedy) pokazuje odtworzony w CSS wordmark "INNOVA". W PHP, w

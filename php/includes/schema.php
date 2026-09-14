@@ -246,6 +246,17 @@ function ensure_schema(): void
         updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
     )$engine");
 
+    // Edytowalne teksty strony głównej (i innych, w miarę dodawania) —
+    // jeden wiersz na klucz treści, np. 'home.hero_title'. Panel admina
+    // (admin-tresci.php) edytuje te wiersze; strony publiczne czytają je
+    // przez get_content($klucz, $domyślnaWartość) — brakujący wiersz albo
+    // pusta baza nie psuje strony, bo zawsze jest fallback w kodzie.
+    $pdo->exec("CREATE TABLE IF NOT EXISTS site_content (
+        content_key VARCHAR(120) NOT NULL PRIMARY KEY,
+        content_value TEXT NOT NULL,
+        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )$engine");
+
     // Prosty licznik odwiedzin strony — jeden wiersz na "licznik" (na razie
     // tylko 'site_visits'), żeby łatwo dało się dodać kolejne w przyszłości
     // (np. osobno per podstrona) bez zmiany struktury tabeli.

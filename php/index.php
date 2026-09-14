@@ -16,17 +16,15 @@ require __DIR__ . '/includes/layout_top.php';
 <div class="nb-hero">
   <div>
     <h1>Witamy w <span class="hl">INNOVA<svg viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M2 6 C 20 10, 80 2, 98 7" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/></svg></span>!</h1>
-    <div class="nb-tagline">Rozwijamy pasje. Odkrywamy talenty.<br>Tworzymy przyszłość!</div>
-    <p class="lead">Zgłoś dziecko na zajęcia w kilka minut: sprawdź kalendarz, wybierz termin,
-      a my dobierzemy odpowiednią grupę i potwierdzimy zapis e-mailem. Każde dziecko jest
-      <u>wyjątkowe</u> — pomagamy mu rozkwitać.</p>
+    <div class="nb-tagline"><?= nl2br(e(get_content('home.tagline', "Rozwijamy pasje. Odkrywamy talenty.\nTworzymy przyszłość!"))) ?></div>
+    <p class="lead"><?= nl2br(e(get_content('home.lead', 'Zgłoś dziecko na zajęcia w kilka minut: sprawdź kalendarz, wybierz termin, a my dobierzemy odpowiednią grupę i potwierdzimy zapis e-mailem. Każde dziecko jest wyjątkowe — pomagamy mu rozkwitać.'))) ?></p>
     <div class="nb-cta-row">
-      <a href="<?= e(url('zajecia.php')) ?>" class="nb-btn">Poznaj ofertę →</a>
-      <a href="<?= e(signup_url()) ?>" class="nb-btn coral">Zapisz dziecko →</a>
+      <a href="<?= e(url('zajecia.php')) ?>" class="nb-btn"><?= e(get_content('home.cta_offer_label', 'Poznaj ofertę →')) ?></a>
+      <a href="<?= e(signup_url()) ?>" class="nb-btn coral"><?= e(get_content('home.cta_signup_label', 'Zapisz dziecko →')) ?></a>
     </div>
     <div class="flex flex-wrap gap-2 mt-6" style="font-size:.82rem;">
-      <span class="nb-callout" style="display:inline-block; padding:6px 14px; margin:0;">⭐ Dzień otwarty: <?= e(date('d.m.Y', strtotime(OPEN_DAY_DATE))) ?></span>
-      <span class="nb-callout" style="display:inline-block; padding:6px 14px; margin:0;">📅 Start zajęć: <?= e(date('d.m.Y', strtotime(SEMESTER_START))) ?></span>
+      <span class="nb-callout" style="display:inline-block; padding:6px 14px; margin:0;">⭐ Dzień otwarty: <?= e(date('d.m.Y', strtotime(get_content('home.open_day_date', OPEN_DAY_DATE)))) ?></span>
+      <span class="nb-callout" style="display:inline-block; padding:6px 14px; margin:0;">📅 Start zajęć: <?= e(date('d.m.Y', strtotime(get_content('home.semester_start_date', SEMESTER_START)))) ?></span>
     </div>
   </div>
   <div class="nb-photo-block">
@@ -111,8 +109,8 @@ require __DIR__ . '/includes/layout_top.php';
   <div class="nb-join">→ Dołącz do społeczności INNOVA!</div>
   <p>Razem tworzymy miejsce, gdzie dzieci uczą się z radością. 🙂</p>
   <div class="nb-social">
-    <a href="https://facebook.com/innova.pracownia" style="background:#3b5998;">f</a>
-    <a href="https://instagram.com/innova_pracownia" style="background:linear-gradient(45deg,#f58529,#dd2a7b,#8134af);">ig</a>
+    <a href="https://facebook.com/<?= e(get_content('footer.facebook_handle', 'innova.pracownia')) ?>" style="background:#3b5998;">f</a>
+    <a href="https://instagram.com/<?= e(get_content('footer.instagram_handle', 'innova_pracownia')) ?>" style="background:linear-gradient(45deg,#f58529,#dd2a7b,#8134af);">ig</a>
   </div>
 </div>
 <?php require __DIR__ . '/includes/layout_bottom.php'; ?>

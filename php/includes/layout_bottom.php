@@ -5,11 +5,17 @@
 <?php endif; ?>
 <footer class="site-footer">
   <div style="margin-bottom:16px; display:flex; justify-content:center;"><?= render_logo('sm') ?></div>
+  <?php
+    $footerPhone = get_content('footer.phone_number', '790 250 363');
+    $footerPhoneDigits = preg_replace('/[^0-9]/', '', $footerPhone);
+    $footerFb = get_content('footer.facebook_handle', 'innova.pracownia');
+    $footerIg = get_content('footer.instagram_handle', 'innova_pracownia');
+  ?>
   <div class="footer-links">
-    <span>📍 ul. Kolejowa, Czechowice-Dziedzice</span>
-    <a href="tel:+48790250363">📞 790 250 363</a>
-    <a href="https://facebook.com/innova.pracownia">📘 fb /innova.pracownia</a>
-    <a href="https://instagram.com/innova_pracownia">📷 ig /innova_pracownia</a>
+    <span>📍 <?= e(get_content('footer.address_text', 'ul. Kolejowa, Czechowice-Dziedzice')) ?></span>
+    <a href="tel:+48<?= e($footerPhoneDigits) ?>">📞 <?= e($footerPhone) ?></a>
+    <a href="https://facebook.com/<?= e($footerFb) ?>">📘 fb /<?= e($footerFb) ?></a>
+    <a href="https://instagram.com/<?= e($footerIg) ?>">📷 ig /<?= e($footerIg) ?></a>
     <a href="https://innova-pracownia.pl">🌐 www.innova-pracownia.pl</a>
   </div>
   <p class="text-muted mt-4">© <?= date('Y') ?> INNOVA — Pracownia kreatywno-edukacyjna</p>
