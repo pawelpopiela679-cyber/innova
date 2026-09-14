@@ -19,6 +19,54 @@ function redirect(string $path): never
     exit;
 }
 
+/**
+ * Jak redirect(), ale $work (typowo wysyłkę e-maili) wykonuje PO wysłaniu
+ * przekierowania do przeglądarki, nie przed. Bez tego rodzic zgłaszający
+ * dziecko czekał na stronie tyle, ile trwały (mogące się zawiesić na
+ * niedziałającym SMTP nawet kilkadziesiąt sekund) DWIE kolejne próby
+ * wysyłki e-maila — a zapis do bazy był już wtedy gotowy. To wyglądało jak
+ * "strona czasem nie działa": rodzic, nie doczekawszy się, zamykał kartę,
+ * mimo że zgłoszenie już poszło. Jeśli serwer nie wspiera dokończenia
+ * requestu w tle (fastcgi_finish_request — na home.pl powinno działać przy
+ * PHP-FPM), $work i tak się wykona, tylko przed zamknięciem połączenia —
+ * więc to bezpieczne wszędzie, tylko czasem bez przyspieszenia.
+ */
+function redirect_then(string $path, callable $work): never
+{
+    if (!str_starts_with($path, 'http://') && !str_starts_with($path, 'https://')) {
+        $base = rtrim((string) parse_base_path(), '/');
+        $path = $base . '/' . ltrim($path, '/');
+    }
+
+    ignore_user_abort(true);
+    if (session_status() === PHP_SESSION_ACTIVE) {
+        session_write_close();
+    }
+    header('Location: ' . $path);
+
+    if (function_exists('fastcgi_finish_request')) {
+        if (ob_get_level() > 0) {
+            ob_end_flush();
+        }
+        flush();
+        fastcgi_finish_request();
+    } else {
+        header('Connection: close');
+        header('Content-Length: 0');
+        if (ob_get_level() > 0) {
+            ob_end_flush();
+        }
+        flush();
+    }
+
+    try {
+        $work();
+    } catch (Throwable $e) {
+        error_log('[INNOVA] redirect_then: błąd w tle po przekierowaniu: ' . $e->getMessage());
+    }
+    exit;
+}
+
 /** Katalog, w którym leży aplikacja, względem katalogu głównego domeny —
  *  potrzebne, gdy aplikacja siedzi w podfolderze (np. domena.pl/system/). */
 function parse_base_path(): string

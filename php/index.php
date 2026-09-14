@@ -25,8 +25,8 @@ require __DIR__ . '/includes/layout_top.php';
       <a href="<?= e(signup_url()) ?>" class="nb-btn coral">Zapisz dziecko →</a>
     </div>
     <div class="flex flex-wrap gap-2 mt-6" style="font-size:.82rem;">
-      <span class="nb-callout" style="display:inline-block; padding:6px 14px; margin:0;">⭐ Dzień otwarty: 12.09.2026</span>
-      <span class="nb-callout" style="display:inline-block; padding:6px 14px; margin:0;">📅 Start zajęć: 15.09.2026</span>
+      <span class="nb-callout" style="display:inline-block; padding:6px 14px; margin:0;">⭐ Dzień otwarty: <?= e(date('d.m.Y', strtotime(OPEN_DAY_DATE))) ?></span>
+      <span class="nb-callout" style="display:inline-block; padding:6px 14px; margin:0;">📅 Start zajęć: <?= e(date('d.m.Y', strtotime(SEMESTER_START))) ?></span>
     </div>
   </div>
   <div class="nb-photo-block">

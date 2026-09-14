@@ -80,25 +80,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         db()->prepare("UPDATE enrollments SET group_id=?, class_type_id=?, status=?, confirmed_at=? WHERE id=?")
             ->execute([$groupId, $group['class_type_id'], $newStatus, $isFull ? null : date('Y-m-d H:i:s'), $enrollmentId]);
 
-        send_enrollment_confirmation_email([
-            'parentEmail' => $parent['email'], 'parentName' => $parent['name'],
-            'childName' => $child['first_name'] . ' ' . $child['last_name'],
-            'classTypeName' => $group['ct_name'], 'sessionTitle' => $group['name'],
-            'when' => format_group_schedule((int) $group['day_of_week'], $group['start_time'], $group['end_time']),
-            'instructorName' => $group['instructor_name'], 'instructorEmail' => $group['instructor_email'],
-            'meetingUrl' => $group['meeting_url'], 'waitlisted' => $isFull,
-        ]);
-
-        redirect('admin-grupy.php?assigned=1');
+        // Przekieruj OD RAZU (zapis w bazie już gotowy) — sam e-mail (może się
+        // zawiesić na wolnym SMTP) wysyłamy po odpowiedzi do przeglądarki,
+        // żeby klikanie "Potwierdź" nie wisiało w nieskończoność.
+        redirect_then('admin-grupy.php?assigned=1', function () use ($parent, $child, $group, $isFull) {
+            send_enrollment_confirmation_email([
+                'parentEmail' => $parent['email'], 'parentName' => $parent['name'],
+                'childName' => $child['first_name'] . ' ' . $child['last_name'],
+                'classTypeName' => $group['ct_name'], 'sessionTitle' => $group['name'],
+                'when' => format_group_schedule((int) $group['day_of_week'], $group['start_time'], $group['end_time']),
+                'instructorName' => $group['instructor_name'], 'instructorEmail' => $group['instructor_email'],
+                'meetingUrl' => $group['meeting_url'], 'waitlisted' => $isFull,
+            ]);
+        });
     }
 
     if ($action === 'unassign') {
         $prevGroupId = (int) $enrollment['group_id'];
         db()->prepare("UPDATE enrollments SET group_id=NULL, status='PENDING', confirmed_at=NULL WHERE id=?")->execute([$enrollmentId]);
-        if ($prevGroupId) {
-            promote_next_waitlisted($prevGroupId);
-        }
-        redirect('admin-grupy.php?unassigned=1');
+        redirect_then('admin-grupy.php?unassigned=1', function () use ($prevGroupId) {
+            if ($prevGroupId) {
+                promote_next_waitlisted($prevGroupId);
+            }
+        });
     }
 
     if ($action === 'decline') {
@@ -106,12 +110,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $classType = db()->prepare('SELECT name FROM class_types WHERE id = ?');
         $classType->execute([$enrollment['class_type_id']]);
         $classType = $classType->fetch();
-        send_enrollment_declined_email([
-            'parentEmail' => $parent['email'], 'parentName' => $parent['name'],
-            'childName' => $child['first_name'] . ' ' . $child['last_name'],
-            'classTypeName' => $classType['name'] ?? '',
-        ]);
-        redirect('admin-grupy.php?declined=1');
+        redirect_then('admin-grupy.php?declined=1', function () use ($parent, $child, $classType) {
+            send_enrollment_declined_email([
+                'parentEmail' => $parent['email'], 'parentName' => $parent['name'],
+                'childName' => $child['first_name'] . ' ' . $child['last_name'],
+                'classTypeName' => $classType['name'] ?? '',
+            ]);
+        });
     }
 }
 

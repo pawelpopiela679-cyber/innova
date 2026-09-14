@@ -66,20 +66,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $confirmedCount = (int) $countStmt->fetch()['c'];
         $when = format_group_schedule((int) $group['day_of_week'], $group['start_time'], $group['end_time']);
 
-        send_signup_request_email([
-            'parentEmail' => $user['email'], 'parentName' => $user['name'],
-            'childName' => $child['first_name'] . ' ' . $child['last_name'],
-            'classTypeName' => $group['ct_name'], 'groupName' => $group['name'], 'when' => $when,
-            'instructorName' => $group['instructor_name'],
-        ]);
-        send_studio_new_request_notification([
-            'childName' => $child['first_name'] . ' ' . $child['last_name'], 'childBirthDate' => $child['birth_date'],
-            'parentName' => $user['name'], 'parentEmail' => $user['email'], 'parentPhone' => $user['phone'] ?? '',
-            'classTypeName' => $group['ct_name'], 'groupName' => $group['name'], 'when' => $when,
-            'confirmedCount' => $confirmedCount, 'capacity' => (int) $group['capacity'], 'note' => $note,
-        ]);
-
-        redirect('panel-zapisy-potwierdzenie.php?id=' . $enrollmentId);
+        // Rodzic ma dostać przekierowanie do potwierdzenia OD RAZU — zapis do
+        // bazy już jest gotowy. Same e-maile (mogące się zawiesić na wolnym
+        // SMTP) wysyłamy dopiero PO odpowiedzi do przeglądarki, żeby rodzic
+        // nie czekał na stronie i nie odnosił wrażenia, że "coś nie działa".
+        redirect_then('panel-zapisy-potwierdzenie.php?id=' . $enrollmentId, function () use ($user, $child, $group, $when, $confirmedCount, $note) {
+            send_signup_request_email([
+                'parentEmail' => $user['email'], 'parentName' => $user['name'],
+                'childName' => $child['first_name'] . ' ' . $child['last_name'],
+                'classTypeName' => $group['ct_name'], 'groupName' => $group['name'], 'when' => $when,
+                'instructorName' => $group['instructor_name'],
+            ]);
+            send_studio_new_request_notification([
+                'childName' => $child['first_name'] . ' ' . $child['last_name'], 'childBirthDate' => $child['birth_date'],
+                'parentName' => $user['name'], 'parentEmail' => $user['email'], 'parentPhone' => $user['phone'] ?? '',
+                'classTypeName' => $group['ct_name'], 'groupName' => $group['name'], 'when' => $when,
+                'confirmedCount' => $confirmedCount, 'capacity' => (int) $group['capacity'], 'note' => $note,
+            ]);
+        });
     }
 }
 
