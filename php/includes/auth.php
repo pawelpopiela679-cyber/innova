@@ -145,3 +145,23 @@ function require_staff_manager(): array
     }
     return $user;
 }
+
+/** Właścicielka zawsze, plus imiennie wskazane osoby z włączonym can_manage_content
+ *  (patrz bootstrap w schema.php i admin-prowadzacy-edytuj.php) — edycja treści strony. */
+function user_can_manage_content(?array $user): bool
+{
+    if (!$user) {
+        return false;
+    }
+    return $user['role'] === 'ADMIN' || !empty($user['can_manage_content']);
+}
+
+/** Jak require_staff(), ale tylko dla uprawnionych do edycji treści strony. */
+function require_content_manager(): array
+{
+    $user = require_staff();
+    if (!user_can_manage_content($user)) {
+        redirect('admin.php');
+    }
+    return $user;
+}

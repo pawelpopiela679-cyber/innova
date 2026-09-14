@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/includes/bootstrap.php';
-$user = require_admin();
+$user = require_content_manager();
 
 /**
  * Panel edycji tekstów widocznych na stronie głównej i w stopce — pierwszy

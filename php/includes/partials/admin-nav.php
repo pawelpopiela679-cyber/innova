@@ -3,6 +3,7 @@
 $isMasterAdmin = $user['role'] === 'ADMIN';
 $canManageGroups = user_can_manage_groups($user);
 $canManageStaff = user_can_manage_staff($user);
+$canManageContent = user_can_manage_content($user);
 $poolCount = $canManageGroups
     ? (int) db()->query("SELECT COUNT(*) c FROM enrollments WHERE status = 'PENDING'")->fetch()['c']
     : 0;
@@ -25,8 +26,10 @@ $poolCount = $canManageGroups
   <?php if ($isMasterAdmin): ?>
     <a href="<?= e(url('admin-cennik.php')) ?>" style="border-radius:999px; padding:6px 16px;">Cennik</a>
     <a href="<?= e(url('admin-strony.php')) ?>" style="border-radius:999px; padding:6px 16px;">Strony</a>
-    <a href="<?= e(url('admin-tresci.php')) ?>" style="border-radius:999px; padding:6px 16px;">Treści strony</a>
     <a href="<?= e(url('admin-wyglad.php')) ?>" style="border-radius:999px; padding:6px 16px;">Wygląd</a>
     <a href="<?= e(url('admin-test-email.php')) ?>" style="border-radius:999px; padding:6px 16px;">Test e-maila</a>
+  <?php endif; ?>
+  <?php if ($canManageContent): ?>
+    <a href="<?= e(url('admin-tresci.php')) ?>" style="border-radius:999px; padding:6px 16px;">Treści strony</a>
   <?php endif; ?>
 </nav>

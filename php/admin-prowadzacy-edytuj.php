@@ -64,9 +64,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // ukrytego w HTML pola).
     $canManageGroups = $isMasterAdmin ? (!empty($_POST['canManageGroups']) ? 1 : 0) : (int) $target['can_manage_groups'];
     $canManageStaff = $isMasterAdmin ? (!empty($_POST['canManageStaff']) ? 1 : 0) : (int) $target['can_manage_staff'];
+    $canManageContent = $isMasterAdmin ? (!empty($_POST['canManageContent']) ? 1 : 0) : (int) $target['can_manage_content'];
 
-    $sql = 'UPDATE users SET name=?, email=?, bio=?, avatar_url=?, can_manage_groups=?, can_manage_staff=?';
-    $params = [$name, $email, $bio ?: null, $avatarUrl, $canManageGroups, $canManageStaff];
+    $sql = 'UPDATE users SET name=?, email=?, bio=?, avatar_url=?, can_manage_groups=?, can_manage_staff=?, can_manage_content=?';
+    $params = [$name, $email, $bio ?: null, $avatarUrl, $canManageGroups, $canManageStaff, $canManageContent];
     if ($newPassword !== '') {
         $sql .= ', password_hash=?';
         $params[] = hash_password($newPassword);
@@ -131,6 +132,10 @@ require __DIR__ . '/includes/layout_top.php';
       <div class="field">
         <label class="checkbox-row"><input type="checkbox" name="canManageStaff" <?= $target['can_manage_staff'] ? 'checked' : '' ?>> Rozszerzone uprawnienia — zarządzanie kontami prowadzących</label>
         <p class="field-hint">Odblokowuje tę stronę (zakładanie/edycja/usuwanie kont prowadzących) — bez możliwości nadawania dalszych uprawnień innym kontom.</p>
+      </div>
+      <div class="field">
+        <label class="checkbox-row"><input type="checkbox" name="canManageContent" <?= $target['can_manage_content'] ? 'checked' : '' ?>> Rozszerzone uprawnienia — edycja treści strony</label>
+        <p class="field-hint">Odblokowuje zakładkę „Treści strony” (teksty, daty, dane kontaktowe widoczne na stronie głównej i w stopce).</p>
       </div>
     <?php else: ?>
       <p class="text-muted mt-2" style="font-size:0.82rem;">Rozszerzone uprawnienia (dostęp do grup / zarządzanie kontami) może zmieniać wyłącznie właścicielka pracowni.</p>
