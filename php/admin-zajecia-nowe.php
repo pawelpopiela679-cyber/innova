@@ -65,11 +65,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $classTypes = db()->query('SELECT * FROM class_types ORDER BY id ASC')->fetchAll();
 
-// Podstawione z kliknięcia komórki w admin-grafik.php (dzień + godzina) —
-// żeby nie trzeba było ręcznie wpisywać tego, co już wybrano na siatce.
+// Podstawione z kliknięcia komórki w admin-grafik.php (dzień + godzina), albo
+// z przeciągnięcia na nią ikonki rodzaju zajęć — żeby nie trzeba było ręcznie
+// wpisywać tego, co już wybrano na siatce.
 $prefillDate = (string) ($_GET['date'] ?? '');
 $prefillStart = (string) ($_GET['startTime'] ?? '');
 $prefillEnd = (string) ($_GET['endTime'] ?? '');
+$prefillClassTypeId = (int) ($_GET['classTypeId'] ?? 0);
+
+$prefillTitle = '';
+foreach ($classTypes as $ct) {
+    if ((int) $ct['id'] === $prefillClassTypeId) {
+        $prefillTitle = $ct['name'];
+        break;
+    }
+}
 
 $pageTitle = 'Nowe zajęcia — INNOVA';
 $notebookTheme = true;
@@ -92,12 +102,12 @@ require __DIR__ . '/includes/layout_top.php';
     <div class="field" style="grid-column:1/-1;">
       <label for="classTypeId">Rodzaj zajęć</label>
       <select id="classTypeId" name="classTypeId" required>
-        <?php foreach ($classTypes as $ct): ?><option value="<?= $ct['id'] ?>"><?= e($ct['name']) ?></option><?php endforeach; ?>
+        <?php foreach ($classTypes as $ct): ?><option value="<?= $ct['id'] ?>" <?= (int) $ct['id'] === $prefillClassTypeId ? 'selected' : '' ?>><?= e($ct['name']) ?></option><?php endforeach; ?>
       </select>
     </div>
     <div class="field" style="grid-column:1/-1;">
       <label for="title">Nazwa grupy</label>
-      <input id="title" name="title" required placeholder="np. Robotyka „1” — grupa online">
+      <input id="title" name="title" required placeholder="np. Robotyka „1” — grupa online" value="<?= e($prefillTitle) ?>">
     </div>
     <div class="field">
       <label for="date">Data pierwszych zajęć</label>

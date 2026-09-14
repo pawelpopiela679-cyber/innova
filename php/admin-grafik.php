@@ -40,6 +40,7 @@ foreach ($sessions as $s) {
 }
 
 $dayLabels = ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota', 'Niedziela'];
+$classTypesForPalette = db()->query('SELECT * FROM class_types ORDER BY id ASC')->fetchAll();
 
 $pageTitle = 'Grafik — INNOVA';
 $notebookTheme = true;
@@ -50,9 +51,19 @@ require __DIR__ . '/includes/layout_top.php';
 
   <h1 style="font-size:1.6rem;">Grafik tygodniowy</h1>
   <p class="text-muted mt-2">
-    Kliknij pustą komórkę, żeby dodać zajęcia w tym dniu i o tej godzinie. Kliknij w istniejące zajęcia,
-    żeby je edytować albo odwołać.
+    Przeciągnij ikonkę rodzaju zajęć na wybrany dzień i godzinę, żeby dodać nowe zajęcia (albo po prostu
+    kliknij pustą komórkę). Kliknij w istniejące zajęcia, żeby je edytować albo odwołać.
   </p>
+
+  <div class="nb-grafik-palette mt-4">
+    <?php foreach ($classTypesForPalette as $ct): [$bg, $ink] = nb_pastel($ct['key_name']); ?>
+      <div class="nb-grafik-palette-item" draggable="true" data-class-type-id="<?= (int) $ct['id'] ?>"
+           style="background:<?= e($bg) ?>; color:<?= e($ink) ?>;" title="Przeciągnij na grafik, żeby dodać">
+        <?= nb_icon_svg($ct['key_name'], 'nb-grafik-palette-icon') ?>
+        <span><?= e($ct['name']) ?></span>
+      </div>
+    <?php endforeach; ?>
+  </div>
 
   <div class="flex items-center gap-2 mt-4" style="font-size:0.9rem;">
     <a href="<?= e(url('admin-grafik.php?week=' . date_param((clone $days[0])->modify('-7 days')))) ?>" class="btn btn-outline btn-sm">← Poprzedni tydzień</a>
@@ -83,7 +94,9 @@ require __DIR__ . '/includes/layout_top.php';
             <?php foreach ($days as $dayIndex => $d):
                 $cellSessions = $cellMap[$dayIndex][$h] ?? [];
                 $cellDate = $d->format('Y-m-d');
-                $addUrl = url('admin-zajecia-nowe.php?date=' . $cellDate . '&startTime=' . sprintf('%02d:00', $h) . '&endTime=' . sprintf('%02d:00', $h + 1));
+                $cellStart = sprintf('%02d:00', $h);
+                $cellEnd = sprintf('%02d:00', $h + 1);
+                $addUrlBase = 'admin-zajecia-nowe.php?date=' . $cellDate . '&startTime=' . $cellStart . '&endTime=' . $cellEnd;
             ?>
               <td class="nb-grafik-cell">
                 <?php foreach ($cellSessions as $s): [$bg, $ink] = nb_pastel($s['ct_key']); ?>
@@ -97,7 +110,8 @@ require __DIR__ . '/includes/layout_top.php';
                   </a>
                 <?php endforeach; ?>
                 <?php if (!$cellSessions): ?>
-                  <a href="<?= e($addUrl) ?>" class="nb-grafik-empty" title="Dodaj zajęcia — <?= e($dayLabels[$dayIndex]) ?> <?= sprintf('%02d:00', $h) ?>"></a>
+                  <a href="<?= e(url($addUrlBase)) ?>" class="nb-grafik-empty" data-add-url-base="<?= e(url($addUrlBase)) ?>"
+                     title="Dodaj zajęcia — <?= e($dayLabels[$dayIndex]) ?> <?= $cellStart ?>"></a>
                 <?php endif; ?>
               </td>
             <?php endforeach; ?>
@@ -126,5 +140,60 @@ require __DIR__ . '/includes/layout_top.php';
   .nb-grafik-chip:hover { filter:brightness(0.95); }
   .nb-grafik-chip-icon { flex:none; width:16px; height:16px; margin-top:1px; }
   .nb-grafik-chip-icon svg { width:16px; height:16px; display:block; }
+
+  /* Paleta rodzajów zajęć — przeciągnij ikonkę na pustą komórkę grafiku. */
+  .nb-grafik-palette { display:flex; flex-wrap:wrap; gap:8px; }
+  .nb-grafik-palette-item {
+    display:flex; align-items:center; gap:6px; padding:6px 12px; border-radius:999px;
+    font-size:0.82rem; font-weight:600; cursor:grab; user-select:none;
+    border:1px solid rgba(0,0,0,0.08);
+  }
+  .nb-grafik-palette-item:active { cursor:grabbing; }
+  .nb-grafik-palette-item.is-dragging { opacity:0.4; }
+  .nb-grafik-palette-icon { width:18px; height:18px; flex:none; }
+  /* Podświetlenie komórki, nad którą aktualnie przeciągana jest ikonka. */
+  .nb-grafik-empty.is-drop-target {
+    background:color-mix(in srgb, var(--nb-green,#3f7d45) 18%, transparent) !important;
+    outline:2px dashed var(--nb-green,#3f7d45); outline-offset:-2px;
+  }
 </style>
+<script>
+(function () {
+  var palette = document.querySelectorAll('.nb-grafik-palette-item');
+  var dropzones = document.querySelectorAll('.nb-grafik-empty');
+
+  palette.forEach(function (item) {
+    item.addEventListener('dragstart', function (e) {
+      e.dataTransfer.setData('text/plain', item.getAttribute('data-class-type-id'));
+      e.dataTransfer.effectAllowed = 'copy';
+      item.classList.add('is-dragging');
+    });
+    item.addEventListener('dragend', function () {
+      item.classList.remove('is-dragging');
+    });
+  });
+
+  dropzones.forEach(function (zone) {
+    zone.addEventListener('dragover', function (e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'copy';
+      zone.classList.add('is-drop-target');
+    });
+    zone.addEventListener('dragleave', function () {
+      zone.classList.remove('is-drop-target');
+    });
+    zone.addEventListener('drop', function (e) {
+      e.preventDefault();
+      zone.classList.remove('is-drop-target');
+      var classTypeId = e.dataTransfer.getData('text/plain');
+      if (!classTypeId) {
+        return;
+      }
+      var base = zone.getAttribute('data-add-url-base');
+      var sep = base.indexOf('?') === -1 ? '?' : '&';
+      window.location.href = base + sep + 'classTypeId=' + encodeURIComponent(classTypeId);
+    });
+  });
+})();
+</script>
 <?php require __DIR__ . '/includes/layout_bottom.php'; ?>
