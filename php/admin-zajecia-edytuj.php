@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/includes/bootstrap.php';
-$user = require_staff();
+$user = require_schedule_manager();
 
 $id = (int) ($_GET['id'] ?? $_POST['id'] ?? 0);
 $stmt = db()->prepare('SELECT cs.*, ct.name AS ct_name FROM class_sessions cs JOIN class_types ct ON ct.id = cs.class_type_id WHERE cs.id = ?');

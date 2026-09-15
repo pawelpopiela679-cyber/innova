@@ -18,6 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $canManageGroups = ($isMasterAdmin && !empty($_POST['canManageGroups'])) ? 1 : 0;
         $canManageStaff = ($isMasterAdmin && !empty($_POST['canManageStaff'])) ? 1 : 0;
         $canManageContent = ($isMasterAdmin && !empty($_POST['canManageContent'])) ? 1 : 0;
+        $canManageSchedule = ($isMasterAdmin && !empty($_POST['canManageSchedule'])) ? 1 : 0;
 
         if (mb_strlen($name) < 2) {
             redirect_with('admin-prowadzacy.php', ['error' => 'Podaj imię i nazwisko.']);
@@ -34,8 +35,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             redirect_with('admin-prowadzacy.php', ['error' => 'Konto z tym adresem e-mail już istnieje.']);
         }
 
-        db()->prepare('INSERT INTO users (name, email, bio, password_hash, role, can_manage_groups, can_manage_staff, can_manage_content) VALUES (?,?,?,?,?,?,?,?)')
-            ->execute([$name, $email, $bio ?: null, hash_password($password), 'INSTRUCTOR', $canManageGroups, $canManageStaff, $canManageContent]);
+        db()->prepare('INSERT INTO users (name, email, bio, password_hash, role, can_manage_groups, can_manage_staff, can_manage_content, can_manage_schedule) VALUES (?,?,?,?,?,?,?,?,?)')
+            ->execute([$name, $email, $bio ?: null, hash_password($password), 'INSTRUCTOR', $canManageGroups, $canManageStaff, $canManageContent, $canManageSchedule]);
         $newId = db_last_id(db());
 
         if (!empty($_FILES['photo']['name'])) {
@@ -105,6 +106,7 @@ require __DIR__ . '/includes/layout_top.php';
               <?php if ($u['role'] === 'INSTRUCTOR' && $u['can_manage_groups']): ?><span class="badge" style="background:color-mix(in srgb, var(--coral) 22%, var(--background)); color:var(--coral);">Dostęp do grup</span><?php endif; ?>
               <?php if ($u['role'] === 'INSTRUCTOR' && $u['can_manage_staff']): ?><span class="badge" style="background:color-mix(in srgb, var(--mustard) 28%, var(--background)); color:#7a5a12;">Zarządza kontami</span><?php endif; ?>
               <?php if ($u['role'] === 'INSTRUCTOR' && $u['can_manage_content']): ?><span class="badge" style="background:color-mix(in srgb, var(--gold) 28%, var(--background)); color:#7a5a12;">Edytuje treści strony</span><?php endif; ?>
+              <?php if ($u['role'] === 'INSTRUCTOR' && $u['can_manage_schedule']): ?><span class="badge" style="background:color-mix(in srgb, var(--sage) 22%, var(--background)); color:var(--sage);">Układa grafik</span><?php endif; ?>
             </p>
             <p class="text-muted"><?= e($u['email']) ?></p>
           </div>
@@ -160,6 +162,9 @@ require __DIR__ . '/includes/layout_top.php';
         </div>
         <div class="field" style="grid-column:1/-1;">
           <label class="checkbox-row"><input type="checkbox" name="canManageContent"> Rozszerzone uprawnienia — edycja treści strony (Treści strony)</label>
+        </div>
+        <div class="field" style="grid-column:1/-1;">
+          <label class="checkbox-row"><input type="checkbox" name="canManageSchedule"> Rozszerzone uprawnienia — układanie grafiku (dodawanie/edycja/odwoływanie zajęć)</label>
         </div>
       <?php endif; ?>
       <div style="grid-column:1/-1;">

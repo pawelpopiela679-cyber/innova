@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/includes/bootstrap.php';
-$user = require_staff();
+$user = require_schedule_manager();
 
 $error = null;
 

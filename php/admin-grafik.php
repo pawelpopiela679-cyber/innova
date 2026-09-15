@@ -1,12 +1,18 @@
 <?php
 require_once __DIR__ . '/includes/bootstrap.php';
 $user = require_staff();
+$canManageSchedule = user_can_manage_schedule($user);
 
 /**
  * Klikalny grafik tygodniowy — klikasz w pustą komórkę (dzień + godzina) i
  * od razu trafiasz do formularza "Nowa grupa" z podstawioną datą i godziną,
  * zamiast ręcznie wypełniać wszystko od zera. Zajęte komórki pokazują
  * istniejące zajęcia (link do edycji).
+ *
+ * Układanie grafiku (paleta do przeciągania, dodawanie/edycja zajęć) jest
+ * ograniczone do $canManageSchedule (właścicielka + imiennie wskazane osoby,
+ * patrz auth.php) — reszta prowadzących widzi ten sam grafik, ale bez
+ * możliwości zmian.
  */
 
 $weekAnchor = parse_date_param($_GET['week'] ?? null);
@@ -50,20 +56,26 @@ require __DIR__ . '/includes/layout_top.php';
   <?php include __DIR__ . '/includes/partials/admin-nav.php'; ?>
 
   <h1 style="font-size:1.6rem;">Grafik tygodniowy</h1>
-  <p class="text-muted mt-2">
-    Przeciągnij ikonkę rodzaju zajęć na wybrany dzień i godzinę, żeby dodać nowe zajęcia (albo po prostu
-    kliknij pustą komórkę). Kliknij w istniejące zajęcia, żeby je edytować albo odwołać.
-  </p>
+  <?php if ($canManageSchedule): ?>
+    <p class="text-muted mt-2">
+      Przeciągnij ikonkę rodzaju zajęć na wybrany dzień i godzinę, żeby dodać nowe zajęcia (albo po prostu
+      kliknij pustą komórkę). Kliknij w istniejące zajęcia, żeby je edytować albo odwołać.
+    </p>
+  <?php else: ?>
+    <p class="text-muted mt-2">Podgląd grafiku — układanie zajęć (dodawanie/edycja) jest zarezerwowane dla wybranych osób.</p>
+  <?php endif; ?>
 
-  <div class="nb-grafik-palette mt-4">
-    <?php foreach ($classTypesForPalette as $ct): [$bg, $ink] = nb_pastel($ct['key_name']); ?>
-      <div class="nb-grafik-palette-item" draggable="true" data-class-type-id="<?= (int) $ct['id'] ?>"
-           style="background:<?= e($bg) ?>; color:<?= e($ink) ?>;" title="Przeciągnij na grafik, żeby dodać">
-        <?= nb_icon_svg($ct['key_name'], 'nb-grafik-palette-icon') ?>
-        <span><?= e($ct['name']) ?></span>
-      </div>
-    <?php endforeach; ?>
-  </div>
+  <?php if ($canManageSchedule): ?>
+    <div class="nb-grafik-palette mt-4">
+      <?php foreach ($classTypesForPalette as $ct): [$bg, $ink] = nb_pastel($ct['key_name']); ?>
+        <div class="nb-grafik-palette-item" draggable="true" data-class-type-id="<?= (int) $ct['id'] ?>"
+             style="background:<?= e($bg) ?>; color:<?= e($ink) ?>;" title="Przeciągnij na grafik, żeby dodać">
+          <?= nb_icon_svg($ct['key_name'], 'nb-grafik-palette-icon') ?>
+          <span><?= e($ct['name']) ?></span>
+        </div>
+      <?php endforeach; ?>
+    </div>
+  <?php endif; ?>
 
   <div class="flex items-center gap-2 mt-4" style="font-size:0.9rem;">
     <a href="<?= e(url('admin-grafik.php?week=' . date_param((clone $days[0])->modify('-7 days')))) ?>" class="btn btn-outline btn-sm">← Poprzedni tydzień</a>
@@ -99,17 +111,19 @@ require __DIR__ . '/includes/layout_top.php';
                 $addUrlBase = 'admin-zajecia-nowe.php?date=' . $cellDate . '&startTime=' . $cellStart . '&endTime=' . $cellEnd;
             ?>
               <td class="nb-grafik-cell">
-                <?php foreach ($cellSessions as $s): [$bg, $ink] = nb_pastel($s['ct_key']); ?>
-                  <a href="<?= e(url('admin-zajecia-edytuj.php?id=' . $s['id'])) ?>" class="nb-grafik-chip" title="<?= e($s['title']) ?>" style="background:<?= e($bg) ?>; color:<?= e($ink) ?>;">
+                <?php foreach ($cellSessions as $s): [$bg, $ink] = nb_pastel($s['ct_key']);
+                    $chipTag = $canManageSchedule ? 'a' : 'div';
+                ?>
+                  <<?= $chipTag ?><?= $canManageSchedule ? ' href="' . e(url('admin-zajecia-edytuj.php?id=' . $s['id'])) . '"' : '' ?> class="nb-grafik-chip" title="<?= e($s['title']) ?>" style="background:<?= e($bg) ?>; color:<?= e($ink) ?>;">
                     <span class="nb-grafik-chip-icon"><?= nb_icon_svg($s['ct_key'], '') ?></span>
                     <span>
                       <strong><?= e($s['ct_name']) ?></strong>
                       <?php if ($s['title'] !== $s['ct_name']): ?><br><?= e($s['title']) ?><?php endif; ?>
                       <br><?= h_m($s['starts_at']) ?>–<?= h_m($s['ends_at']) ?>
                     </span>
-                  </a>
+                  </<?= $chipTag ?>>
                 <?php endforeach; ?>
-                <?php if (!$cellSessions): ?>
+                <?php if (!$cellSessions && $canManageSchedule): ?>
                   <a href="<?= e(url($addUrlBase)) ?>" class="nb-grafik-empty" data-add-url-base="<?= e(url($addUrlBase)) ?>"
                      title="Dodaj zajęcia — <?= e($dayLabels[$dayIndex]) ?> <?= $cellStart ?>"></a>
                 <?php endif; ?>

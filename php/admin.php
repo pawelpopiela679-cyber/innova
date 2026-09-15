@@ -1,16 +1,24 @@
 <?php
 require_once __DIR__ . '/includes/bootstrap.php';
 $user = require_staff();
+$canManageSchedule = user_can_manage_schedule($user);
 
 /**
  * Dawniej pełny kalendarz miesiąc/tydzień/dzień (includes/partials/calendar-*.php)
  * — usunięty na prośbę właścicielki (nie pasował stylem, a lista poniżej daje
  * to samo, prościej). Partiale zostają w repo nieużywane, jako backup, gdyby
  * kiedyś ten widok był jednak potrzebny z powrotem — patrz git log tego pliku.
+ *
+ * Odwoływanie zajęć (jak i edycja, patrz linki niżej) jest ograniczone do
+ * $canManageSchedule — reszta prowadzących widzi listę, ale bez przycisków
+ * zmian (i tak samo egzekwowane tu server-side, na wypadek ręcznego POST-a).
  */
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['_action'] ?? '') === 'cancel_session') {
     csrf_check();
+    if (!$canManageSchedule) {
+        redirect('admin.php');
+    }
     $sessionId = (int) ($_POST['sessionId'] ?? 0);
     db()->prepare("UPDATE class_sessions SET status = 'CANCELED' WHERE id = ?")->execute([$sessionId]);
     redirect('admin.php?canceled=1');
@@ -94,6 +102,7 @@ require __DIR__ . '/includes/layout_top.php';
               <?= $s['confirmed_count'] ?>/<?= (int) $s['capacity'] ?> zapisanych
             </div>
           </div>
+          <?php if ($canManageSchedule): ?>
           <div class="flex gap-2 mt-4">
             <a href="<?= e(url('admin-zajecia-edytuj.php?id=' . $s['id'])) ?>" class="btn btn-outline btn-sm">Edytuj</a>
             <form method="post" style="display:inline;">
@@ -103,6 +112,7 @@ require __DIR__ . '/includes/layout_top.php';
               <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Na pewno odwołać te zajęcia?')">Odwołaj zajęcia</button>
             </form>
           </div>
+          <?php endif; ?>
         </div>
       <?php endforeach; ?>
     </div>

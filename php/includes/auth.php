@@ -165,3 +165,25 @@ function require_content_manager(): array
     }
     return $user;
 }
+
+/** Właścicielka zawsze, plus imiennie wskazane osoby z włączonym can_manage_schedule
+ *  (patrz bootstrap w schema.php i admin-prowadzacy-edytuj.php) — układanie grafiku
+ *  (dodawanie/edycja/odwoływanie zajęć). Reszta prowadzących widzi grafik, ale nie
+ *  może w nim nic zmieniać. */
+function user_can_manage_schedule(?array $user): bool
+{
+    if (!$user) {
+        return false;
+    }
+    return $user['role'] === 'ADMIN' || !empty($user['can_manage_schedule']);
+}
+
+/** Jak require_staff(), ale tylko dla uprawnionych do układania grafiku. */
+function require_schedule_manager(): array
+{
+    $user = require_staff();
+    if (!user_can_manage_schedule($user)) {
+        redirect('admin.php');
+    }
+    return $user;
+}

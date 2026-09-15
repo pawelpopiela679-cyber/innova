@@ -74,6 +74,7 @@ function ensure_schema(): void
         can_manage_groups TINYINT(1) NOT NULL DEFAULT 0,
         can_manage_staff TINYINT(1) NOT NULL DEFAULT 0,
         can_manage_content TINYINT(1) NOT NULL DEFAULT 0,
+        can_manage_schedule TINYINT(1) NOT NULL DEFAULT 0,
         created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
     )$engine");
     // Na istniejącej (produkcyjnej) bazie tabela users już jest — dokładamy
@@ -81,12 +82,14 @@ function ensure_schema(): void
     add_column_if_missing($pdo, 'users', 'can_manage_groups', 'TINYINT(1) NOT NULL DEFAULT 0');
     add_column_if_missing($pdo, 'users', 'can_manage_staff', 'TINYINT(1) NOT NULL DEFAULT 0');
     add_column_if_missing($pdo, 'users', 'can_manage_content', 'TINYINT(1) NOT NULL DEFAULT 0');
+    add_column_if_missing($pdo, 'users', 'can_manage_schedule', 'TINYINT(1) NOT NULL DEFAULT 0');
     // Z prośby właścicielki: te dwa konkretne konta prowadzących mają od razu
-    // dostęp do zarządzania kontami prowadzących (dodawanie/usuwanie) oraz do
-    // edycji treści strony — niedestrukcyjne (tylko włącza flagę na koncie,
+    // dostęp do zarządzania kontami prowadzących (dodawanie/usuwanie), do
+    // edycji treści strony i do układania grafiku (dodawanie/edycja/
+    // odwoływanie zajęć) — niedestrukcyjne (tylko włącza flagę na koncie,
     // jeśli już istnieje; nic nie robi, jeśli konto o tym adresie jeszcze nie
     // zostało założone).
-    $pdo->prepare("UPDATE users SET can_manage_staff = 1, can_manage_content = 1 WHERE email IN ('marzenawypych@innova-pracownia.pl', 'dominikapopiela@innova-pracownia.pl')")->execute();
+    $pdo->prepare("UPDATE users SET can_manage_staff = 1, can_manage_content = 1, can_manage_schedule = 1 WHERE email IN ('marzenawypych@innova-pracownia.pl', 'dominikapopiela@innova-pracownia.pl')")->execute();
 
     $pdo->exec("CREATE TABLE IF NOT EXISTS class_types (
         id $pk,

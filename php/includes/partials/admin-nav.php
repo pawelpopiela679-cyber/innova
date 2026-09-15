@@ -4,6 +4,7 @@ $isMasterAdmin = $user['role'] === 'ADMIN';
 $canManageGroups = user_can_manage_groups($user);
 $canManageStaff = user_can_manage_staff($user);
 $canManageContent = user_can_manage_content($user);
+$canManageSchedule = user_can_manage_schedule($user);
 $poolCount = $canManageGroups
     ? (int) db()->query("SELECT COUNT(*) c FROM enrollments WHERE status = 'PENDING'")->fetch()['c']
     : 0;
@@ -11,7 +12,9 @@ $poolCount = $canManageGroups
 <nav class="mt-2" style="margin-bottom:32px; display:flex; flex-wrap:wrap; gap:8px; border-radius:999px; border:1px solid var(--border); background:var(--surface); padding:4px; width:fit-content; font-size:0.9rem;">
   <a href="<?= e(url('admin.php')) ?>" style="border-radius:999px; padding:6px 16px;">Zaplanowane zajęcia</a>
   <a href="<?= e(url('admin-grafik.php')) ?>" style="border-radius:999px; padding:6px 16px;">Grafik</a>
-  <a href="<?= e(url('admin-zajecia-nowe.php')) ?>" style="border-radius:999px; padding:6px 16px;">+ Nowa grupa</a>
+  <?php if ($canManageSchedule): ?>
+    <a href="<?= e(url('admin-zajecia-nowe.php')) ?>" style="border-radius:999px; padding:6px 16px;">+ Nowa grupa</a>
+  <?php endif; ?>
   <?php if ($canManageGroups): ?>
     <a href="<?= e(url('admin-grupy.php')) ?>" class="flex items-center gap-2" style="border-radius:999px; padding:6px 16px;">
       Grupy
