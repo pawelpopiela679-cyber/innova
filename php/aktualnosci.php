@@ -5,14 +5,10 @@ $posts = db()->query('SELECT * FROM news_posts ORDER BY created_at DESC')->fetch
 
 $pageTitle = 'Aktualności — INNOVA';
 $notebookTheme = true;
-$notebookActive = 'news';
+$notebookBare = true;
 require __DIR__ . '/includes/layout_top.php';
 ?>
-<div class="text-center">
-  <img src="<?= e(url('assets/img/banners/aktualnosci.png')) ?>" alt="Aktualności — nowe zajęcia, dzień otwarty, wydarzenia, ważne informacje" style="max-width:280px; width:100%; height:auto;">
-</div>
-<h1 class="nb-section-title" style="font-size:1.8rem;">Aktualności</h1>
-<p class="text-center text-muted mt-2">Nowinki i newsy z życia pracowni.</p>
+<div class="nb-graphic-page" style="background-image:url('<?= e(url('assets/img/banners/aktualnosci.png')) ?>');"></div>
 
 <?php if (!$posts): ?>
   <p class="text-muted text-center mt-8">Na razie brak wpisów — zajrzyj tu wkrótce!</p>

@@ -5,12 +5,10 @@ $instructors = db()->query("SELECT * FROM users WHERE role = 'INSTRUCTOR' ORDER 
 
 $pageTitle = 'Poznaj nas — INNOVA';
 $notebookTheme = true;
-$notebookActive = 'about';
+$notebookBare = true;
 require __DIR__ . '/includes/layout_top.php';
 ?>
-<div class="text-center">
-  <img src="<?= e(url('assets/img/banners/o-nas.png')) ?>" alt="O nas — INNOVA to miejsce, gdzie pasja spotyka się z edukacją." style="max-width:340px; width:100%; height:auto;">
-</div>
+<div class="nb-graphic-page" style="background-image:url('<?= e(url('assets/img/banners/o-nas.png')) ?>');"></div>
 <p class="text-center text-muted mt-4">Zespół prowadzących pracowni INNOVA.</p>
 
 <?php if (!$instructors): ?>

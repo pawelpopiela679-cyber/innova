@@ -26,18 +26,13 @@ ksort($exampleGrid);
 
 $pageTitle = 'Grafik zajęć — INNOVA';
 $notebookTheme = true;
-$notebookActive = 'schedule';
+$notebookBare = true;
 require __DIR__ . '/includes/layout_top.php';
 ?>
-<div class="nb-hero" style="grid-template-columns:1fr 1.4fr; margin-top:0;">
-  <div class="nb-photo-block" style="max-width:260px;">
-    <img src="<?= e(url('assets/img/banners/grafik.png')) ?>" alt="Grafik — sprawdź aktualne terminy zajęć i zaplanuj swoją przygodę z INNOVA!" style="width:100%; height:auto; filter:drop-shadow(0 8px 16px rgba(74,67,38,.18));">
-  </div>
-  <div>
-    <div class="nb-step-title">3. Sprawdź grafik <span class="nb-box"></span></div>
-    <div class="nb-step-sub">Poniżej przykładowy, cotygodniowy rytm zajęć.</div>
-    <a href="<?= e(signup_url()) ?>" class="nb-pill-dark">Zapisz się ↓</a>
-  </div>
+<div class="nb-graphic-page" style="background-image:url('<?= e(url('assets/img/banners/grafik.png')) ?>');"></div>
+<div class="text-center" style="margin:20px 0 30px;">
+  <div class="nb-step-sub">Poniżej przykładowy, cotygodniowy rytm zajęć.</div>
+  <a href="<?= e(signup_url()) ?>" class="nb-pill-dark">Zapisz się ↓</a>
 </div>
 
 <div class="nb-grid-wrap">
