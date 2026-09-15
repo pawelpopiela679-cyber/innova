@@ -54,12 +54,16 @@
   --font-heading: var(--nb-font-heading);
   --font-sans: var(--nb-font-body);
   position: relative;
+  /* Liniatura i czerwona linia marginesu są celowo dużo subtelniejsze niż
+     wcześniej (niska nieprzezroczystość) — sygnalizują "zeszyt" bez efektu
+     zakratkowanej kartki; tekst nadal siada na tym samym rytmie (--nb-line
+     w line-height niżej), tylko linie w tle są ledwie widoczne. */
   background:
-    linear-gradient(90deg, transparent 0, transparent 54px, var(--nb-margin) 54px, var(--nb-margin) 56px, transparent 56px),
-    repeating-linear-gradient(180deg, transparent, transparent 31px, var(--nb-rule) 31px, var(--nb-rule) 33px, transparent 33px),
+    linear-gradient(90deg, transparent 0, transparent 54px, rgba(221,143,136,.35) 54px, rgba(221,143,136,.35) 55px, transparent 55px),
+    repeating-linear-gradient(180deg, transparent, transparent 31px, rgba(183,203,232,.32) 31px, rgba(183,203,232,.32) 32px, transparent 32px),
     var(--nb-paper);
-  border-radius: 14px;
-  box-shadow: 0 18px 40px rgba(74,67,38,.18), 0 2px 0 rgba(74,67,38,.08) inset;
+  border-radius: 20px;
+  box-shadow: 0 40px 80px -32px rgba(74,67,38,.32), 0 4px 24px -8px rgba(74,67,38,.12);
   /* Góra dopełnienia = wielokrotność --nb-line, żeby pierwszy wiersz
      tekstu też startował zgodnie z rytmem liniatury w tle. */
   padding: 33px clamp(60px, 8vw, 84px);
@@ -78,11 +82,22 @@
 .notebook .nb-step-sub, .notebook .nb-form-sub, .notebook .text-muted {
   line-height: var(--nb-line);
 }
+/* Grzbiet zeszytu — zamiast dosłownej plastikowej spirali (wyglądała na
+   "papierowo"/clipart), subtelny pasek w trzech barwach marki z rzędem
+   delikatnych kropek — ten sam zabieg, który właścicielka pracowni
+   zaakceptowała w wizualizacji nowego wyglądu strony. linear-gradient
+   naturalnie rozciąga się na całą wysokość niezależnie od długości strony,
+   więc nie trzeba (jak poprzednio) kafelkować obrazka w pionie. */
 .notebook .spiral {
-  position: absolute; left: 12px; top: 0; bottom: 0; width: 34px;
-  background-image: radial-gradient(circle at 17px 20px, #fff 0 6px, #9aa79a 6px 8px, transparent 9px);
-  background-size: 34px 42px; background-repeat: repeat-y;
-  filter: drop-shadow(1px 2px 1px rgba(0,0,0,.15));
+  position: absolute; left: 0; top: 0; bottom: 0; width: 10px;
+  background: linear-gradient(180deg, var(--nb-green) 0%, var(--nb-green) 33%, var(--nb-coral) 33%, var(--nb-coral) 66%, var(--nb-gold) 66%, var(--nb-gold) 100%);
+  opacity: .9;
+  border-radius: 20px 0 0 20px;
+}
+.notebook .spiral-dots {
+  position: absolute; left: 24px; top: 0; bottom: 0; width: 5px;
+  background-image: radial-gradient(circle, rgba(74,67,38,.16) 0 2.5px, transparent 3px);
+  background-size: 5px 30px; background-repeat: repeat-y;
 }
 
 /* ---- Zakładki po prawej: prawdziwe linki do 6 stron ---- */
@@ -117,8 +132,8 @@
   border: 2px solid var(--nb-green); background: var(--nb-paper); color: var(--nb-green); cursor: pointer; text-decoration: none;
   display: inline-flex; align-items: center; gap: 8px;
 }
-.nb-btn.solid { background: var(--nb-green); color: #fff; border-color: var(--nb-green); }
-.nb-btn.coral { background: var(--nb-coral); border-color: var(--nb-coral); color: #fff; }
+.nb-btn.solid { background: var(--nb-green); color: #fff; border-color: var(--nb-green); box-shadow: 0 14px 28px -14px rgba(63,125,69,.6); }
+.nb-btn.coral { background: var(--nb-coral); border-color: var(--nb-coral); color: #fff; box-shadow: 0 14px 28px -14px rgba(224,96,122,.6); }
 .nb-btn.uppercase { text-transform: uppercase; letter-spacing: .02em; }
 .nb-btn.big { padding: 15px 26px; font-size: .85rem; }
 
@@ -144,7 +159,8 @@
 .nb-section { margin-top: 56px; }
 .nb-section-title { font-family: var(--nb-font-heading); font-weight: 700; font-size: 2.5rem; color: var(--nb-green); text-align: center; margin: 0 0 30px; }
 .nb-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-.nb-card { position: relative; border-radius: 14px; padding: 22px 18px 20px; border: 1px solid rgba(74,67,38,.12); box-shadow: 2px 4px 0 rgba(74,67,38,.08); text-decoration: none; color: inherit; display: block; }
+.nb-card { position: relative; border-radius: 16px; padding: 24px 20px 22px; border: 1px solid rgba(74,67,38,.08); box-shadow: 0 24px 48px -32px rgba(74,67,38,.4); text-decoration: none; color: inherit; display: block; transition: transform .15s ease, box-shadow .15s ease; }
+.nb-card:hover { transform: translateY(-3px); box-shadow: 0 28px 52px -28px rgba(74,67,38,.45); }
 .nb-card .nb-tape { top: -10px; left: 24px; transform: rotate(-6deg); }
 .nb-card .nb-icon { width: 56px; height: 56px; margin-bottom: 10px; }
 .nb-card h3 { font-family: var(--nb-font-heading); font-weight: 700; font-size: 1.5rem; margin: 0 0 8px; }

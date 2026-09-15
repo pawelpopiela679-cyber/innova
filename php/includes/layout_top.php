@@ -44,6 +44,7 @@ try {
 <div class="notebook-wrap">
   <div class="notebook">
     <div class="spiral"></div>
+    <div class="spiral-dots"></div>
     <?= nb_render_tabs($notebookActive) ?>
     <div style="display:flex; justify-content:flex-end; gap:12px; align-items:center; font-size:.8rem; margin-bottom:8px; flex-wrap:wrap; padding-right:100px;">
       <?php if ($user): ?>
