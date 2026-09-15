@@ -28,11 +28,8 @@ require __DIR__ . '/includes/layout_top.php';
     </div>
   </div>
   <div class="nb-photo-block">
-    <img src="<?= e(url('assets/img/hero-photo.png')) ?>" alt="Dzieci budujące robota na zajęciach INNOVA" class="nb-photo-real">
+    <img src="<?= e(url('assets/img/hero-notebook.png')) ?>" alt="Zeszyt INNOVA — Odkrywaj. Twórz. Rośnij." class="nb-photo-real" style="transform:rotate(-3deg);">
   </div>
-</div>
-<div class="text-center" style="margin:20px 0 0;">
-  <img src="<?= e(url('assets/img/banners/haslo.png')) ?>" alt="Odkrywaj. Twórz. Rośnij." style="max-width:280px; width:100%; height:auto;">
 </div>
 
 <div class="nb-section">

@@ -6,6 +6,9 @@ $notebookTheme = true;
 $notebookActive = 'contact';
 require __DIR__ . '/includes/layout_top.php';
 ?>
+<div class="text-center">
+  <img src="<?= e(url('assets/img/banners/kontakt.png')) ?>" alt="Kontakt — napisz do nas, zadzwoń, odwiedź nas, znajdź nas w social mediach" style="max-width:280px; width:100%; height:auto;">
+</div>
 <h1 class="nb-section-title" style="font-size:1.8rem;">Skontaktuj się z nami</h1>
 <p class="text-center text-muted mt-2">Masz pytania o zajęcia, grafik albo zapisy? Chętnie pomożemy.</p>
 

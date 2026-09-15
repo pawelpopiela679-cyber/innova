@@ -92,6 +92,9 @@ $notebookTheme = true;
 $notebookActive = 'signup';
 require __DIR__ . '/includes/layout_top.php';
 ?>
+<div class="text-center">
+  <img src="<?= e(url('assets/img/banners/zapisy.png')) ?>" alt="Zapisy — jak się zapisać, formularz online, zajęcia próbne, regulamin, najczęstsze pytania. Tu zaczyna się przygoda!" style="max-width:280px; width:100%; height:auto;">
+</div>
 <div class="nb-form-wrap">
   <div class="nb-form-card nb-form">
     <div class="nb-tape"></div>
