@@ -172,6 +172,32 @@
 .nb-card-art img { display: block; width: 100%; height: auto; border-radius: 14px; }
 .nb-card-art:hover { transform: translateY(-4px); }
 
+/* ---- Karteczki samoprzylepne (poznaj-nas.php) — prowadzący "przyklejeni"
+   jak na tablicy korkowej: lekki obrót, róg odklejający się u dołu,
+   pinezka u góry. Kolor/obrót cyklicznie z tablicy w PHP. ---- */
+.nb-sticky-board { display: flex; flex-wrap: wrap; justify-content: center; gap: 30px 24px; }
+.sticky-note {
+  position: relative; width: 226px; padding: 30px 20px 22px; text-align: center;
+  box-shadow: 3px 6px 14px -4px rgba(74,67,38,.35); transition: transform .18s ease, box-shadow .18s ease;
+}
+.sticky-note:hover { box-shadow: 5px 10px 20px -4px rgba(74,67,38,.4); }
+.sticky-note::after {
+  /* Odklejający się róg — trójkąt w lekko ciemniejszym odcieniu tła. */
+  content: ""; position: absolute; right: 0; bottom: 0; width: 26px; height: 26px;
+  background: linear-gradient(135deg, transparent 50%, rgba(0,0,0,.12) 50%);
+  border-radius: 0 0 3px 0;
+}
+.sticky-note .pin {
+  position: absolute; top: -9px; left: 50%; transform: translateX(-50%);
+  width: 16px; height: 16px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff 0 2px, #c0392b 3px, #922b21 9px);
+  box-shadow: 0 2px 3px rgba(0,0,0,.3);
+}
+.sticky-note .avatar,
+.sticky-note .avatar-placeholder { width: 82px; height: 82px; margin: 0 auto; }
+.sticky-note h3 { font-family: var(--nb-font-heading); font-weight: 700; font-size: 1.4rem; margin: 14px 0 4px; }
+.sticky-note p { font-size: .8rem; line-height: 1.5; color: var(--nb-ink); opacity: .85; margin: 0; }
+
 /* ---- Dlaczego INNOVA ---- */
 .nb-why { margin-top: 60px; border-top: 2px dashed var(--nb-rule); padding-top: 26px; }
 .nb-why-head { display: flex; align-items: center; gap: 10px; font-family: var(--nb-font-heading); font-weight: 700; color: var(--nb-green); font-size: 1.6rem; margin-bottom: 22px; }

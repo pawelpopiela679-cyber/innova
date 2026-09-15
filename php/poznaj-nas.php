@@ -16,16 +16,24 @@ require __DIR__ . '/includes/layout_top.php';
 <?php if (!$instructors): ?>
   <p class="text-center text-muted mt-8">Wkrótce pojawi się tu zespół prowadzących.</p>
 <?php else: ?>
-  <div class="nb-cards mt-8" style="grid-template-columns:repeat(2,1fr);">
-    <?php foreach ($instructors as $u): $avatarBg = '#' . substr(md5($u['name']), 0, 6); ?>
-      <div class="nb-card" style="background:var(--nb-surface); text-align:center; cursor:default;">
+  <?php
+    // Karteczki samoprzylepne — kolor i obrót cyklicznie z ustalonej palety
+    // (te same barwy co reszta motywu zeszytu), żeby wyglądały jak naprawdę
+    // poprzyklejane na tablicy, a nie idealnie równym rzędem.
+    $stickyColors = ['#fff3c4', '#dcebd6', '#cfe6f7', '#f7d9e6', '#f0e2c9', '#d3f0df'];
+    $stickyRotations = [-3, 2, -1.5, 3, -2, 1.5];
+  ?>
+  <div class="nb-sticky-board mt-8">
+    <?php foreach ($instructors as $i => $u): $avatarBg = '#' . substr(md5($u['name']), 0, 6); ?>
+      <div class="sticky-note" style="background:<?= e($stickyColors[$i % count($stickyColors)]) ?>; transform:rotate(<?= $stickyRotations[$i % count($stickyRotations)] ?>deg);">
+        <div class="pin"></div>
         <?php if ($u['avatar_url']): ?>
-          <img src="<?= e(url($u['avatar_url'])) ?>" alt="<?= e($u['name']) ?>" class="avatar" style="width:96px; height:96px; margin:0 auto;">
+          <img src="<?= e(url($u['avatar_url'])) ?>" alt="<?= e($u['name']) ?>" class="avatar" style="border-radius:50%; object-fit:cover;">
         <?php else: ?>
-          <div style="width:96px; height:96px; margin:0 auto; border-radius:50%; background:<?= e($avatarBg) ?>; color:#fff; display:flex; align-items:center; justify-content:center; font-family:'Baloo 2','Nunito',sans-serif; font-weight:700; font-size:2rem;"><?= e(mb_substr($u['name'], 0, 1)) ?></div>
+          <div class="avatar-placeholder" style="border-radius:50%; background:<?= e($avatarBg) ?>; color:#fff; display:flex; align-items:center; justify-content:center; font-family:var(--nb-font-heading); font-weight:700; font-size:2.1rem;"><?= e(mb_substr($u['name'], 0, 1)) ?></div>
         <?php endif; ?>
-        <h3 class="mt-4"><?= e($u['name']) ?></h3>
-        <?php if ($u['bio']): ?><p class="text-muted mt-2"><?= e($u['bio']) ?></p><?php endif; ?>
+        <h3><?= e($u['name']) ?></h3>
+        <?php if ($u['bio']): ?><p><?= e($u['bio']) ?></p><?php endif; ?>
       </div>
     <?php endforeach; ?>
   </div>
