@@ -30,6 +30,7 @@ $notebookBare = true;
 require __DIR__ . '/includes/layout_top.php';
 ?>
 <div class="nb-graphic-page" style="background-image:url('<?= e(url('assets/img/banners/grafik.png')) ?>');"></div>
+<div class="nb-graphic-content">
 <div class="text-center" style="margin:20px 0 30px;">
   <div class="nb-step-sub">Poniżej przykładowy, cotygodniowy rytm zajęć.</div>
   <a href="<?= e(signup_url()) ?>" class="nb-pill-dark">Zapisz się ↓</a>
@@ -88,5 +89,6 @@ require __DIR__ . '/includes/layout_top.php';
       <a href="<?= e(signup_url()) ?>" class="nb-btn solid uppercase" style="width:100%; justify-content:center; box-sizing:border-box;">Zapisz się teraz</a>
     </div>
   </div>
+</div>
 </div>
 <?php require __DIR__ . '/includes/layout_bottom.php'; ?>

@@ -47,13 +47,14 @@ try {
 </head>
 <body<?= $notebookTheme ? ' class="notebook-body"' : '' ?>>
 <?php if ($notebookTheme): ?>
-<div class="notebook-wrap">
+<div class="notebook-wrap<?= $notebookBare ? ' notebook-wrap--bare' : '' ?>">
   <div class="notebook<?= $notebookBare ? ' notebook--bare' : '' ?>">
     <?php if (!$notebookBare): ?>
       <div class="spiral"></div>
       <div class="spiral-dots"></div>
       <?= nb_render_tabs($notebookActive) ?>
     <?php endif; ?>
+    <?php if ($notebookBare): ?><div style="padding:16px clamp(16px,4vw,40px) 0;"><?php endif; ?>
     <div style="display:flex; justify-content:<?= $notebookBare ? 'space-between' : 'flex-end' ?>; gap:12px; align-items:center; font-size:.8rem; margin-bottom:8px; flex-wrap:wrap; <?= $notebookBare ? '' : 'padding-right:100px;' ?>">
       <?php if ($notebookBare): ?><a href="<?= e(url('index.php')) ?>" style="text-decoration:none; color:var(--nb-muted,#8a7f5c); font-weight:700;">← Strona główna</a><?php endif; ?>
       <?php if ($user): ?>
@@ -74,6 +75,7 @@ try {
     <div class="nb-topbar">
       <a href="<?= e(url('index.php')) ?>" style="text-decoration:none;"><?= render_logo('md', true) ?></a>
     </div>
+    <?php if ($notebookBare): ?></div><?php endif; ?>
 <?php else: ?>
 <header class="navbar">
   <div class="navbar-inner">

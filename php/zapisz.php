@@ -93,6 +93,7 @@ $notebookBare = true;
 require __DIR__ . '/includes/layout_top.php';
 ?>
 <div class="nb-graphic-page" style="background-image:url('<?= e(url('assets/img/banners/zapisy.png')) ?>');"></div>
+<div class="nb-graphic-content">
 <div class="nb-form-wrap">
   <div class="nb-form-card nb-form">
     <div class="nb-tape"></div>
@@ -143,5 +144,6 @@ require __DIR__ . '/includes/layout_top.php';
       <p class="nb-form-foot">Zgłoszenie wymaga potwierdzenia przez pracownię — jeśli wybrany termin jest pełny, zaproponujemy inny albo zapiszemy dziecko na listę rezerwową.</p>
     <?php endif; ?>
   </div>
+</div>
 </div>
 <?php require __DIR__ . '/includes/layout_bottom.php'; ?>

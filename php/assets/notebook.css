@@ -79,11 +79,15 @@
    zeszytu (ona ma własną spiralę, tło i zakładkę) — bez naszej
    dekoracyjnej powłoki, ale z tymi samymi klasami .nb-* (karty, tabelki,
    formularze) dla reszty, prawdziwej treści strony. */
+.notebook-wrap--bare { max-width: none; padding: 0; background: #f0efe9; }
 .notebook--bare {
-  background: none;
+  /* Ten sam odcień papieru co w dostarczonej grafice (próbkowany z
+     ilustracji), żeby przezroczyste narożniki obrazka nie odcinały się
+     innym kolorem tła. */
+  background: #f0efe9;
   border-radius: 0;
   box-shadow: none;
-  padding: 20px clamp(16px, 4vw, 40px) 60px;
+  padding: 0 0 60px;
   min-height: 0;
 }
 /* Zwykły tekst akapitowy (opisy, podpisy, listy) siada na liniaturze w tle —

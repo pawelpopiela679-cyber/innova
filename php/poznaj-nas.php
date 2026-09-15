@@ -9,6 +9,7 @@ $notebookBare = true;
 require __DIR__ . '/includes/layout_top.php';
 ?>
 <div class="nb-graphic-page" style="background-image:url('<?= e(url('assets/img/banners/o-nas.png')) ?>');"></div>
+<div class="nb-graphic-content">
 <p class="text-center text-muted mt-4">Zespół prowadzących pracowni INNOVA.</p>
 
 <?php if (!$instructors): ?>
@@ -36,4 +37,5 @@ require __DIR__ . '/includes/layout_top.php';
     <?php endforeach; ?>
   </div>
 <?php endif; ?>
+</div>
 <?php require __DIR__ . '/includes/layout_bottom.php'; ?>

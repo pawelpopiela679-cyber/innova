@@ -13,7 +13,7 @@ $notebookBare = true;
 require __DIR__ . '/includes/layout_top.php';
 ?>
 <div class="nb-graphic-page" style="background-image:url('<?= e(url('assets/img/banners/zajecia.png')) ?>');"></div>
-
+<div class="nb-graphic-content">
 <h1 class="nb-section-title" style="text-align:left; max-width:640px; font-size:1.7rem;">Zajęcia, w których dzieci i młodzież odkrywają, zdobywają nowe umiejętności i świetnie się bawią!</h1>
 <p class="text-muted" style="max-width:640px;">Zajęcia odbywają się 1x w tygodniu, w małych grupach (maks. 10 dzieci). Pełny terminarz i wolne miejsca znajdziesz w <a href="<?= e(url('kalendarz.php')) ?>" style="color:var(--nb-coral); text-decoration:underline;">grafiku</a>.</p>
 <div class="nb-cta-row">
@@ -109,5 +109,6 @@ require __DIR__ . '/includes/layout_top.php';
     <?php endforeach; ?>
   </div>
   <p class="text-center text-muted mt-8"><strong style="color:var(--nb-ink);">Zniżki:</strong> rodzeństwo −15% · Karta Dużej Rodziny −10%</p>
+</div>
 </div>
 <?php require __DIR__ . '/includes/layout_bottom.php'; ?>

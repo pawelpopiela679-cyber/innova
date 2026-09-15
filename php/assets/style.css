@@ -241,12 +241,12 @@ footer.site-footer { border-top: 1px solid var(--border); background: var(--surf
    spirali czy paska zakładek. ---- */
 .nb-graphic-page {
   position: relative;
-  width: clamp(320px, 90vw, 720px);
-  margin: 0 auto;
+  width: 100%;
   aspect-ratio: 700 / 932;
   background-size: 100% 100%;
   background-repeat: no-repeat;
 }
+.nb-graphic-content { padding: 24px clamp(16px, 4vw, 40px) 0; }
 .nb-graphic-overlay {
   position: absolute;
   font-family: 'Nunito', sans-serif;

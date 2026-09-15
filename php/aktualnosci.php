@@ -9,6 +9,7 @@ $notebookBare = true;
 require __DIR__ . '/includes/layout_top.php';
 ?>
 <div class="nb-graphic-page" style="background-image:url('<?= e(url('assets/img/banners/aktualnosci.png')) ?>');"></div>
+<div class="nb-graphic-content">
 
 <?php if (!$posts): ?>
   <p class="text-muted text-center mt-8">Na razie brak wpisów — zajrzyj tu wkrótce!</p>
@@ -26,5 +27,6 @@ require __DIR__ . '/includes/layout_top.php';
       </div>
     </article>
   <?php endforeach; ?>
+</div>
 </div>
 <?php require __DIR__ . '/includes/layout_bottom.php'; ?>
