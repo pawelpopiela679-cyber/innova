@@ -225,10 +225,19 @@ table.nb-week th, table.nb-week td { border: 1px solid var(--nb-rule); text-alig
 table.nb-week th { background: #fff8e6; font-family: var(--nb-font-heading); color: var(--nb-green); }
 table.nb-week td { background: #ffffff; }
 table.nb-week td.nb-time { font-weight: 700; color: var(--nb-muted); background: #fff8e6; }
-.nb-slot { display: flex; flex-direction: column; align-items: center; gap: 2px; text-decoration: none; color: inherit; }
-.nb-slot .nb-dot { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-.nb-slot .nb-dot svg { width: 16px; height: 16px; }
-.nb-slot small { color: var(--nb-muted); font-size: .68rem; }
+/* Termin w publicznym grafiku (kalendarz.php) — kolorowy "karteczkowy" blok
+   zamiast samej kropki z ikoną: cała komórka ma tło rodzaju zajęć, godzina
+   jest odręcznym krojem (Caveat), zamiast nazwy zajęć jest tylko szkicowana
+   ikonka — ten sam zabieg zaakceptowany w wizualizacji nowego wyglądu. */
+.nb-slot {
+  display: flex; flex-direction: column; align-items: center; gap: 1px; text-decoration: none;
+  border-radius: 10px; padding: 5px 4px 6px; margin: 3px auto; max-width: 76px;
+  box-shadow: 0 6px 14px -10px rgba(74,67,38,.4); transition: transform .12s ease;
+}
+.nb-slot:hover { transform: translateY(-2px); }
+.nb-slot .nb-dot { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+.nb-slot .nb-dot svg { width: 22px; height: 22px; }
+.nb-slot small { font-family: var(--nb-font-heading); font-weight: 700; font-size: .92rem; line-height: 1; }
 .nb-pill-dark { display: inline-block; background: var(--nb-ink); color: #fff; border: none; border-radius: 999px; padding: 9px 18px; font-weight: 700; font-size: .72rem; letter-spacing: .05em; text-transform: uppercase; cursor: pointer; text-decoration: none; }
 .nb-process-item { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; }
 .nb-process-item svg { width: 26px; height: 26px; color: var(--nb-green); flex: none; margin-top: 2px; }

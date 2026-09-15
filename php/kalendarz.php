@@ -52,9 +52,9 @@ require __DIR__ . '/includes/layout_top.php';
               <?php foreach ($days[$d] ?? [] as $s): [$bg, $ink] = nb_pastel($s['ct_key']);
                   $slotHref = $s['group_id'] ? signup_url((int) $s['group_id']) : url('zajecia.php#cennik-' . $s['ct_key']);
               ?>
-                <a href="<?= e($slotHref) ?>" class="nb-slot" title="<?= e($s['ct_name']) ?> — kliknij, żeby zapisać dziecko na ten termin">
-                  <span class="nb-dot" style="background:<?= e($bg) ?>;"><?= nb_icon_svg($s['ct_key'], '') ?></span>
-                  <small><?= h_m($s['starts_at']) ?></small>
+                <a href="<?= e($slotHref) ?>" class="nb-slot" style="background:<?= e($bg) ?>;" title="<?= e($s['ct_name']) ?> — kliknij, żeby zapisać dziecko na ten termin">
+                  <span class="nb-dot" style="color:<?= e($ink) ?>;"><?= nb_icon_svg($s['ct_key'], '') ?></span>
+                  <small style="color:<?= e($ink) ?>;"><?= h_m($s['starts_at']) ?></small>
                 </a>
               <?php endforeach; ?>
             </td>
