@@ -5,30 +5,20 @@ $classTypes = db()->query("SELECT * FROM class_types WHERE key_name != 'OPEN_DAY
 
 $pageTitle = 'INNOVA — Pracownia kreatywno-edukacyjna';
 $notebookTheme = true;
-$notebookActive = 'home';
+$notebookBare = true;
 require __DIR__ . '/includes/layout_top.php';
 ?>
-<svg class="nb-doodle" style="left:-40px; top:6px; width:30px; height:30px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z"/></svg>
-<img class="nb-doodle" src="<?= e(url('assets/img/doodles/star.png')) ?>" alt="" style="left:180px; top:-4px; width:34px;">
-<img class="nb-doodle" src="<?= e(url('assets/img/doodles/arrow.png')) ?>" alt="" style="left:-56px; top:400px; width:46px;">
-<img class="nb-doodle" src="<?= e(url('assets/img/doodles/paper-plane.png')) ?>" alt="" style="right:60px; top:60px; left:auto; width:38px;">
+<div class="nb-graphic-page" style="background-image:url('<?= e(url('assets/img/hero-notebook.png')) ?>');"></div>
+<div class="nb-graphic-content">
 
-<div class="nb-hero">
-  <div>
-    <h1>Witamy w <span class="hl">INNOVA<svg viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M2 6 C 20 10, 80 2, 98 7" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/></svg></span>!</h1>
-    <div class="nb-tagline"><?= nl2br(e(get_content('home.tagline', "Rozwijamy pasje. Odkrywamy talenty.\nTworzymy przyszłość!"))) ?></div>
-    <p class="lead"><?= nl2br(e(get_content('home.lead', 'Zgłoś dziecko na zajęcia w kilka minut: sprawdź kalendarz, wybierz termin, a my dobierzemy odpowiednią grupę i potwierdzimy zapis e-mailem. Każde dziecko jest wyjątkowe — pomagamy mu rozkwitać.'))) ?></p>
-    <div class="nb-cta-row">
-      <a href="<?= e(url('zajecia.php')) ?>" class="nb-btn"><?= e(get_content('home.cta_offer_label', 'Poznaj ofertę →')) ?></a>
-      <a href="<?= e(signup_url()) ?>" class="nb-btn coral"><?= e(get_content('home.cta_signup_label', 'Zapisz dziecko →')) ?></a>
-    </div>
-    <div class="flex flex-wrap gap-2 mt-6" style="font-size:.82rem;">
-      <span class="nb-callout" style="display:inline-block; padding:6px 14px; margin:0;">⭐ Dzień otwarty: <?= e(date('d.m.Y', strtotime(get_content('home.open_day_date', OPEN_DAY_DATE)))) ?></span>
-      <span class="nb-callout" style="display:inline-block; padding:6px 14px; margin:0;">📅 Start zajęć: <?= e(date('d.m.Y', strtotime(get_content('home.semester_start_date', SEMESTER_START)))) ?></span>
-    </div>
+<div class="text-center" style="margin:30px 0;">
+  <div class="nb-cta-row" style="justify-content:center;">
+    <a href="<?= e(url('zajecia.php')) ?>" class="nb-btn"><?= e(get_content('home.cta_offer_label', 'Poznaj ofertę →')) ?></a>
+    <a href="<?= e(signup_url()) ?>" class="nb-btn coral"><?= e(get_content('home.cta_signup_label', 'Zapisz dziecko →')) ?></a>
   </div>
-  <div class="nb-photo-block">
-    <img src="<?= e(url('assets/img/hero-notebook.png')) ?>" alt="Zeszyt INNOVA — Odkrywaj. Twórz. Rośnij." class="nb-photo-real" style="transform:rotate(-3deg);">
+  <div class="flex flex-wrap gap-2 mt-6" style="font-size:.82rem; justify-content:center;">
+    <span class="nb-callout" style="display:inline-block; padding:6px 14px; margin:0;">⭐ Dzień otwarty: <?= e(date('d.m.Y', strtotime(get_content('home.open_day_date', OPEN_DAY_DATE)))) ?></span>
+    <span class="nb-callout" style="display:inline-block; padding:6px 14px; margin:0;">📅 Start zajęć: <?= e(date('d.m.Y', strtotime(get_content('home.semester_start_date', SEMESTER_START)))) ?></span>
   </div>
 </div>
 
@@ -109,5 +99,6 @@ require __DIR__ . '/includes/layout_top.php';
     <a href="https://facebook.com/<?= e(get_content('footer.facebook_handle', 'innova.pracownia')) ?>" style="background:#3b5998;">f</a>
     <a href="https://instagram.com/<?= e(get_content('footer.instagram_handle', 'innova_pracownia')) ?>" style="background:linear-gradient(45deg,#f58529,#dd2a7b,#8134af);">ig</a>
   </div>
+</div>
 </div>
 <?php require __DIR__ . '/includes/layout_bottom.php'; ?>
