@@ -1,0 +1,79 @@
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: #efe4cf; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+a { color: inherit; }
+
+.frame {
+  position: relative;
+  width: 100%;
+  max-width: 1672px;
+  margin: 0 auto;
+  aspect-ratio: 1672 / 941;
+  overflow: hidden;
+}
+.frame > img.bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.hot {
+  position: absolute;
+  display: block;
+  text-decoration: none;
+}
+a.hot { cursor: pointer; }
+
+/* Transparent form fields sitting on top of the hand-drawn input boxes */
+.field {
+  position: absolute;
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 0 1.2%;
+  font-family: inherit;
+  color: #24344a;
+  font-size: 1.4cqw;
+}
+.field:focus { background: rgba(255,255,255,0.35); border-radius: 6px; }
+textarea.field { resize: none; padding-top: 0.8%; }
+.frame { container-type: inline-size; }
+
+.checkbox {
+  position: absolute;
+  cursor: pointer;
+  accent-color: #24344a;
+}
+
+.demo-badge {
+  position: fixed;
+  bottom: 14px;
+  right: 14px;
+  background: #24344a;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 8px 14px;
+  border-radius: 999px;
+  z-index: 50;
+  box-shadow: 0 6px 16px rgba(0,0,0,.25);
+  font-family: -apple-system, sans-serif;
+}
+
+.success-panel {
+  position: absolute;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: rgba(248, 242, 224, 0.97);
+  border-radius: 14px;
+  box-shadow: inset 0 0 0 1px rgba(74,67,38,.15);
+  padding: 3%;
+}
+.success-panel.show { display: flex; }
+.success-panel .emoji { font-size: 2.4rem; margin: 0 0 6px; }
+.success-panel h3 { margin: 0 0 6px; font-family: 'Baloo 2', sans-serif; color: #7d7a4a; }
+.success-panel p { margin: 0; color: #8a7f5c; font-size: .9rem; }
