@@ -47,6 +47,10 @@ export function SessionCard({
             {format(session.startsAt, "EEEE d MMMM, HH:mm", { locale: pl })}–
             {format(session.endsAt, "HH:mm")} · prowadzi {session.instructorName}
           </p>
+          <p className="text-sm text-[var(--muted)]">
+            <span aria-hidden>📍</span>{" "}
+            {session.location === "Pracownia" ? "Pracownia INNOVA" : `${session.location} (zajęcia wyjazdowe)`}
+          </p>
         </div>
 
         {!canceled && (

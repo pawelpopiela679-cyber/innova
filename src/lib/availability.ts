@@ -7,6 +7,7 @@ export type SessionWithAvailability = {
   startsAt: Date;
   endsAt: Date;
   capacity: number;
+  location: string;
   confirmedCount: number;
   spotsLeft: number;
   isFull: boolean;
@@ -49,6 +50,7 @@ export async function getSessionsWithAvailability(
       startsAt: s.startsAt,
       endsAt: s.endsAt,
       capacity: s.capacity,
+      location: s.location,
       confirmedCount,
       spotsLeft,
       isFull: spotsLeft === 0,

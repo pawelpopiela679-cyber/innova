@@ -105,6 +105,7 @@ model ClassSession {
   startsAt       DateTime
   endsAt         DateTime
   capacity       Int           @default(10) // studio rule: max 10 dzieci na grupę
+  location       String        @default("Pracownia") // np. "Pracownia" lub "Hałcnów" dla zajęć wyjazdowych
   meetingUrl     String? // online meeting link, shown to confirmed parents
   instructorId   String?
   instructor     User?         @relation("InstructorSessions", fields: [instructorId], references: [id], onDelete: SetNull)

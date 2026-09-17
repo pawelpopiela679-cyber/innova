@@ -49,6 +49,7 @@ type GroupDef = {
   dayOffset: number; // 0=poniedziałek ... 6=niedziela, względem SEMESTER_START
   startHour: number;
   startMinute: number;
+  location?: string; // domyślnie "Pracownia" — inna wartość dla zajęć wyjazdowych (np. "Hałcnów")
 };
 
 type ClassTypeDef = {
@@ -139,12 +140,11 @@ async function main() {
       description:
         "Nauka angielskiego przez zabawę, piosenki, gry i krótkie dialogi — zajęcia prowadzone w małych grupach, dopasowane do wieku i poziomu dziecka.",
       color: "#8f8a56",
-      ageMin: 3,
+      ageMin: 5,
       ageMax: 7,
       instructorEmail: "ola@innova-pracownia.pl",
       groups: [
-        { label: "", ageLabel: "3–4 lata", durationMin: 35, priceMonthly: 149, dayOffset: 0, startHour: 16, startMinute: 0 },
-        { label: "", ageLabel: "5–7 lat", durationMin: 50, priceMonthly: 199, dayOffset: 0, startHour: 16, startMinute: 45 },
+        { label: "", ageLabel: "5–7 lat", durationMin: 45, priceMonthly: 199, dayOffset: 3, startHour: 12, startMinute: 0 },
       ],
     },
     {
@@ -172,8 +172,29 @@ async function main() {
       ageMax: 10,
       instructorEmail: "marek@innova-pracownia.pl",
       groups: [
-        { label: "", ageLabel: "5–7 lat", durationMin: 60, priceMonthly: 249, dayOffset: 2, startHour: 17, startMinute: 0 },
-        { label: "", ageLabel: "8–10 lat", durationMin: 60, priceMonthly: 249, dayOffset: 2, startHour: 18, startMinute: 15 },
+        { label: "Robotyka — grupa 1", ageLabel: "5–10 lat", durationMin: 45, priceMonthly: 229, dayOffset: 0, startHour: 13, startMinute: 0 },
+        { label: "Robotyka — grupa 2", ageLabel: "5–10 lat", durationMin: 45, priceMonthly: 229, dayOffset: 0, startHour: 13, startMinute: 50 },
+        {
+          label: "Robotyka wyjazdowa",
+          ageLabel: "5–10 lat",
+          durationMin: 60,
+          priceMonthly: 249,
+          dayOffset: 2,
+          startHour: 15,
+          startMinute: 0,
+          location: "Hałcnów",
+        },
+        {
+          label: "Robotyka wyjazdowa",
+          ageLabel: "5–10 lat",
+          durationMin: 50,
+          priceMonthly: 249,
+          dayOffset: 2,
+          startHour: 16,
+          startMinute: 10,
+          location: "Hałcnów",
+        },
+        { label: "Robotyka", ageLabel: "5–10 lat", durationMin: 60, priceMonthly: 249, dayOffset: 2, startHour: 17, startMinute: 45 },
       ],
     },
     {
@@ -186,17 +207,17 @@ async function main() {
       ageMax: 15,
       instructorEmail: "ania@innova-pracownia.pl",
       groups: [
-        { label: "Mix kreatywny", ageLabel: "5–7 lat", durationMin: 50, priceMonthly: 229, dayOffset: 1, startHour: 16, startMinute: 0 },
-        { label: "Mix kreatywny", ageLabel: "8–11 lat", durationMin: 60, priceMonthly: 229, dayOffset: 1, startHour: 17, startMinute: 0 },
+        { label: "Zajęcia kreatywne", ageLabel: "5–7 lat", durationMin: 60, priceMonthly: 229, dayOffset: 0, startHour: 16, startMinute: 10 },
+        { label: "Zajęcia kreatywne", ageLabel: "8–11 lat", durationMin: 60, priceMonthly: 229, dayOffset: 4, startHour: 15, startMinute: 0 },
         {
           label: "Szydełkowanie / haft",
           ageLabel: "9–15 lat",
-          durationMin: 75,
+          durationMin: 60,
           priceMonthly: 229,
           oneTimeFee: 79,
-          dayOffset: 1,
-          startHour: 18,
-          startMinute: 15,
+          dayOffset: 0,
+          startHour: 17,
+          startMinute: 20,
         },
       ],
     },
@@ -210,10 +231,9 @@ async function main() {
       ageMax: 15,
       instructorEmail: "beata@innova-pracownia.pl",
       groups: [
-        { label: "Matematyczne odkrycia", ageLabel: "4–5 lat", durationMin: 35, priceMonthly: 149, dayOffset: 4, startHour: 16, startMinute: 0 },
-        { label: "Matematyka bez stresu", ageLabel: "6–8 lat", durationMin: 50, priceMonthly: 199, dayOffset: 4, startHour: 16, startMinute: 45 },
-        { label: "Logika + pomoc szkolna", ageLabel: "klasy 1–3", durationMin: 60, priceMonthly: 199, dayOffset: 4, startHour: 17, startMinute: 45 },
-        { label: "Kurs E8", ageLabel: "klasa 8", durationMin: 75, priceMonthly: 249, dayOffset: 4, startHour: 19, startMinute: 0 },
+        { label: "Matematyka", ageLabel: "4–5 lat", durationMin: 35, priceMonthly: 149, dayOffset: 4, startHour: 13, startMinute: 0 },
+        { label: "Matematyka bez stresu", ageLabel: "6–8 lat", durationMin: 60, priceMonthly: 199, dayOffset: 4, startHour: 17, startMinute: 20 },
+        { label: "Przygotowanie do E8", ageLabel: "klasa 8", durationMin: 60, priceMonthly: 249, dayOffset: 0, startHour: 14, startMinute: 50 },
       ],
     },
     {
@@ -223,11 +243,10 @@ async function main() {
         "Bezpieczne eksperymenty chemiczne i fizyczne, które tłumaczą, jak działa świat — dzieci samodzielnie odkrywają zjawiska naukowe pod okiem prowadzącego, ucząc się przez działanie.",
       color: "#a8a473",
       ageMin: 6,
-      ageMax: 15,
+      ageMax: 9,
       instructorEmail: "tomek@innova-pracownia.pl",
       groups: [
-        { label: "", ageLabel: "6–9 lat", durationMin: 60, priceMonthly: 229, dayOffset: 5, startHour: 11, startMinute: 0 },
-        { label: "", ageLabel: "10–15 lat", durationMin: 75, priceMonthly: 249, dayOffset: 5, startHour: 12, startMinute: 15 },
+        { label: "", ageLabel: "6–9 lat", durationMin: 60, priceMonthly: 229, dayOffset: 0, startHour: 18, startMinute: 40 },
       ],
     },
   ];
@@ -289,9 +308,9 @@ async function main() {
             startsAt: occ.startsAt,
             endsAt: occ.endsAt,
             capacity: MAX_GROUP_SIZE,
+            location: group.location ?? "Pracownia",
             instructorId: instructor.id,
             instructorName: instructor.name,
-            meetingUrl: "https://meet.innova-pracownia.pl/demo-room",
           },
         });
       }
