@@ -101,6 +101,7 @@ require __DIR__ . '/includes/layout_top.php';
               <div>
                 <strong style="display:block; font-family:var(--nb-font-heading); font-weight:700; font-size:1.2rem;"><?= e($g['ct_name']) ?></strong>
                 <span style="font-family:var(--nb-font-heading); font-weight:600; font-size:.98rem; opacity:.85;"><?= e($g['start_time']) ?>–<?= e($g['end_time']) ?> · z <?= e($g['instructor_name']) ?></span>
+                <span style="display:block; font-size:.85rem; opacity:.85;">📍 <?= ($g['location'] ?? 'Pracownia') === 'Pracownia' ? 'Pracownia INNOVA' : e($g['location']) . ' (zajęcia wyjazdowe)' ?></span>
               </div>
             </div>
           </div>

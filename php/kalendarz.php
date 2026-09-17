@@ -47,10 +47,13 @@ require __DIR__ . '/includes/layout_top.php';
             <td>
               <?php foreach ($days[$d] ?? [] as $s): [$bg, $ink] = nb_pastel($s['ct_key']);
                   $slotHref = $s['group_id'] ? signup_url((int) $s['group_id']) : url('zajecia.php#cennik-' . $s['ct_key']);
+                  $slotLocation = $s['location'] ?? 'Pracownia';
+                  $slotTitle = $s['ct_name'] . ' · ' . ($slotLocation === 'Pracownia' ? 'Pracownia INNOVA' : $slotLocation . ' (zajęcia wyjazdowe)') . ' — kliknij, żeby zapisać dziecko na ten termin';
               ?>
-                <a href="<?= e($slotHref) ?>" class="nb-slot" style="background:<?= e($bg) ?>;" title="<?= e($s['ct_name']) ?> — kliknij, żeby zapisać dziecko na ten termin">
+                <a href="<?= e($slotHref) ?>" class="nb-slot" style="background:<?= e($bg) ?>;" title="<?= e($slotTitle) ?>">
                   <span class="nb-dot" style="color:<?= e($ink) ?>;"><?= nb_icon_svg($s['ct_key'], '') ?></span>
                   <small style="color:<?= e($ink) ?>;"><?= h_m($s['starts_at']) ?></small>
+                  <?php if ($slotLocation !== 'Pracownia'): ?><small style="color:<?= e($ink) ?>; display:block; font-size:.62rem;">📍 <?= e($slotLocation) ?></small><?php endif; ?>
                 </a>
               <?php endforeach; ?>
             </td>

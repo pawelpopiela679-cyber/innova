@@ -79,7 +79,7 @@ require __DIR__ . '/includes/layout_top.php';
   <?php else: ?>
     <h2 class="mt-8" style="font-size:1.1rem;">Cotygodniowy rytm</h2>
     <table class="mt-3">
-      <thead><tr><th>Dzień</th><th>Godzina</th><th>Zajęcia</th><th>Prowadzący</th></tr></thead>
+      <thead><tr><th>Dzień</th><th>Godzina</th><th>Zajęcia</th><th>Prowadzący</th><th>Miejsce</th></tr></thead>
       <tbody>
         <?php foreach ($groups as $g): ?>
           <tr>
@@ -87,6 +87,7 @@ require __DIR__ . '/includes/layout_top.php';
             <td><?= e($g['start_time']) ?>–<?= e($g['end_time']) ?></td>
             <td><?= e($g['ct_name']) ?> — <?= e($g['name']) ?></td>
             <td><?= e($g['instructor_name']) ?></td>
+            <td><?= ($g['location'] ?? 'Pracownia') === 'Pracownia' ? 'Pracownia INNOVA' : e($g['location']) . ' (wyjazdowe)' ?></td>
           </tr>
         <?php endforeach; ?>
       </tbody>

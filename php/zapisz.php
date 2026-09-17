@@ -166,6 +166,7 @@ require __DIR__ . '/includes/layout_top.php';
                   <option value="<?= (int) $g['id'] ?>" <?= $preselectedGroup === (int) $g['id'] ? 'selected' : '' ?>>
                     <?= e(ucfirst(weekday_name_plural_iso((int) $g['day_of_week']))) ?> <?= e($g['start_time']) ?>–<?= e($g['end_time']) ?>
                     — <?= e($g['instructor_name']) ?>
+                    <?php if (($g['location'] ?? 'Pracownia') !== 'Pracownia'): ?> · <?= e($g['location']) ?> (wyjazdowe)<?php endif; ?>
                     <?= $g['is_full'] ? ' (brak miejsc — lista rezerwowa)' : ' (wolne miejsca: ' . (int) $g['spots_left'] . '/' . (int) $g['capacity'] . ')' ?>
                   </option>
                 <?php endforeach; ?>

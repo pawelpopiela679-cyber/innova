@@ -145,6 +145,7 @@ function ensure_schema(): void
         start_time VARCHAR(5) NOT NULL,
         end_time VARCHAR(5) NOT NULL,
         capacity INT NOT NULL DEFAULT 10,
+        location VARCHAR(190) NOT NULL DEFAULT 'Pracownia',
         meeting_url VARCHAR(255) NULL,
         active TINYINT(1) NOT NULL DEFAULT 1,
         created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -152,6 +153,7 @@ function ensure_schema(): void
         FOREIGN KEY (instructor_id) REFERENCES users(id) ON DELETE SET NULL
     )$engine");
     create_index_if_missing($pdo, 'idx_groups_class_type', 'class_groups', 'class_type_id');
+    add_column_if_missing($pdo, 'class_groups', 'location', "VARCHAR(190) NOT NULL DEFAULT 'Pracownia'");
 
     $pdo->exec("CREATE TABLE IF NOT EXISTS class_sessions (
         id $pk,
@@ -162,6 +164,7 @@ function ensure_schema(): void
         starts_at DATETIME NOT NULL,
         ends_at DATETIME NOT NULL,
         capacity INT NOT NULL DEFAULT 10,
+        location VARCHAR(190) NOT NULL DEFAULT 'Pracownia',
         meeting_url VARCHAR(255) NULL,
         instructor_id INT NULL,
         instructor_name VARCHAR(190) NOT NULL,
@@ -177,6 +180,7 @@ function ensure_schema(): void
     create_index_if_missing($pdo, 'idx_sessions_class_type', 'class_sessions', 'class_type_id');
     add_column_if_missing($pdo, 'class_sessions', 'group_id', 'INT NULL');
     create_index_if_missing($pdo, 'idx_sessions_group', 'class_sessions', 'group_id');
+    add_column_if_missing($pdo, 'class_sessions', 'location', "VARCHAR(190) NOT NULL DEFAULT 'Pracownia'");
 
     $pdo->exec("CREATE TABLE IF NOT EXISTS enrollments (
         id $pk,

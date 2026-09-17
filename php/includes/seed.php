@@ -48,21 +48,22 @@ function seed_upsert_user(PDO $pdo, string $email, array $createData, array $upd
  */
 function seed_upsert_group(PDO $pdo, int $classTypeId, string $name, array $data): int
 {
+    $location = $data['location'] ?? 'Pracownia';
     $existing = $pdo->prepare('SELECT id FROM class_groups WHERE class_type_id = ? AND name = ?');
     $existing->execute([$classTypeId, $name]);
     $row = $existing->fetch();
     if ($row) {
-        $pdo->prepare('UPDATE class_groups SET instructor_id=?, instructor_name=?, day_of_week=?, start_time=?, end_time=?, capacity=?, meeting_url=? WHERE id=?')
+        $pdo->prepare('UPDATE class_groups SET instructor_id=?, instructor_name=?, day_of_week=?, start_time=?, end_time=?, capacity=?, location=?, meeting_url=? WHERE id=?')
             ->execute([
                 $data['instructor_id'], $data['instructor_name'], $data['day_of_week'],
-                $data['start_time'], $data['end_time'], $data['capacity'], $data['meeting_url'], $row['id'],
+                $data['start_time'], $data['end_time'], $data['capacity'], $location, $data['meeting_url'], $row['id'],
             ]);
         return (int) $row['id'];
     }
-    $pdo->prepare('INSERT INTO class_groups (class_type_id, name, instructor_id, instructor_name, day_of_week, start_time, end_time, capacity, meeting_url) VALUES (?,?,?,?,?,?,?,?,?)')
+    $pdo->prepare('INSERT INTO class_groups (class_type_id, name, instructor_id, instructor_name, day_of_week, start_time, end_time, capacity, location, meeting_url) VALUES (?,?,?,?,?,?,?,?,?,?)')
         ->execute([
             $classTypeId, $name, $data['instructor_id'], $data['instructor_name'], $data['day_of_week'],
-            $data['start_time'], $data['end_time'], $data['capacity'], $data['meeting_url'],
+            $data['start_time'], $data['end_time'], $data['capacity'], $location, $data['meeting_url'],
         ]);
     return db_last_id($pdo);
 }
@@ -150,18 +151,20 @@ function run_seed(): array
         $log[] = 'Prowadzący hasło startowe (nowe konta): ' . $instructorPassword . ' (istniejące konta zachowują swoje hasła/dane z panelu)';
 
         // --- Rodzaje zajęć + realne grupy wiekowe, zgodnie z prawdziwym grafikiem
-        //     pracowni (odczytanym z odręcznej tabeli: Poniedziałek/Wtorek/Piątek —
-        //     Środa i Czwartek bez zajęć). dayOffset liczony od SEMESTER_START
-        //     (poniedziałek): 0=pon, 1=wt, 4=pt. ---
+        //     pracowni, odczytanym i potwierdzonym wprost przez właścicielkę:
+        //     Poniedziałek / Środa / Czwartek / Piątek — Wtorek bez zajęć.
+        //     dayOffset liczony od SEMESTER_START (poniedziałek): 0=pon, 2=śr,
+        //     3=czw, 4=pt. Środowa Robotyka odbywa się wyjazdowo w Hałcnowie
+        //     (patrz 'location' niżej), reszta w pracowni. Zajęcia sceniczne
+        //     (THEATER) nie były częścią odczytanego grafiku — zostają
+        //     nietknięte do czasu potwierdzenia osobnego harmonogramu. ---
         $classTypeDefs = [
             [
                 'key' => 'ENGLISH', 'name' => 'Angielski',
                 'description' => 'Nauka angielskiego przez zabawę, piosenki, gry i krótkie dialogi — zajęcia prowadzone w małych grupach, dopasowane do wieku i poziomu dziecka.',
-                'color' => '#8f8a56', 'age_min' => 3, 'age_max' => 12, 'instructor' => 'ola@innova-pracownia.pl',
+                'color' => '#8f8a56', 'age_min' => 5, 'age_max' => 7, 'instructor' => 'ola@innova-pracownia.pl',
                 'groups' => [
-                    ['label' => '', 'age_label' => '3–4 lata', 'duration' => 35, 'price' => 149, 'day' => 1, 'h' => 13, 'm' => 0],
-                    ['label' => '', 'age_label' => '5–7 lat', 'duration' => 50, 'price' => 199, 'day' => 1, 'h' => 13, 'm' => 50],
-                    ['label' => '', 'age_label' => '8–12 lat', 'duration' => 60, 'price' => 219, 'day' => 1, 'h' => 19, 'm' => 0],
+                    ['label' => '', 'age_label' => '5–7 lat', 'duration' => 45, 'price' => 199, 'day' => 3, 'h' => 12, 'm' => 0],
                 ],
             ],
             [
@@ -171,9 +174,6 @@ function run_seed(): array
                 'groups' => [
                     ['label' => 'Scena', 'age_label' => '6–9 lat', 'duration' => 60, 'price' => 199, 'day' => 1, 'h' => 15, 'm' => 0],
                     ['label' => 'Słowo na scenie', 'age_label' => '9–15 lat', 'duration' => 85, 'price' => 249, 'day' => 1, 'h' => 16, 'm' => 10],
-                    // Druga grupa "Słowo na scenie MIX" (wtorek, po "Słowo na scenie")
-                    // celowo pominięta — godzina na grafiku nieczytelna ("16:80-17:85",
-                    // niemożliwa). Dodaj ją ręcznie w „+ Nowe zajęcia", gdy znasz godzinę.
                 ],
             ],
             [
@@ -181,9 +181,11 @@ function run_seed(): array
                 'description' => 'Budowanie i programowanie prostych robotów oraz automatów — dzieci uczą się podstaw elektroniki, logicznego myślenia i programowania blokowego w przyjaznej, praktycznej formie.',
                 'color' => '#6b6642', 'age_min' => 5, 'age_max' => 10, 'instructor' => 'marek@innova-pracownia.pl',
                 'groups' => [
-                    ['label' => 'Robotyka „1”', 'age_label' => '5–7 lat', 'duration' => 60, 'price' => 249, 'day' => 0, 'h' => 13, 'm' => 0],
-                    ['label' => 'Robotyka „2”', 'age_label' => '8–10 lat', 'duration' => 60, 'price' => 249, 'day' => 0, 'h' => 14, 'm' => 0],
-                    ['label' => 'Robotyka „3”', 'age_label' => '8–10 lat', 'duration' => 60, 'price' => 249, 'day' => 4, 'h' => 15, 'm' => 10],
+                    ['label' => 'Grupa 1', 'age_label' => '5–10 lat', 'duration' => 45, 'price' => 229, 'day' => 0, 'h' => 13, 'm' => 0],
+                    ['label' => 'Grupa 2', 'age_label' => '5–10 lat', 'duration' => 45, 'price' => 229, 'day' => 0, 'h' => 13, 'm' => 50],
+                    ['label' => 'Wyjazdowa 1', 'age_label' => '5–10 lat', 'duration' => 60, 'price' => 249, 'day' => 2, 'h' => 15, 'm' => 0, 'location' => 'Hałcnów'],
+                    ['label' => 'Wyjazdowa 2', 'age_label' => '5–10 lat', 'duration' => 50, 'price' => 249, 'day' => 2, 'h' => 16, 'm' => 10, 'location' => 'Hałcnów'],
+                    ['label' => 'Grupa 3', 'age_label' => '5–10 lat', 'duration' => 60, 'price' => 249, 'day' => 2, 'h' => 17, 'm' => 45],
                 ],
             ],
             [
@@ -191,9 +193,9 @@ function run_seed(): array
                 'description' => 'Malarstwo, rękodzieło, prace plastyczne i eksperymenty z różnymi materiałami — rozwijamy wyobraźnię i zdolności manualne najmłodszych w luźnej, artystycznej atmosferze.',
                 'color' => '#d9a3a6', 'age_min' => 5, 'age_max' => 15, 'instructor' => 'ania@innova-pracownia.pl',
                 'groups' => [
-                    ['label' => 'Mikrokreatywny', 'age_label' => '8–11 lat', 'duration' => 50, 'price' => 229, 'day' => 0, 'h' => 15, 'm' => 10],
-                    ['label' => 'Mix kreatywny', 'age_label' => '5–7 lat', 'duration' => 60, 'price' => 229, 'day' => 0, 'h' => 16, 'm' => 10],
-                    ['label' => 'Szydełkowanie', 'age_label' => '9–15 lat', 'duration' => 75, 'price' => 229, 'fee' => 79, 'day' => 0, 'h' => 17, 'm' => 20],
+                    ['label' => 'Zajęcia kreatywne', 'age_label' => '5–7 lat', 'duration' => 60, 'price' => 229, 'day' => 0, 'h' => 16, 'm' => 10],
+                    ['label' => 'Zajęcia kreatywne', 'age_label' => '8–11 lat', 'duration' => 60, 'price' => 229, 'day' => 4, 'h' => 15, 'm' => 0],
+                    ['label' => 'Szydełkowanie', 'age_label' => '9–15 lat', 'duration' => 60, 'price' => 229, 'fee' => 79, 'day' => 0, 'h' => 17, 'm' => 20],
                 ],
             ],
             [
@@ -201,21 +203,17 @@ function run_seed(): array
                 'description' => 'Matematyczne odkrycia przez zabawę, oswajanie z liczbami i logiczne myślenie dla najmłodszych, a dla starszych — pomoc szkolna, nadrabianie zaległości i przygotowanie do egzaminu ósmoklasisty.',
                 'color' => '#c9a768', 'age_min' => 4, 'age_max' => 15, 'instructor' => 'beata@innova-pracownia.pl',
                 'groups' => [
-                    ['label' => 'Matematyczne odkrycia', 'age_label' => '4–5 lat', 'duration' => 35, 'price' => 149, 'day' => 4, 'h' => 13, 'm' => 0],
-                    ['label' => 'Logika + pomoc szkolna', 'age_label' => 'klasy 1–3', 'duration' => 60, 'price' => 199, 'day' => 4, 'h' => 17, 'm' => 40],
-                    ['label' => '', 'age_label' => 'klasy 6–8', 'duration' => 50, 'price' => 199, 'day' => 4, 'h' => 18, 'm' => 45],
+                    ['label' => 'Matematyka', 'age_label' => '4–5 lat', 'duration' => 35, 'price' => 149, 'day' => 4, 'h' => 13, 'm' => 0],
+                    ['label' => 'Matematyka bez stresu', 'age_label' => '6–8 lat', 'duration' => 60, 'price' => 199, 'day' => 4, 'h' => 17, 'm' => 20],
+                    ['label' => 'Przygotowanie do E8', 'age_label' => 'klasa 8', 'duration' => 60, 'price' => 249, 'day' => 0, 'h' => 14, 'm' => 50],
                 ],
             ],
             [
                 'key' => 'SCIENCE', 'name' => 'Eksperymentatorium',
                 'description' => 'Bezpieczne eksperymenty chemiczne i fizyczne, które tłumaczą, jak działa świat — dzieci samodzielnie odkrywają zjawiska naukowe pod okiem prowadzącego, ucząc się przez działanie.',
-                'color' => '#a8a473', 'age_min' => 6, 'age_max' => 15, 'instructor' => 'tomek@innova-pracownia.pl',
+                'color' => '#a8a473', 'age_min' => 6, 'age_max' => 9, 'instructor' => 'tomek@innova-pracownia.pl',
                 'groups' => [
                     ['label' => '', 'age_label' => '6–9 lat', 'duration' => 60, 'price' => 229, 'day' => 0, 'h' => 18, 'm' => 40],
-                    // Piątek 16:10-16:35 (25 min) — dokładnie tak jak na grafiku; jeśli
-                    // to literówka i miało być dłużej, popraw w /admin-cennik.php i
-                    // usuń/dodaj terminy w „Dostępność terminów".
-                    ['label' => '', 'age_label' => '10–15 lat', 'duration' => 25, 'price' => 249, 'day' => 4, 'h' => 16, 'm' => 10],
                 ],
             ],
         ];
@@ -256,6 +254,7 @@ function run_seed(): array
             $total = 0;
             foreach ($def['groups'] as $g) {
                 $title = $g['label'] ? "{$g['label']} — {$g['age_label']}" : $g['age_label'];
+                $location = $g['location'] ?? 'Pracownia';
                 $startTime = sprintf('%02d:%02d', $g['h'], $g['m']);
                 $anchor = new DateTime(SEMESTER_START);
                 $anchor->modify('+' . $g['day'] . ' days');
@@ -265,7 +264,7 @@ function run_seed(): array
                 $groupId = seed_upsert_group($pdo, $classTypeId, $title, [
                     'instructor_id' => $instructorId, 'instructor_name' => $instructorName,
                     'day_of_week' => (int) $anchor->format('N'), 'start_time' => $startTime, 'end_time' => $endTime,
-                    'capacity' => MAX_GROUP_SIZE, 'meeting_url' => 'https://meet.innova-pracownia.pl/demo-room',
+                    'capacity' => MAX_GROUP_SIZE, 'location' => $location, 'meeting_url' => null,
                 ]);
 
                 for ($w = 0; $w < $weeksToGenerate; $w++) {
@@ -280,13 +279,13 @@ function run_seed(): array
                     $check->execute([$classTypeId, $title, $startsStr]);
                     if ($check->fetch()) {
                         // Sesja już istnieje (np. z czasów sprzed wprowadzenia grup) —
-                        // dopinamy jej group_id, gdyby jeszcze go nie miała.
-                        $pdo->prepare('UPDATE class_sessions SET group_id = ? WHERE class_type_id = ? AND title = ? AND starts_at = ? AND group_id IS NULL')
-                            ->execute([$groupId, $classTypeId, $title, $startsStr]);
+                        // dopinamy jej group_id/lokalizacji, gdyby jeszcze ich nie miała.
+                        $pdo->prepare('UPDATE class_sessions SET group_id = ?, location = ? WHERE class_type_id = ? AND title = ? AND starts_at = ?')
+                            ->execute([$groupId, $location, $classTypeId, $title, $startsStr]);
                         continue;
                     }
-                    $pdo->prepare('INSERT INTO class_sessions (class_type_id, group_id, title, starts_at, ends_at, capacity, meeting_url, instructor_id, instructor_name) VALUES (?,?,?,?,?,?,?,?,?)')
-                        ->execute([$classTypeId, $groupId, $title, $startsStr, $ends->format('Y-m-d H:i:s'), MAX_GROUP_SIZE, 'https://meet.innova-pracownia.pl/demo-room', $instructorId, $instructorName]);
+                    $pdo->prepare('INSERT INTO class_sessions (class_type_id, group_id, title, starts_at, ends_at, capacity, location, instructor_id, instructor_name) VALUES (?,?,?,?,?,?,?,?,?)')
+                        ->execute([$classTypeId, $groupId, $title, $startsStr, $ends->format('Y-m-d H:i:s'), MAX_GROUP_SIZE, $location, $instructorId, $instructorName]);
                     $total++;
                 }
             }
