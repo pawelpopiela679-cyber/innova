@@ -96,6 +96,101 @@ export function HeartDoodle({
   );
 }
 
+export function StarDoodle({
+  className,
+  color = "var(--ink)",
+}: {
+  className?: string;
+  color?: string;
+}) {
+  return (
+    <svg viewBox="0 0 40 40" className={className} aria-hidden focusable="false" fill="none">
+      <path
+        d="M20 4 L23 16 L36 20 L23 24 L20 36 L17 24 L4 20 L17 16 Z"
+        stroke={color}
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+export function LightbulbDoodle({
+  className,
+  color = "var(--ink)",
+}: {
+  className?: string;
+  color?: string;
+}) {
+  return (
+    <svg viewBox="0 0 40 48" className={className} aria-hidden focusable="false" fill="none">
+      <path
+        d="M20 4c-8 0-13 6-13 13 0 5.5 3 9 6 11.5V33h14v-4.5c3-2.5 6-6 6-11.5 0-7-5-13-13-13Z"
+        stroke={color}
+        strokeWidth="2.2"
+        strokeLinejoin="round"
+      />
+      <path d="M15 38h10M16 43h8" stroke={color} strokeWidth="2.2" strokeLinecap="round" />
+      <path d="M20 12v10M15 20l5 3 5-3" stroke={color} strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export function PaperPlaneDoodle({
+  className,
+  color = "var(--ink)",
+}: {
+  className?: string;
+  color?: string;
+}) {
+  return (
+    <svg viewBox="0 0 40 40" className={className} aria-hidden focusable="false" fill="none">
+      <path
+        d="M37 4 3 17l13 5m21-18-9 30-8-11m17-19L16 22"
+        stroke={color}
+        strokeWidth="2.2"
+        strokeLinejoin="round"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+export function ArrowDoodle({
+  className,
+  color = "var(--ink)",
+}: {
+  className?: string;
+  color?: string;
+}) {
+  return (
+    <svg viewBox="0 0 60 30" className={className} aria-hidden focusable="false" fill="none">
+      <path
+        d="M2 15c14-8 32-9 48-2M40 7l10 6-8 8"
+        stroke={color}
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+export function CheckDoodle({
+  className,
+  color = "var(--sage)",
+}: {
+  className?: string;
+  color?: string;
+}) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden focusable="false" fill="none">
+      <rect x="2" y="2" width="20" height="20" rx="4" stroke={color} strokeWidth="2" />
+      <path d="M6 12.5l4 4 8-9" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 export function DashedDivider({ className }: { className?: string }) {
   return (
     <div

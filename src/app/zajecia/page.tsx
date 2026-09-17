@@ -1,7 +1,17 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { classTypeIcon } from "@/lib/class-type-icons";
-import { DashedDivider } from "@/components/decor";
+import { NotebookCard, SectionHeading } from "@/components/scrapbook";
+import { LightbulbDoodle, StarDoodle } from "@/components/decor";
+
+const TAB_COLORS = [
+  "var(--pill-pink)",
+  "var(--pill-mint)",
+  "var(--pill-purple)",
+  "var(--pill-orange)",
+  "var(--pill-blue)",
+  "var(--pill-teal)",
+];
 
 export default async function ClassesPage() {
   const classTypes = await prisma.classType.findMany({
@@ -10,34 +20,26 @@ export default async function ClassesPage() {
   });
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-12">
-      <h1 className="text-center font-heading text-3xl font-extrabold">
-        Oferta <span className="text-[var(--coral)]">i cennik</span>
-      </h1>
-      <DashedDivider className="mx-auto mt-4 w-40" />
-      <p className="mx-auto mt-4 max-w-xl text-center text-[var(--muted)]">
-        Zajęcia odbywają się 1x w tygodniu. Pełny terminarz i wolne miejsca znajdziesz w{" "}
-        <Link href="/kalendarz" className="text-[var(--coral)] underline">
-          kalendarzu
-        </Link>
-        .
-      </p>
+    <div className="mx-auto max-w-6xl px-4 py-12">
+      <div className="relative">
+        <StarDoodle className="absolute -left-2 top-0 hidden h-8 w-8 sm:block" />
+        <LightbulbDoodle className="absolute -right-2 top-0 hidden h-10 w-10 sm:block" />
+        <SectionHeading
+          eyebrow="Zajęcia, które rozwijają pasje!"
+          title="Zajęcia"
+          subtitle="Twórcze, rozwijające i pełne dobrej energii zajęcia"
+          highlight="var(--pill-blue)"
+        />
+      </div>
 
-      <div className="mt-8 space-y-6">
+      <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {classTypes.map((ct, i) => (
-          <section
+          <NotebookCard
             key={ct.id}
             id={ct.key}
-            className="relative scroll-mt-20 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 pt-8 shadow-sm transition-shadow hover:shadow-md"
-            style={{ borderTopWidth: 4, borderTopColor: ct.color }}
+            className="scroll-mt-24"
+            tab={{ label: ct.name, color: TAB_COLORS[i % TAB_COLORS.length] }}
           >
-            <span
-              className="absolute -top-4 left-6 flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold text-white shadow-sm"
-              style={{ backgroundColor: ct.color }}
-              aria-hidden
-            >
-              {i + 1}
-            </span>
             <div className="flex items-center gap-3">
               <span
                 className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-2xl"
@@ -52,7 +54,7 @@ export default async function ClassesPage() {
 
             {ct.pricingTiers.length > 0 && (
               <div className="mt-4 overflow-x-auto">
-                <table className="w-full min-w-[420px] border-collapse text-sm">
+                <table className="w-full min-w-[280px] border-collapse text-sm">
                   <thead>
                     <tr className="text-left text-[var(--muted)]">
                       {ct.pricingTiers.some((t) => t.label) && <th className="pb-2 pr-3 font-semibold">Wariant</th>}
@@ -91,15 +93,19 @@ export default async function ClassesPage() {
               href={`/kalendarz?classType=${ct.id}`}
               className="mt-4 inline-block rounded-full bg-[var(--sage)] px-4 py-2 text-sm font-semibold text-white shadow-sm transition-transform hover:scale-105 hover:opacity-90"
             >
-              Zobacz terminy
+              Zobacz szczegóły →
             </Link>
-          </section>
+          </NotebookCard>
         ))}
       </div>
 
       <p className="mt-8 text-center text-sm text-[var(--muted)]">
-        <span className="font-semibold text-[var(--foreground)]">Zniżki:</span> rodzeństwo −15% ·
-        Karta Dużej Rodziny −10%
+        Zajęcia odbywają się 1x w tygodniu. Pełny terminarz i wolne miejsca znajdziesz w{" "}
+        <Link href="/kalendarz" className="text-[var(--coral)] underline">
+          grafiku
+        </Link>
+        . <span className="font-semibold text-[var(--foreground)]">Zniżki:</span> rodzeństwo −15%
+        · Karta Dużej Rodziny −10%
       </p>
     </div>
   );

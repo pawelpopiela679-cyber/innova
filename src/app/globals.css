@@ -28,6 +28,20 @@
   --logo-green: #7d7a4a;
   --logo-pink: #d99a9f;
   --logo-gold: #c9a768;
+
+  /* Scrapbook nav-pill accents — decorative only, not theme-editable, so
+     the seven nav pills each keep their own pastel color regardless of
+     what the master admin picks in /admin/wyglad. */
+  --pill-green: #b9cfa4;
+  --pill-pink: #f3c6cf;
+  --pill-mint: #c7e0b8;
+  --pill-blue: #bcd6ea;
+  --pill-purple: #d3c3e8;
+  --pill-orange: #f4cd9e;
+  --pill-teal: #a9d8cf;
+  --ink: #24344a; /* dark navy used for hand-drawn strokes/headings on paper */
+  --paper: #f3e9d4; /* kraft notebook page color */
+  --paper-line: #dfcda3;
 }
 
 @theme inline {
@@ -50,6 +64,15 @@
   --font-heading: var(--font-heading), var(--font-sans);
   --font-logo: var(--font-logo), var(--font-sans);
   --font-script: var(--font-script), cursive;
+  --color-pill-green: var(--pill-green);
+  --color-pill-pink: var(--pill-pink);
+  --color-pill-mint: var(--pill-mint);
+  --color-pill-blue: var(--pill-blue);
+  --color-pill-purple: var(--pill-purple);
+  --color-pill-orange: var(--pill-orange);
+  --color-pill-teal: var(--pill-teal);
+  --color-ink: var(--ink);
+  --color-paper: var(--paper);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -75,6 +98,98 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+  background-image:
+    radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--foreground) 6%, transparent) 1px, transparent 0);
+  background-size: 22px 22px;
+}
+
+/* ---------------------------------------------------------------------
+   Scrapbook / notebook design system — spiral-bound cards, sticky notes,
+   torn-paper edges and doodle strokes, matching the studio's hand-drawn
+   promotional materials.
+   ------------------------------------------------------------------- */
+
+.notebook {
+  position: relative;
+  background: var(--paper);
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--ink) 12%, var(--paper-line));
+  box-shadow: 0 10px 24px -12px color-mix(in srgb, var(--ink) 35%, transparent),
+    0 2px 6px -2px color-mix(in srgb, var(--ink) 20%, transparent);
+  padding-left: 2.1rem;
+}
+
+.notebook::before {
+  /* spiral binding along the left edge */
+  content: "";
+  position: absolute;
+  left: 0.5rem;
+  top: 0.9rem;
+  bottom: 0.9rem;
+  width: 0.7rem;
+  background-image: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--ink) 55%, transparent) 32%,
+    transparent 34%
+  );
+  background-size: 100% 1.4rem;
+  background-repeat: repeat-y;
+  opacity: 0.55;
+}
+
+.notebook-tab {
+  position: absolute;
+  top: 1.1rem;
+  right: -0.6rem;
+  writing-mode: vertical-rl;
+  border-radius: 0 8px 8px 0;
+  padding: 0.6rem 0.35rem;
+  font-family: var(--font-heading), var(--font-sans);
+  font-weight: 700;
+  font-size: 0.7rem;
+  color: var(--ink);
+  box-shadow: 2px 2px 5px -2px color-mix(in srgb, var(--ink) 40%, transparent);
+}
+
+.sticky-note {
+  position: relative;
+  border-radius: 4px;
+  box-shadow: 0 8px 16px -8px color-mix(in srgb, var(--ink) 45%, transparent);
+  color: var(--ink);
+}
+
+.sticky-note::before {
+  /* piece of tape across the top corner */
+  content: "";
+  position: absolute;
+  top: -0.55rem;
+  left: 50%;
+  width: 2.4rem;
+  height: 1.1rem;
+  transform: translateX(-50%) rotate(-3deg);
+  background: color-mix(in srgb, var(--mustard) 55%, white 30%);
+  opacity: 0.75;
+  border: 1px solid color-mix(in srgb, var(--ink) 10%, transparent);
+}
+
+.doodle-stroke {
+  stroke: var(--ink);
+}
+
+/* Jagged torn-paper edge, used to divide the footer ribbon from the page. */
+.torn-edge-top {
+  clip-path: polygon(
+    0% 100%, 0% 18%, 3% 0%, 7% 22%, 12% 3%, 17% 20%, 22% 2%, 27% 18%,
+    32% 4%, 37% 22%, 42% 0%, 47% 16%, 52% 3%, 57% 20%, 62% 2%, 67% 18%,
+    72% 4%, 77% 22%, 82% 0%, 87% 16%, 92% 3%, 97% 20%, 100% 4%, 100% 100%
+  );
+}
+
+.washi-underline {
+  text-decoration-line: underline;
+  text-decoration-color: currentColor;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 4px;
 }
 
 /* Used for the logo's hollow "O" — an outlined letter with no fill,

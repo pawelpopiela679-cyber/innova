@@ -1,55 +1,74 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { classTypeIcon } from "@/lib/class-type-icons";
-import { Blob, DashedDivider, HeartDoodle, HeroIllustration, Sparkle } from "@/components/decor";
+import {
+  ArrowDoodle,
+  HeartDoodle,
+  LightbulbDoodle,
+  StarDoodle,
+} from "@/components/decor";
 import { Logo } from "@/components/logo";
+import { NotebookCard, StickyNote, SectionHeading } from "@/components/scrapbook";
+import { NAV_LINKS } from "@/components/nav-links";
 
 export default async function HomePage() {
   const classTypes = await prisma.classType.findMany({ orderBy: { createdAt: "asc" } });
+  const pageLinks = NAV_LINKS.filter((l) => l.href !== "/");
 
   return (
     <div className="overflow-x-clip">
-      <section className="relative overflow-hidden">
-        <Blob
-          className="pointer-events-none absolute -left-24 -top-24 h-80 w-80 opacity-60 sm:h-96 sm:w-96"
-          color="var(--sage-light)"
-        />
-        <Blob
-          className="pointer-events-none absolute -right-28 top-10 h-72 w-72 opacity-40"
-          color="var(--coral)"
-        />
+      {/* ---------------------------------------------------------------- Hero */}
+      <section className="relative mx-auto max-w-6xl px-4 pb-16 pt-10 sm:pt-14">
+        <StickyNote
+          color="pink"
+          className="absolute -top-2 right-2 hidden w-40 sm:block"
+        >
+          Tu zaczyna się przygoda! <HeartDoodle className="mx-auto mt-1 h-4 w-4" />
+        </StickyNote>
 
-        <div className="relative mx-auto grid max-w-6xl gap-10 px-4 py-16 lg:grid-cols-2 lg:items-center lg:py-24">
-          <div className="text-center lg:text-left">
-            <div className="flex justify-center lg:justify-start">
-              <Logo size="lg" withSubtitle />
-            </div>
+        <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
+          <NotebookCard rotate="-rotate-1" className="mx-auto max-w-md text-center lg:mx-0">
+            <Logo size="md" />
+            <p className="mt-4 font-script text-3xl text-[var(--sage)]">
+              Odkrywaj
+              <br />
+              Twórz
+              <br />
+              Rośnij
+            </p>
+            <HeartDoodle className="mx-auto mt-3 h-5 w-5" />
+          </NotebookCard>
 
-            <div className="mt-4 flex items-center justify-center gap-2 lg:justify-start">
-              <p className="font-script text-4xl text-[var(--sage)] sm:text-5xl">Miejsce rozwoju</p>
-              <HeartDoodle className="mb-2 h-6 w-6 self-end" />
-            </div>
-            <h1 className="mt-1 font-heading text-2xl font-bold tracking-tight text-[var(--coral)] sm:text-3xl">
-              DLA TWOJEGO DZIECKA
+          <div className="relative text-center lg:text-left">
+            <StarDoodle className="absolute -left-2 -top-6 hidden h-8 w-8 lg:block" />
+            <h1 className="relative inline-block font-heading text-3xl font-extrabold leading-tight text-[var(--ink)] sm:text-5xl">
+              Miejsce, w którym
+              <br />
+              <span className="relative">
+                pomysły rosną!
+                <span
+                  className="absolute inset-x-0 bottom-1 -z-10 h-3 rounded-full opacity-60"
+                  style={{ backgroundColor: "var(--pill-mint)" }}
+                  aria-hidden
+                />
+              </span>
             </h1>
-            <DashedDivider className="mx-auto mt-5 w-40 lg:mx-0" />
-
             <p className="mx-auto mt-5 max-w-xl text-lg text-[var(--muted)] lg:mx-0">
-              Zgłoś dziecko na zajęcia w kilka minut: sprawdź kalendarz, wybierz
-              termin, a my dobierzemy odpowiednią grupę i potwierdzimy zapis e-mailem.
+              Kreatywno-edukacyjne zajęcia dla dzieci i młodzieży, które inspirują,
+              rozwijają pasje i dają nowe możliwości.
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-3 lg:justify-start">
               <Link
-                href="/kalendarz"
+                href="/poznaj-nas"
                 className="rounded-full bg-[var(--sage)] px-6 py-3 font-semibold text-[var(--primary-foreground)] shadow-md shadow-[var(--sage)]/20 transition-transform hover:scale-105 hover:opacity-90"
               >
-                Zobacz kalendarz zajęć
+                Poznaj nas bliżej →
               </Link>
               <Link
-                href="/rejestracja"
+                href="/zajecia"
                 className="rounded-full border border-[var(--border)] bg-[var(--surface)] px-6 py-3 font-semibold transition-colors hover:bg-[var(--background)]"
               >
-                Załóż konto rodzica
+                Zobacz zajęcia →
               </Link>
             </div>
 
@@ -62,32 +81,41 @@ export default async function HomePage() {
               </span>
             </div>
           </div>
-
-          <div className="relative mx-auto w-full max-w-md lg:max-w-none">
-            <Sparkle className="absolute -left-2 top-2 h-7 w-7" color="var(--mustard)" />
-            <Sparkle className="absolute right-6 top-0 h-5 w-5" color="var(--coral)" />
-            <HeroIllustration className="w-full drop-shadow-sm" />
-          </div>
         </div>
       </section>
 
+      {/* -------------------------------------------------------- Page tabs grid */}
       <section className="mx-auto max-w-6xl px-4 pb-16">
-        <h2 className="mb-6 text-center font-heading text-2xl font-bold">Nasza oferta</h2>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {classTypes.map((ct, i) => (
+          {pageLinks.map((link) => (
+            <Link key={link.href} href={link.href} className="group block">
+              <NotebookCard tab={{ label: link.label, color: link.color }}>
+                <h3 className="font-heading text-lg font-bold group-hover:text-[var(--coral)]">
+                  {link.label}
+                </h3>
+                <p className="mt-2 text-sm text-[var(--muted)]">
+                  {PAGE_TEASERS[link.href]}
+                </p>
+                <span className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-[var(--sage)]">
+                  Przejdź <ArrowDoodle className="h-3 w-6" />
+                </span>
+              </NotebookCard>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* -------------------------------------------------------------- Oferta */}
+      <section className="mx-auto max-w-6xl px-4 pb-16">
+        <SectionHeading eyebrow="Nasza oferta" title="Zajęcia dla każdego" highlight="var(--pill-blue)" />
+        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {classTypes.map((ct) => (
             <Link
               key={ct.id}
               href={`/zajecia#${ct.key}`}
               className="group relative rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 pt-7 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
               style={{ borderTopWidth: 4, borderTopColor: ct.color }}
             >
-              <span
-                className="absolute -top-4 left-5 flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold text-white shadow-sm"
-                style={{ backgroundColor: ct.color }}
-                aria-hidden
-              >
-                {i + 1}
-              </span>
               <div className="flex items-center gap-3">
                 <span
                   className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-xl"
@@ -115,26 +143,25 @@ export default async function HomePage() {
         </p>
       </section>
 
+      {/* --------------------------------------------------------- Dlaczego warto */}
       <section className="mx-auto max-w-6xl px-4 pb-16">
-        <div className="relative overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-8">
-          <Blob
-            className="pointer-events-none absolute -bottom-16 -right-16 h-48 w-48 opacity-20"
-            color="var(--mustard)"
-          />
-          <h2 className="relative text-center font-heading text-xl font-bold">Dlaczego warto?</h2>
-          <div className="relative mt-6 grid gap-6 sm:grid-cols-3">
+        <NotebookCard className="relative overflow-hidden">
+          <LightbulbDoodle className="absolute -top-2 right-6 hidden h-12 w-12 opacity-70 sm:block" />
+          <h2 className="text-center font-heading text-xl font-bold">Dlaczego warto?</h2>
+          <div className="mt-6 grid gap-6 sm:grid-cols-3">
             <Reason icon="🧸" color="var(--sage)" title="Kameralne grupy" text="Mała liczba dzieci w grupie — więcej uwagi dla każdego." />
             <Reason icon="🤗" color="var(--coral)" title="Przyjazna atmosfera" text="Bezpieczna, ciepła przestrzeń, w której dzieci chętnie wracają." />
             <Reason icon="🎯" color="var(--mustard)" title="Nauka przez działanie" text="Wiedza i umiejętności zdobywane w praktyce, nie z podręcznika." />
           </div>
-          <div className="relative mx-auto mt-6 flex max-w-md items-center justify-center gap-2 rounded-xl bg-[var(--mustard-soft)] px-5 py-3 text-center text-sm font-semibold text-[var(--foreground)]">
+          <div className="mx-auto mt-6 flex max-w-md items-center justify-center gap-2 rounded-xl bg-[var(--mustard-soft)] px-5 py-3 text-center text-sm font-semibold text-[var(--foreground)]">
             <span aria-hidden>💛</span> Materiały podstawowe w cenie zajęć
           </div>
-        </div>
+        </NotebookCard>
       </section>
 
-      <section className="mx-auto max-w-6xl px-4 pb-16">
-        <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-8 text-center">
+      {/* -------------------------------------------------------------- Jak to działa */}
+      <section className="mx-auto max-w-6xl px-4 pb-20">
+        <NotebookCard rotate="rotate-0" className="text-center">
           <h2 className="font-heading text-xl font-bold">Jak to działa?</h2>
           <div className="mt-6 grid gap-6 text-left sm:grid-cols-2 lg:grid-cols-5">
             <Step n={1} title="Załóż konto rodzica" text="Szybka rejestracja e-mailem." />
@@ -159,11 +186,8 @@ export default async function HomePage() {
               text="Dostajesz e-mail z potwierdzeniem i przypisaną grupą."
             />
           </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-3xl px-4 pb-20 text-center text-sm text-[var(--muted)]">
-        <p>
+        </NotebookCard>
+        <p className="mt-6 text-center text-sm text-[var(--muted)]">
           <span className="font-semibold text-[var(--foreground)]">Zniżki:</span> rodzeństwo −15%
           · Karta Dużej Rodziny −10%
         </p>
@@ -171,6 +195,15 @@ export default async function HomePage() {
     </div>
   );
 }
+
+const PAGE_TEASERS: Record<string, string> = {
+  "/aktualnosci": "Wydarzenia, zajęcia i nowe możliwości — bądź na bieżąco z życiem INNOVA.",
+  "/poznaj-nas": "Kim jesteśmy, jaka jest nasza misja i kto prowadzi zajęcia.",
+  "/zajecia": "Angielski, zajęcia sceniczne, robotyka, kreatywne, matematyka, eksperymentatorium.",
+  "/kalendarz": "Sprawdź plan zajęć — dni, godziny i wolne miejsca w grupach.",
+  "/zapisy": "Jak się zapisać, formularz zgłoszeniowy i najczęstsze pytania.",
+  "/kontakt": "Napisz do nas, zadzwoń albo odwiedź naszą pracownię.",
+};
 
 function Reason({
   icon,

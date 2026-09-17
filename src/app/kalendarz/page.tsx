@@ -15,6 +15,7 @@ import { SessionCard } from "@/components/calendar/session-card";
 import { enrollAction } from "@/lib/actions/enrollment-actions";
 import { format } from "date-fns";
 import { pl } from "date-fns/locale";
+import { NotebookCard, SectionHeading, StickyNote } from "@/components/scrapbook";
 
 type SearchParams = {
   view?: string;
@@ -48,70 +49,78 @@ export default async function CalendarPage({
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-10">
-      <h1 className="text-3xl font-extrabold">Kalendarz zajęć</h1>
-      <p className="mt-1 text-[var(--muted)]">
-        Wybierz dzień, żeby zobaczyć opis zajęć i zapisać dziecko.
-      </p>
+      <SectionHeading
+        eyebrow="Rozwijaj pasje krok po kroku!"
+        title="Grafik"
+        subtitle="Sprawdź plan zajęć w INNOVA"
+        highlight="var(--pill-purple)"
+      />
 
       {sp.error && (
         <p className="mt-4 rounded-lg bg-red-50 px-4 py-2 text-sm text-red-700">{sp.error}</p>
       )}
 
-      <div className="mt-6 flex flex-wrap items-center gap-3">
-        <form method="get" className="flex items-center gap-2 text-sm">
-          <input type="hidden" name="view" value={view} />
-          <input type="hidden" name="date" value={toDateParam(anchor)} />
-          <label htmlFor="classType" className="text-[var(--muted)]">
-            Rodzaj zajęć:
-          </label>
-          <select
-            id="classType"
-            name="classType"
-            defaultValue={sp.classType ?? ""}
-            className="rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 py-1.5"
-          >
-            <option value="">Wszystkie</option>
-            {classTypes.map((ct) => (
-              <option key={ct.id} value={ct.id}>
-                {ct.name}
-              </option>
-            ))}
-          </select>
-          <button
-            type="submit"
-            className="rounded-lg border border-[var(--border)] px-3 py-1.5 hover:bg-[var(--surface)]"
-          >
-            Filtruj
-          </button>
-        </form>
-      </div>
+      <NotebookCard className="mt-8">
+        <div className="flex flex-wrap items-center gap-3">
+          <form method="get" className="flex items-center gap-2 text-sm">
+            <input type="hidden" name="view" value={view} />
+            <input type="hidden" name="date" value={toDateParam(anchor)} />
+            <label htmlFor="classType" className="text-[var(--muted)]">
+              Rodzaj zajęć:
+            </label>
+            <select
+              id="classType"
+              name="classType"
+              defaultValue={sp.classType ?? ""}
+              className="rounded-lg border border-[var(--border)] bg-[var(--background)] px-2 py-1.5"
+            >
+              <option value="">Wszystkie</option>
+              {classTypes.map((ct) => (
+                <option key={ct.id} value={ct.id}>
+                  {ct.name}
+                </option>
+              ))}
+            </select>
+            <button
+              type="submit"
+              className="rounded-lg border border-[var(--border)] px-3 py-1.5 hover:bg-[var(--background)]"
+            >
+              Filtruj
+            </button>
+          </form>
+        </div>
 
-      <div className="mt-6">
-        <CalendarNav basePath="/kalendarz" view={view} anchor={anchor} extra={extra} />
-      </div>
+        <div className="mt-6">
+          <CalendarNav basePath="/kalendarz" view={view} anchor={anchor} extra={extra} />
+        </div>
 
-      <div className="mt-6">
-        {view === "month" && (
-          <MonthGrid
-            anchor={anchor}
-            sessions={sessions}
-            dayHref={(dateStr) => hrefFor("/kalendarz", "day", new Date(`${dateStr}T00:00:00`), extra)}
-          />
-        )}
+        <div className="mt-6">
+          {view === "month" && (
+            <MonthGrid
+              anchor={anchor}
+              sessions={sessions}
+              dayHref={(dateStr) => hrefFor("/kalendarz", "day", new Date(`${dateStr}T00:00:00`), extra)}
+            />
+          )}
 
-        {view === "week" && (
-          <WeekView anchor={anchor} sessions={sessions} extra={extra} />
-        )}
+          {view === "week" && (
+            <WeekView anchor={anchor} sessions={sessions} extra={extra} />
+          )}
 
-        {view === "day" && (
-          <DayView
-            anchor={anchor}
-            sessions={sessions.filter((s) => s.status === "SCHEDULED")}
-            isLoggedIn={!!session}
-            kids={children}
-          />
-        )}
-      </div>
+          {view === "day" && (
+            <DayView
+              anchor={anchor}
+              sessions={sessions.filter((s) => s.status === "SCHEDULED")}
+              isLoggedIn={!!session}
+              kids={children}
+            />
+          )}
+        </div>
+      </NotebookCard>
+
+      <StickyNote color="green" className="mx-auto mt-8 max-w-xs">
+        Dobry plan to więcej możliwości! 🙂
+      </StickyNote>
     </div>
   );
 }

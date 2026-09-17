@@ -99,3 +99,21 @@ export const createSessionSchema = z
     message: "Godzina zakończenia musi być po godzinie rozpoczęcia.",
     path: ["endTime"],
   });
+
+/** Public "Zapisy" lead form — a quick inquiry, separate from the parent-account signup flow. */
+export const leadSchema = z.object({
+  childName: z.string().trim().min(1, "Podaj imię dziecka."),
+  childAge: z.coerce.number().int().min(1, "Podaj wiek dziecka.").max(18, "Podaj wiek dziecka."),
+  parentEmail: z.string().trim().toLowerCase().email("Podaj poprawny adres e-mail."),
+  parentPhone: z.string().trim().min(1, "Podaj numer telefonu."),
+  consent: z.literal("on", { message: "Zgoda na kontakt jest wymagana." }),
+});
+
+/** Public "Kontakt" page form. */
+export const contactSchema = z.object({
+  name: z.string().trim().min(1, "Podaj imię i nazwisko."),
+  email: z.string().trim().toLowerCase().email("Podaj poprawny adres e-mail."),
+  subject: z.string().trim().optional().or(z.literal("")),
+  message: z.string().trim().min(1, "Podaj treść wiadomości."),
+  consent: z.literal("on", { message: "Zgoda na przetwarzanie danych jest wymagana." }),
+});
