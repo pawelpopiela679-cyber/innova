@@ -54,36 +54,30 @@ try {
       <div class="spiral-dots"></div>
       <?= nb_render_tabs($notebookActive) ?>
     <?php endif; ?>
-    <?php
-      // Na stronie głównej link "← Strona główna" i osobny pasek z logo są
-      // zbędne — grafika-okładka poniżej już POKAZUJE logo/markę, a link
-      // "wróć na stronę główną" na samej stronie głównej nie ma sensu.
-      $notebookIsHome = $notebookBare && $notebookActive === 'home';
-    ?>
-    <?php if ($notebookBare): ?><div style="padding:16px clamp(16px,4vw,40px) 0;"><?php endif; ?>
-    <div style="display:flex; justify-content:<?= ($notebookBare && !$notebookIsHome) ? 'space-between' : 'flex-end' ?>; gap:12px; align-items:center; font-size:.8rem; margin-bottom:8px; flex-wrap:wrap; <?= $notebookBare ? '' : 'padding-right:100px;' ?>">
-      <?php if ($notebookBare && !$notebookIsHome): ?><a href="<?= e(url('index.php')) ?>" style="text-decoration:none; color:var(--nb-muted,#8a7f5c); font-weight:700;">← Strona główna</a><?php endif; ?>
-      <?php if ($user): ?>
-        <?php if ($isStaff): ?>
-          <a href="<?= e(url('admin.php')) ?>" style="color:var(--nb-green,#3f7d45); font-weight:700; text-decoration:none;">Panel prowadzącego</a>
+    <?php if ($notebookBare): ?>
+    <div class="nb-pillbar">
+      <div class="nb-pillbar-left">
+        <a href="<?= e(url('index.php')) ?>" style="text-decoration:none;"><?= render_logo('sm', true) ?></a>
+      </div>
+      <?= nb_render_pillnav($notebookActive) ?>
+      <div class="nb-pillbar-right">
+        <?php if ($user): ?>
+          <?php if ($isStaff): ?>
+            <a href="<?= e(url('admin.php')) ?>" class="login">Panel prowadzącego</a>
+          <?php else: ?>
+            <a href="<?= e(url('panel.php')) ?>" class="login">Panel rodzica</a>
+          <?php endif; ?>
+          <form method="post" action="<?= e(url('wyloguj.php')) ?>" style="display:inline;">
+            <?= csrf_field() ?>
+            <button type="submit" style="background:none; border:none; color:var(--nb-muted,#8a7f5c); font-weight:700; text-decoration:underline; cursor:pointer; font-size:inherit; padding:0;">Wyloguj (<?= e($user['name']) ?>)</button>
+          </form>
         <?php else: ?>
-          <a href="<?= e(url('panel.php')) ?>" style="color:var(--nb-green,#3f7d45); font-weight:700; text-decoration:none;">Panel rodzica</a>
+          <a href="<?= e(url('logowanie.php')) ?>" class="login">Zaloguj się</a>
         <?php endif; ?>
-        <span style="color:var(--nb-muted,#8a7f5c);"><?= e($user['name']) ?></span>
-        <form method="post" action="<?= e(url('wyloguj.php')) ?>" style="display:inline;">
-          <?= csrf_field() ?>
-          <button type="submit" style="background:none; border:none; color:var(--nb-muted,#8a7f5c); font-weight:700; text-decoration:underline; cursor:pointer; font-size:inherit;">Wyloguj</button>
-        </form>
-      <?php else: ?>
-        <a href="<?= e(url('logowanie.php')) ?>" style="color:var(--nb-muted,#8a7f5c); font-weight:700; text-decoration:none;">Zaloguj się</a>
-      <?php endif; ?>
-    </div>
-    <?php if (!$notebookIsHome): ?>
-    <div class="nb-topbar">
-      <a href="<?= e(url('index.php')) ?>" style="text-decoration:none;"><?= render_logo('md', true) ?></a>
+        <span class="tagline">♡ Małe pomysły<br>Wielkie możliwości!</span>
+      </div>
     </div>
     <?php endif; ?>
-    <?php if ($notebookBare): ?></div><?php endif; ?>
 <?php else: ?>
 <header class="navbar">
   <div class="navbar-inner">

@@ -6,11 +6,33 @@ $instructors = db()->query("SELECT * FROM users WHERE role = 'INSTRUCTOR' ORDER 
 $pageTitle = 'Poznaj nas — INNOVA';
 $notebookTheme = true;
 $notebookBare = true;
+$notebookActive = 'about';
 require __DIR__ . '/includes/layout_top.php';
 ?>
-<div class="nb-graphic-page" style="background-image:url('<?= e(url('assets/img/banners/o-nas.png')) ?>');"></div>
-<div class="nb-graphic-content">
-<p class="text-center text-muted mt-4">Zespół prowadzących pracowni INNOVA.</p>
+<img class="nb-header-banner" src="<?= e(url('assets/img/headers/o-nas.png')) ?>" alt="O nas — tworzymy przestrzeń, w której dzieci i młodzież odkrywają swoje talenty">
+
+<div class="nb-why-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom:40px;">
+  <div class="nb-card" style="background:#cfe6f7; cursor:default;">
+    <h3 style="margin:0 0 8px;">🎯 Nasza misja</h3>
+    <p><?= nl2br(e(get_content('about.mission', 'Inspirujemy, wspieramy i dajemy narzędzia dzieciom i młodzieży, aby mogły odkrywać swoje pasje, rozwijać umiejętności i z odwagą sięgać po więcej.'))) ?></p>
+  </div>
+  <div class="nb-card" style="background:#faedc4; cursor:default;">
+    <h3 style="margin:0 0 8px;">💎 Nasze wartości</h3>
+    <ul style="margin:0; padding-left:18px; font-size:.86rem; line-height:1.7;">
+      <li>Szacunek do każdego dziecka</li>
+      <li>Kreatywność w działaniu</li>
+      <li>Współpraca i otwartość</li>
+      <li>Rozwój przez doświadczenie</li>
+      <li>Przyjazna atmosfera</li>
+    </ul>
+  </div>
+  <div class="nb-card" style="background:#f7d9e6; cursor:default;">
+    <h3 style="margin:0 0 8px;">🏠 Nasza przestrzeń</h3>
+    <p><?= nl2br(e(get_content('about.space', 'INNOVA to przytulne, twórcze miejsce, w którym dzieci i młodzież mogą czuć się swobodnie, rozwijać swoje pomysły i spędzać czas w inspirującym otoczeniu.'))) ?></p>
+  </div>
+</div>
+
+<p class="text-center text-muted">Poznaj nasz zespół — ludzie, którzy tworzą INNOVA.</p>
 
 <?php if (!$instructors): ?>
   <p class="text-center text-muted mt-8">Wkrótce pojawi się tu zespół prowadzących.</p>
@@ -37,5 +59,4 @@ require __DIR__ . '/includes/layout_top.php';
     <?php endforeach; ?>
   </div>
 <?php endif; ?>
-</div>
 <?php require __DIR__ . '/includes/layout_bottom.php'; ?>

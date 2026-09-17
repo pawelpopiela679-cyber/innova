@@ -130,6 +130,40 @@
 /* ---- Górna belka ---- */
 .nb-topbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; margin-bottom: 8px; }
 
+/* ---- Realny pasek nawigacji z kolorowymi "pigułkami" (na podstawie
+   dostarczonych makiet stron) — używany zamiast starego minimalnego paska
+   na wszystkich 7 stronach publicznych. Każda zakładka to prawdziwy,
+   klikalny link; obecna strona dostaje podkreślenie. ---- */
+.nb-pillbar {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 16px; flex-wrap: wrap; padding: 14px clamp(16px,4vw,40px) 0;
+}
+.nb-pillbar-left { display: flex; align-items: center; gap: 6px; flex: none; }
+.nb-pillnav { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; flex: 1 1 auto; justify-content: center; }
+.nb-pill {
+  display: inline-block; padding: 8px 16px; border-radius: 999px; font-weight: 700; font-size: .85rem;
+  text-decoration: none; color: var(--nb-ink); white-space: nowrap;
+}
+.nb-pill.active { text-decoration: underline; text-underline-offset: 3px; }
+.nb-pill--home { background: #bdc8a3; }
+.nb-pill--aktualnosci { background: #f7b5c3; }
+.nb-pill--onas { background: #d7e1b7; }
+.nb-pill--zajecia { background: #b4d8fb; }
+.nb-pill--grafik { background: #e1b7f6; }
+.nb-pill--zapisy { background: #facda2; }
+.nb-pill--kontakt { background: #acdfcf; }
+.nb-pillbar-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex: none; font-size: .78rem; color: var(--nb-muted); text-align: right; line-height: 1.3; }
+.nb-pillbar-right a.login { color: var(--nb-muted); font-weight: 700; text-decoration: none; }
+.nb-pillbar-right .tagline { font-family: var(--nb-font-heading); font-weight: 700; font-size: 1.05rem; color: var(--nb-green); }
+@media (max-width: 780px) {
+  .nb-pillbar { justify-content: center; text-align: center; }
+  .nb-pillbar-right { align-items: center; text-align: center; }
+}
+
+/* ---- Banner nagłówkowy (grafika dostarczona przez pracownię) na górze
+   każdej podstrony — pełna szerokość, bez kadrowania. ---- */
+.nb-header-banner { display: block; width: 100%; height: auto; margin: 10px 0 30px; }
+
 /* ---- Doodle ozdoby ---- */
 .nb-doodle { position: absolute; color: var(--nb-green); opacity: .85; pointer-events: none; }
 .nb-tape { position: absolute; width: 70px; height: 26px; background: rgba(255,255,255,.55); border: 1px solid rgba(255,255,255,.7); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
@@ -310,6 +344,10 @@ table.nb-week td.nb-time { font-weight: 700; color: var(--nb-muted); background:
 .nb-form-foot a { color: var(--nb-green); font-weight: 700; text-decoration: underline; }
 .nb-alert-error {
   background: #fbecec; border: 1px solid #e6b8b8; color: #8a2f2f; border-radius: 10px;
+  padding: 10px 14px; font-size: .88rem; margin-bottom: 16px;
+}
+.nb-alert-success {
+  background: #eaf5ea; border: 1px solid #b8dcb8; color: #2f5a2f; border-radius: 10px;
   padding: 10px 14px; font-size: .88rem; margin-bottom: 16px;
 }
 

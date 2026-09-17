@@ -7,13 +7,34 @@ $tiersStmt = db()->prepare('SELECT * FROM pricing_tiers WHERE class_type_id = ? 
 $instructors = db()->query("SELECT * FROM users WHERE role = 'INSTRUCTOR' ORDER BY name ASC")->fetchAll();
 $roleStmt = db()->prepare("SELECT DISTINCT ct.name FROM class_sessions cs JOIN class_types ct ON ct.id = cs.class_type_id WHERE cs.instructor_id = ?");
 
+$zajeciaFotoMap = ['ENGLISH', 'THEATER', 'ROBOTICS', 'CREATIVE', 'MATH', 'SCIENCE'];
+
 $pageTitle = 'Zajęcia i cennik — INNOVA';
 $notebookTheme = true;
 $notebookBare = true;
+$notebookActive = 'classes';
 require __DIR__ . '/includes/layout_top.php';
 ?>
-<div class="nb-graphic-page" style="background-image:url('<?= e(url('assets/img/banners/zajecia.png')) ?>');"></div>
-<div class="nb-graphic-content">
+<img class="nb-header-banner" src="<?= e(url('assets/img/headers/zajecia.png')) ?>" alt="Zajęcia — twórcze, rozwijające i pełne dobrej energii">
+
+<div class="nb-cards" style="grid-template-columns: repeat(3, 1fr); margin-bottom:20px;">
+  <?php foreach ($classTypes as $ct): [$bg, $ink] = nb_pastel($ct['key_name']);
+    $foto = in_array($ct['key_name'], $zajeciaFotoMap, true) ? url('assets/img/zajecia-foto/' . $ct['key_name'] . '.png') : null;
+  ?>
+    <a href="#cennik-<?= e($ct['key_name']) ?>" class="nb-card" style="background:<?= e($bg) ?>;">
+      <div class="flex items-center gap-2">
+        <?= nb_icon_svg($ct['key_name']) ?>
+        <h3 style="color:<?= e($ink) ?>; margin:0;"><?= e($ct['name']) ?></h3>
+      </div>
+      <p class="mt-2"><?= e($ct['description']) ?></p>
+      <?php if ($foto): ?>
+        <div class="nb-photo-frame" style="max-width:170px; margin:10px 0;"><img src="<?= e($foto) ?>" alt="<?= e($ct['name']) ?>"></div>
+      <?php endif; ?>
+      <span class="nb-more" style="color:<?= e($ink) ?>;">Zobacz szczegóły →</span>
+    </a>
+  <?php endforeach; ?>
+</div>
+
 <h1 class="nb-section-title" style="text-align:left; max-width:640px; font-size:1.7rem;">Zajęcia, w których dzieci i młodzież odkrywają, zdobywają nowe umiejętności i świetnie się bawią!</h1>
 <p class="text-muted" style="max-width:640px;">Zajęcia odbywają się 1x w tygodniu, w małych grupach (maks. 10 dzieci). Pełny terminarz i wolne miejsca znajdziesz w <a href="<?= e(url('kalendarz.php')) ?>" style="color:var(--nb-coral); text-decoration:underline;">grafiku</a>.</p>
 <div class="nb-cta-row">
@@ -109,6 +130,5 @@ require __DIR__ . '/includes/layout_top.php';
     <?php endforeach; ?>
   </div>
   <p class="text-center text-muted mt-8"><strong style="color:var(--nb-ink);">Zniżki:</strong> rodzeństwo −15% · Karta Dużej Rodziny −10%</p>
-</div>
 </div>
 <?php require __DIR__ . '/includes/layout_bottom.php'; ?>

@@ -27,10 +27,10 @@ ksort($exampleGrid);
 $pageTitle = 'Grafik zajęć — INNOVA';
 $notebookTheme = true;
 $notebookBare = true;
+$notebookActive = 'schedule';
 require __DIR__ . '/includes/layout_top.php';
 ?>
-<div class="nb-graphic-page" style="background-image:url('<?= e(url('assets/img/banners/grafik.png')) ?>');"></div>
-<div class="nb-graphic-content">
+<img class="nb-header-banner" src="<?= e(url('assets/img/headers/grafik.png')) ?>" alt="Grafik — sprawdź plan zajęć w INNOVA">
 <div class="text-center" style="margin:20px 0 30px;">
   <div class="nb-step-sub">Poniżej przykładowy, cotygodniowy rytm zajęć.</div>
   <a href="<?= e(signup_url()) ?>" class="nb-pill-dark">Zapisz się ↓</a>
@@ -89,6 +89,5 @@ require __DIR__ . '/includes/layout_top.php';
       <a href="<?= e(signup_url()) ?>" class="nb-btn solid uppercase" style="width:100%; justify-content:center; box-sizing:border-box;">Zapisz się teraz</a>
     </div>
   </div>
-</div>
 </div>
 <?php require __DIR__ . '/includes/layout_bottom.php'; ?>

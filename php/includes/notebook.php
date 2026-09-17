@@ -93,3 +93,37 @@ function nb_render_tabs(string $active): string
     return $out . '</nav>';
 }
 
+/** Kolejność i kolor "pigułki" nawigacji na podstawie dostarczonych makiet
+ *  (Strona główna / Aktualności / O nas / Zajęcia / Grafik / Zapisy / Kontakt). */
+function nb_pill_defs(): array
+{
+    $byKey = [];
+    foreach (nb_tab_defs() as $t) {
+        $byKey[$t['key']] = $t;
+    }
+    $order = ['home', 'news', 'about', 'classes', 'schedule', 'signup', 'contact'];
+    $colorClass = [
+        'home' => 'nb-pill--home', 'news' => 'nb-pill--aktualnosci', 'about' => 'nb-pill--onas',
+        'classes' => 'nb-pill--zajecia', 'schedule' => 'nb-pill--grafik', 'signup' => 'nb-pill--zapisy',
+        'contact' => 'nb-pill--kontakt',
+    ];
+    $out = [];
+    foreach ($order as $key) {
+        $out[] = ['key' => $key, 'label' => $byKey[$key]['label'], 'url' => $byKey[$key]['url'], 'color' => $colorClass[$key]];
+    }
+    return $out;
+}
+
+/** Prawdziwy pasek nawigacji z kolorowymi "pigułkami" — patrz notebook.css
+ *  .nb-pillbar. Zastępuje stary minimalny pasek "← Strona główna" na
+ *  wszystkich 7 stronach publicznych. */
+function nb_render_pillnav(string $active): string
+{
+    $out = '<nav class="nb-pillnav">';
+    foreach (nb_pill_defs() as $p) {
+        $cls = 'nb-pill ' . $p['color'] . ($p['key'] === $active ? ' active' : '');
+        $out .= '<a href="' . e(url($p['url'])) . '" class="' . $cls . '">' . e($p['label']) . '</a>';
+    }
+    return $out . '</nav>';
+}
+

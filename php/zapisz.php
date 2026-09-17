@@ -90,10 +90,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $pageTitle = 'Zapisz dziecko — INNOVA';
 $notebookTheme = true;
 $notebookBare = true;
+$notebookActive = 'signup';
 require __DIR__ . '/includes/layout_top.php';
 ?>
-<div class="nb-graphic-page" style="background-image:url('<?= e(url('assets/img/banners/zapisy.png')) ?>');"></div>
-<div class="nb-graphic-content">
+<img class="nb-header-banner" src="<?= e(url('assets/img/headers/zapisy.png')) ?>" alt="Zapisy — dołącz do naszej kreatywnej przygody">
+
+<div class="nb-two-col" style="margin-bottom:34px;">
+  <div>
+    <div class="nb-step-title">Jak się zapisać? <span class="nb-box"></span></div>
+    <div class="nb-process-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M2 20h20"/></svg>
+      <div><b>Wypełnij formularz</b><br>Wybierz dziecko i konkretny termin, który Wam pasuje.</div>
+    </div>
+    <div class="nb-process-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 6l9 7 9-7"/></svg>
+      <div><b>Otrzymaj potwierdzenie</b><br>Sprawdzamy dostępność i potwierdzamy zapis e-mailem.</div>
+    </div>
+    <div class="nb-process-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.4"/><path d="M15.5 14.2c2.3.3 4 2.4 4 5.8"/></svg>
+      <div><b>Dołącz do zajęć!</b><br>Widzimy się na kreatywnych zajęciach — razem odkrywamy talenty.</div>
+    </div>
+  </div>
+  <div>
+    <div class="nb-step-title">Najczęściej zadawane pytania <span class="nb-box"></span></div>
+    <div class="nb-process-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 16v.01M12 8a2.5 2.5 0 012.5 2.5c0 1.5-2.5 2-2.5 3.5"/></svg>
+      <div>Od jakiego wieku można się zapisać? — od 3 lat, w zależności od zajęć.</div>
+    </div>
+    <div class="nb-process-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 16v.01M12 8a2.5 2.5 0 012.5 2.5c0 1.5-2.5 2-2.5 3.5"/></svg>
+      <div>Ile trwają zajęcia? — 45–60 minut, 1x w tygodniu.</div>
+    </div>
+    <div class="nb-process-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 16v.01M12 8a2.5 2.5 0 012.5 2.5c0 1.5-2.5 2-2.5 3.5"/></svg>
+      <div>Jak wygląda płatność? — miesięcznie, szczegóły w <a href="<?= e(url('zajecia.php#cennik')) ?>" style="color:var(--nb-coral);">cenniku</a>.</div>
+    </div>
+    <div class="nb-process-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 16v.01M12 8a2.5 2.5 0 012.5 2.5c0 1.5-2.5 2-2.5 3.5"/></svg>
+      <div>Masz inne pytania? <a href="<?= e(url('kontakt.php')) ?>" style="color:var(--nb-coral);">Skontaktuj się z nami →</a></div>
+    </div>
+  </div>
+</div>
+
 <div class="nb-form-wrap">
   <div class="nb-form-card nb-form">
     <div class="nb-tape"></div>
@@ -144,6 +182,5 @@ require __DIR__ . '/includes/layout_top.php';
       <p class="nb-form-foot">Zgłoszenie wymaga potwierdzenia przez pracownię — jeśli wybrany termin jest pełny, zaproponujemy inny albo zapiszemy dziecko na listę rezerwową.</p>
     <?php endif; ?>
   </div>
-</div>
 </div>
 <?php require __DIR__ . '/includes/layout_bottom.php'; ?>
