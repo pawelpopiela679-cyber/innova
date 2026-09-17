@@ -8,7 +8,7 @@ $notebookTheme = true;
 $notebookBare = true;
 require __DIR__ . '/includes/layout_top.php';
 ?>
-<div class="nb-graphic-page" style="background-image:url('<?= e(url('assets/img/hero-notebook.png')) ?>');"></div>
+<div class="nb-graphic-page" style="background-image:url('<?= e(url('assets/img/hero-notebook.png')) ?>'); aspect-ratio:700/1038;"></div>
 <div class="nb-graphic-content">
 
 <div class="text-center" style="margin:30px 0;">
