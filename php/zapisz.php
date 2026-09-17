@@ -95,7 +95,7 @@ require __DIR__ . '/includes/layout_top.php';
 ?>
 <img class="nb-header-banner" src="<?= e(url('assets/img/headers/zapisy.png')) ?>" alt="Zapisy — dołącz do naszej kreatywnej przygody">
 
-<div class="nb-two-col" style="margin-bottom:34px;">
+<div class="nb-two-col">
   <div>
     <div class="nb-step-title">Jak się zapisać? <span class="nb-box"></span></div>
     <div class="nb-process-item">
@@ -112,7 +112,61 @@ require __DIR__ . '/includes/layout_top.php';
     </div>
   </div>
   <div>
-    <div class="nb-step-title">Najczęściej zadawane pytania <span class="nb-box"></span></div>
+    <div class="nb-form-card nb-form" style="margin:0;">
+      <div class="nb-tape"></div>
+      <div class="nb-form-title">Zapisz dziecko</div>
+      <p class="nb-form-sub">Wybierz dziecko i konkretny termin, który Wam pasuje — resztę (potwierdzenie miejsca) załatwimy e-mailem.</p>
+
+      <?php if ($error): ?><p class="nb-alert-error"><?= e($error) ?></p><?php endif; ?>
+
+      <?php if (!$children): ?>
+        <p class="text-center" style="margin:18px 0;">Nie masz jeszcze dodanych dzieci.</p>
+        <a href="<?= e(url('panel-dzieci.php')) ?>" class="nb-btn solid" style="width:100%; justify-content:center; box-sizing:border-box;">Dodaj dziecko →</a>
+      <?php elseif (!$groups): ?>
+        <p class="text-center" style="margin:18px 0;">Aktualnie nie ma jeszcze otwartych grup zajęć — sprawdź wkrótce albo skontaktuj się z nami.</p>
+      <?php else: ?>
+        <form method="post">
+          <?= csrf_field() ?>
+          <div class="nb-field">
+            <label for="childId">Dziecko</label>
+            <select id="childId" name="childId" required>
+              <?php foreach ($children as $c): ?>
+                <option value="<?= (int) $c['id'] ?>"><?= e($c['first_name'] . ' ' . $c['last_name']) ?></option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+          <div class="nb-field">
+            <label for="groupId">Zajęcia — dzień i godzina</label>
+            <select id="groupId" name="groupId" required>
+              <option value="">Wybierz termin…</option>
+              <?php foreach ($groupsByType as $ctId => $bucket): ?>
+                <optgroup label="<?= e($bucket['name']) ?>">
+                  <?php foreach ($bucket['groups'] as $g): ?>
+                    <option value="<?= (int) $g['id'] ?>" <?= $preselectedGroup === (int) $g['id'] ? 'selected' : '' ?>>
+                      <?= e(ucfirst(weekday_name_plural_iso((int) $g['day_of_week']))) ?> <?= e($g['start_time']) ?>–<?= e($g['end_time']) ?>
+                      — <?= e($g['instructor_name']) ?>
+                      <?= $g['is_full'] ? ' (brak miejsc — lista rezerwowa)' : ' (wolne miejsca: ' . (int) $g['spots_left'] . '/' . (int) $g['capacity'] . ')' ?>
+                    </option>
+                  <?php endforeach; ?>
+                </optgroup>
+              <?php endforeach; ?>
+            </select>
+          </div>
+          <div class="nb-field">
+            <label for="note">Wiadomość do prowadzących (opcjonalnie)</label>
+            <textarea id="note" name="note" rows="3" maxlength="1000" placeholder="Np. specjalne potrzeby dziecka, alergie, prośba o konkretną grupę…"><?= e($noteValue) ?></textarea>
+          </div>
+          <button type="submit" class="nb-btn solid" style="width:100%; justify-content:center; box-sizing:border-box;">Zgłoś chęć zapisu</button>
+        </form>
+        <p class="nb-form-foot">Zgłoszenie wymaga potwierdzenia przez pracownię — jeśli wybrany termin jest pełny, zaproponujemy inny albo zapiszemy dziecko na listę rezerwową.</p>
+      <?php endif; ?>
+    </div>
+  </div>
+</div>
+
+<div class="nb-section">
+  <div class="nb-step-title">Najczęściej zadawane pytania <span class="nb-box"></span></div>
+  <div class="nb-why-grid" style="grid-template-columns: repeat(2, 1fr); margin-top:16px;">
     <div class="nb-process-item">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 16v.01M12 8a2.5 2.5 0 012.5 2.5c0 1.5-2.5 2-2.5 3.5"/></svg>
       <div>Od jakiego wieku można się zapisać? — od 3 lat, w zależności od zajęć.</div>
@@ -123,64 +177,12 @@ require __DIR__ . '/includes/layout_top.php';
     </div>
     <div class="nb-process-item">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 16v.01M12 8a2.5 2.5 0 012.5 2.5c0 1.5-2.5 2-2.5 3.5"/></svg>
-      <div>Jak wygląda płatność? — miesięcznie, szczegóły w <a href="<?= e(url('zajecia.php#cennik')) ?>" style="color:var(--nb-coral);">cenniku</a>.</div>
+      <div>Jak wygląda płatność? — miesięcznie, przelewem — szczegóły przekazujemy po potwierdzeniu zapisu.</div>
     </div>
     <div class="nb-process-item">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 16v.01M12 8a2.5 2.5 0 012.5 2.5c0 1.5-2.5 2-2.5 3.5"/></svg>
       <div>Masz inne pytania? <a href="<?= e(url('kontakt.php')) ?>" style="color:var(--nb-coral);">Skontaktuj się z nami →</a></div>
     </div>
-  </div>
-</div>
-
-<div class="nb-form-wrap">
-  <div class="nb-form-card nb-form">
-    <div class="nb-tape"></div>
-    <div class="nb-form-title">Zapisz dziecko na zajęcia</div>
-    <p class="nb-form-sub">Wybierz dziecko i konkretny termin, który Wam pasuje — resztę (potwierdzenie miejsca) załatwimy e-mailem.</p>
-
-    <?php if ($error): ?><p class="nb-alert-error"><?= e($error) ?></p><?php endif; ?>
-
-    <?php if (!$children): ?>
-      <p class="text-center" style="margin:18px 0;">Nie masz jeszcze dodanych dzieci.</p>
-      <a href="<?= e(url('panel-dzieci.php')) ?>" class="nb-btn solid" style="width:100%; justify-content:center; box-sizing:border-box;">Dodaj dziecko →</a>
-    <?php elseif (!$groups): ?>
-      <p class="text-center" style="margin:18px 0;">Aktualnie nie ma jeszcze otwartych grup zajęć — sprawdź wkrótce albo skontaktuj się z nami.</p>
-    <?php else: ?>
-      <form method="post">
-        <?= csrf_field() ?>
-        <div class="nb-field">
-          <label for="childId">Dziecko</label>
-          <select id="childId" name="childId" required>
-            <?php foreach ($children as $c): ?>
-              <option value="<?= (int) $c['id'] ?>"><?= e($c['first_name'] . ' ' . $c['last_name']) ?></option>
-            <?php endforeach; ?>
-          </select>
-        </div>
-        <div class="nb-field">
-          <label for="groupId">Zajęcia — dzień i godzina</label>
-          <select id="groupId" name="groupId" required>
-            <option value="">Wybierz termin…</option>
-            <?php foreach ($groupsByType as $ctId => $bucket): ?>
-              <optgroup label="<?= e($bucket['name']) ?>">
-                <?php foreach ($bucket['groups'] as $g): ?>
-                  <option value="<?= (int) $g['id'] ?>" <?= $preselectedGroup === (int) $g['id'] ? 'selected' : '' ?>>
-                    <?= e(ucfirst(weekday_name_plural_iso((int) $g['day_of_week']))) ?> <?= e($g['start_time']) ?>–<?= e($g['end_time']) ?>
-                    — <?= e($g['instructor_name']) ?>
-                    <?= $g['is_full'] ? ' (brak miejsc — lista rezerwowa)' : ' (wolne miejsca: ' . (int) $g['spots_left'] . '/' . (int) $g['capacity'] . ')' ?>
-                  </option>
-                <?php endforeach; ?>
-              </optgroup>
-            <?php endforeach; ?>
-          </select>
-        </div>
-        <div class="nb-field">
-          <label for="note">Wiadomość do prowadzących (opcjonalnie)</label>
-          <textarea id="note" name="note" rows="3" maxlength="1000" placeholder="Np. specjalne potrzeby dziecka, alergie, prośba o konkretną grupę…"><?= e($noteValue) ?></textarea>
-        </div>
-        <button type="submit" class="nb-btn solid" style="width:100%; justify-content:center; box-sizing:border-box;">Zgłoś chęć zapisu</button>
-      </form>
-      <p class="nb-form-foot">Zgłoszenie wymaga potwierdzenia przez pracownię — jeśli wybrany termin jest pełny, zaproponujemy inny albo zapiszemy dziecko na listę rezerwową.</p>
-    <?php endif; ?>
   </div>
 </div>
 <?php require __DIR__ . '/includes/layout_bottom.php'; ?>
