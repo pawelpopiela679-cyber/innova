@@ -2,6 +2,12 @@
 html, body { margin: 0; padding: 0; background: #efe4cf; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
 a { color: inherit; }
 
+/* Single-file makieta: all 7 "pages" live in one HTML file and are
+   swapped with JS (no real page navigation, so it works everywhere —
+   double-clicked locally, previewed in a chat/zip viewer, etc.). */
+.page { display: none; }
+.page.active { display: block; }
+
 .frame {
   position: relative;
   width: 100%;
