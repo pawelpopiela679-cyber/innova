@@ -39,9 +39,8 @@
   --pill-purple: #d3c3e8;
   --pill-orange: #f4cd9e;
   --pill-teal: #a9d8cf;
-  --ink: #24344a; /* dark navy used for hand-drawn strokes/headings on paper */
-  --paper: #f3e9d4; /* kraft notebook page color */
-  --paper-line: #dfcda3;
+  --ink: #24344a; /* dark navy used for text overlaid on the mockup screenshots */
+  --paper: #f3e9d4; /* kraft page color, used behind success states/overlays on the mockup screenshots */
 }
 
 @theme inline {
@@ -94,86 +93,14 @@
   }
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
-  background-image:
-    radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--foreground) 6%, transparent) 1px, transparent 0);
-  background-size: 22px 22px;
-}
-
-/* ---------------------------------------------------------------------
-   Scrapbook / notebook design system — spiral-bound cards, sticky notes,
-   torn-paper edges and doodle strokes, matching the studio's hand-drawn
-   promotional materials.
-   ------------------------------------------------------------------- */
-
-.notebook {
-  position: relative;
-  background: var(--paper);
-  border-radius: 14px;
-  border: 1px solid color-mix(in srgb, var(--ink) 12%, var(--paper-line));
-  box-shadow: 0 10px 24px -12px color-mix(in srgb, var(--ink) 35%, transparent),
-    0 2px 6px -2px color-mix(in srgb, var(--ink) 20%, transparent);
-  padding-left: 2.1rem;
-}
-
-.notebook::before {
-  /* spiral binding along the left edge */
-  content: "";
-  position: absolute;
-  left: 0.5rem;
-  top: 0.9rem;
-  bottom: 0.9rem;
-  width: 0.7rem;
-  background-image: radial-gradient(
-    circle,
-    color-mix(in srgb, var(--ink) 55%, transparent) 32%,
-    transparent 34%
-  );
-  background-size: 100% 1.4rem;
-  background-repeat: repeat-y;
-  opacity: 0.55;
-}
-
-.notebook-tab {
-  position: absolute;
-  top: 1.1rem;
-  right: -0.6rem;
-  writing-mode: vertical-rl;
-  border-radius: 0 8px 8px 0;
-  padding: 0.6rem 0.35rem;
-  font-family: var(--font-heading), var(--font-sans);
-  font-weight: 700;
-  font-size: 0.7rem;
-  color: var(--ink);
-  box-shadow: 2px 2px 5px -2px color-mix(in srgb, var(--ink) 40%, transparent);
-}
-
-.sticky-note {
-  position: relative;
-  border-radius: 4px;
-  box-shadow: 0 8px 16px -8px color-mix(in srgb, var(--ink) 45%, transparent);
-  color: var(--ink);
-}
-
-.sticky-note::before {
-  /* piece of tape across the top corner */
-  content: "";
-  position: absolute;
-  top: -0.55rem;
-  left: 50%;
-  width: 2.4rem;
-  height: 1.1rem;
-  transform: translateX(-50%) rotate(-3deg);
-  background: color-mix(in srgb, var(--mustard) 55%, white 30%);
-  opacity: 0.75;
-  border: 1px solid color-mix(in srgb, var(--ink) 10%, transparent);
-}
-
-.doodle-stroke {
-  stroke: var(--ink);
 }
 
 /* Jagged torn-paper edge, used to divide the footer ribbon from the page. */

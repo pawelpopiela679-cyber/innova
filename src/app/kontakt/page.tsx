@@ -1,5 +1,11 @@
-import { NotebookCard, SectionHeading } from "@/components/scrapbook";
+import { getSession } from "@/lib/auth";
+import { MockupFrame } from "@/components/mockup-frame";
+import { MockupNav } from "@/components/mockup-nav";
+import { MockupFooterLinks } from "@/components/mockup-footer-links";
 import { submitContactAction } from "@/lib/actions/contact-actions";
+
+const fieldClass =
+  "absolute rounded-md bg-transparent px-2 text-[var(--ink)] outline-none focus:bg-white/40";
 
 export default async function ContactPage({
   searchParams,
@@ -7,154 +13,107 @@ export default async function ContactPage({
   searchParams: Promise<{ error?: string; success?: string }>;
 }) {
   const sp = await searchParams;
+  const session = await getSession();
+  const isStaff = session?.role === "ADMIN" || session?.role === "INSTRUCTOR";
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-12">
-      <SectionHeading
-        eyebrow="Dobry pomysł zaczyna się od rozmowy!"
-        title="Kontakt"
-        subtitle="Masz pytania? Napisz do nas!"
-        highlight="var(--pill-teal)"
+    <MockupFrame src="/mockups/kontakt.png" alt="INNOVA — Kontakt">
+      <MockupNav isLoggedIn={!!session} isStaff={isStaff} />
+
+      {sp.success ? (
+        <div
+          className="absolute flex flex-col items-center justify-center rounded-xl bg-[var(--paper)]/95 p-4 text-center shadow-inner"
+          style={{ left: "11.5%", top: "35%", width: "26%", height: "50%" }}
+        >
+          <p className="text-3xl">💌</p>
+          <p className="mt-2 font-heading text-base font-bold text-[var(--sage)] sm:text-lg">
+            Wiadomość wysłana!
+          </p>
+          <p className="mt-2 text-xs text-[var(--muted)] sm:text-sm">
+            Odpowiemy najszybciej, jak to możliwe.
+          </p>
+        </div>
+      ) : (
+        <form action={submitContactAction}>
+          {sp.error && (
+            <p
+              className="absolute rounded-lg bg-red-50 px-3 py-1.5 text-[10px] text-red-700 sm:text-xs"
+              style={{ left: "13%", top: "36%", width: "22%" }}
+            >
+              {sp.error}
+            </p>
+          )}
+          <input
+            aria-label="Imię i nazwisko"
+            name="name"
+            required
+            className={fieldClass}
+            style={{ left: "13%", top: "43%", width: "22.3%", height: "3.6%" }}
+          />
+          <input
+            aria-label="Adres e-mail"
+            name="email"
+            type="email"
+            required
+            className={fieldClass}
+            style={{ left: "13%", top: "48.5%", width: "22.3%", height: "3.6%" }}
+          />
+          <input
+            aria-label="Temat"
+            name="subject"
+            className={fieldClass}
+            style={{ left: "13%", top: "54%", width: "22.3%", height: "3.6%" }}
+          />
+          <textarea
+            aria-label="Wiadomość"
+            name="message"
+            required
+            className={`${fieldClass} resize-none py-1.5`}
+            style={{ left: "13%", top: "59.3%", width: "22.3%", height: "12.7%" }}
+          />
+          <input
+            aria-label="Wyrażam zgodę na przetwarzanie moich danych osobowych"
+            name="consent"
+            type="checkbox"
+            required
+            className="absolute cursor-pointer accent-[var(--ink)]"
+            style={{ left: "14%", top: "75%", width: "1.3%", height: "2.3%" }}
+          />
+          <button
+            type="submit"
+            aria-label="Wyślij wiadomość"
+            className="absolute"
+            style={{ left: "13.5%", top: "78%", width: "21.5%", height: "6.5%" }}
+          />
+        </form>
+      )}
+
+      <a
+        href="mailto:biuro@innova-pracownia.pl"
+        aria-label="Napisz e-mail: biuro@innova-pracownia.pl"
+        className="absolute"
+        style={{ left: "43%", top: "50.5%", width: "15%", height: "4%" }}
+      />
+      <a
+        href="tel:+48123456789"
+        aria-label="Zadzwoń: +48 123 456 789"
+        className="absolute"
+        style={{ left: "43%", top: "59.5%", width: "15%", height: "4.5%" }}
+      />
+      <a
+        href="https://facebook.com/innova.pracownia"
+        aria-label="Facebook"
+        className="absolute"
+        style={{ left: "45.4%", top: "71.5%", width: "3%", height: "5.5%" }}
+      />
+      <a
+        href="https://instagram.com/innova_pracownia"
+        aria-label="Instagram"
+        className="absolute"
+        style={{ left: "50.6%", top: "71.5%", width: "3%", height: "5.5%" }}
       />
 
-      <div className="mt-10 grid gap-6 lg:grid-cols-3 lg:items-start">
-        <NotebookCard rotate="-rotate-1">
-          <h2 className="font-heading text-lg font-bold">Napisz do nas</h2>
-          {sp.success ? (
-            <div className="py-8 text-center">
-              <p className="text-3xl">💌</p>
-              <p className="mt-2 font-semibold text-[var(--sage)]">Wiadomość wysłana!</p>
-              <p className="mt-1 text-sm text-[var(--muted)]">
-                Odpowiemy najszybciej, jak to możliwe.
-              </p>
-            </div>
-          ) : (
-            <>
-              {sp.error && (
-                <p className="mb-4 rounded-lg bg-red-50 px-4 py-2 text-sm text-red-700">{sp.error}</p>
-              )}
-              <form action={submitContactAction} className="mt-4 space-y-4">
-                <div>
-                  <label htmlFor="name" className="text-sm font-medium">
-                    Imię i nazwisko *
-                  </label>
-                  <input
-                    id="name"
-                    name="name"
-                    required
-                    className="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--background)] px-3 py-2"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="email" className="text-sm font-medium">
-                    Adres e-mail *
-                  </label>
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    required
-                    className="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--background)] px-3 py-2"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="subject" className="text-sm font-medium">
-                    Temat
-                  </label>
-                  <input
-                    id="subject"
-                    name="subject"
-                    className="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--background)] px-3 py-2"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="message" className="text-sm font-medium">
-                    Wiadomość *
-                  </label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    required
-                    rows={4}
-                    className="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--background)] px-3 py-2"
-                  />
-                </div>
-                <label className="flex items-start gap-2 text-sm text-[var(--muted)]">
-                  <input type="checkbox" name="consent" required className="mt-1" />
-                  Wyrażam zgodę na przetwarzanie moich danych osobowych w celu odpowiedzi na
-                  wiadomość.
-                </label>
-                <button
-                  type="submit"
-                  className="w-full rounded-full bg-[var(--sage)] py-2.5 font-semibold text-white shadow-sm transition-transform hover:scale-[1.02] hover:opacity-90"
-                >
-                  Wyślij wiadomość ✈
-                </button>
-              </form>
-            </>
-          )}
-        </NotebookCard>
-
-        <NotebookCard rotate="rotate-1">
-          <h2 className="font-heading text-lg font-bold">Nasze dane</h2>
-          <ul className="mt-4 space-y-3 text-sm">
-            <li className="flex items-start gap-2">
-              <span aria-hidden>📍</span>
-              <span>
-                ul. Kolejowa
-                <br />
-                Czechowice-Dziedzice
-              </span>
-            </li>
-            <li className="flex items-center gap-2">
-              <span aria-hidden>✉️</span>
-              <a href="mailto:kontakt@innova-pracownia.pl" className="hover:text-[var(--coral)]">
-                kontakt@innova-pracownia.pl
-              </a>
-            </li>
-            <li className="flex items-center gap-2">
-              <span aria-hidden>📞</span>
-              <a href="tel:+48570250363" className="hover:text-[var(--coral)]">
-                570 250 363
-              </a>
-            </li>
-          </ul>
-          <div className="mt-6 border-t border-[var(--border)] pt-4">
-            <h3 className="text-center text-sm font-semibold">Znajdź nas w social mediach</h3>
-            <div className="mt-3 flex justify-center gap-3">
-              <a
-                href="https://facebook.com/innova.pracownia"
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--pill-blue)] text-lg"
-                aria-label="Facebook"
-              >
-                📘
-              </a>
-              <a
-                href="https://instagram.com/innova_pracownia"
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--pill-pink)] text-lg"
-                aria-label="Instagram"
-              >
-                📷
-              </a>
-            </div>
-          </div>
-        </NotebookCard>
-
-        <NotebookCard rotate="-rotate-1">
-          <h2 className="font-heading text-lg font-bold">Tu nas znajdziesz</h2>
-          <div className="mt-4 overflow-hidden rounded-xl border border-[var(--border)]">
-            <iframe
-              title="Mapa — Czechowice-Dziedzice, ul. Kolejowa"
-              src="https://www.openstreetmap.org/export/embed.html?bbox=18.98%2C49.90%2C19.04%2C49.94&layer=mapnik&marker=49.92%2C19.01"
-              className="h-64 w-full"
-              loading="lazy"
-            />
-          </div>
-          <p className="mt-3 text-center text-sm text-[var(--muted)]">
-            Łatwy dojazd! Czekamy na Ciebie w Czechowicach-Dziedzicach.
-          </p>
-        </NotebookCard>
-      </div>
-    </div>
+      <MockupFooterLinks />
+    </MockupFrame>
   );
 }

@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Fredoka, Quicksand, Caveat, Nunito } from "next/font/google";
 import "./globals.css";
-import { Navbar } from "@/components/navbar";
-import { Footer } from "@/components/footer";
 import { getTheme } from "@/lib/theme";
 
 const fredoka = Fredoka({
@@ -60,9 +58,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col">
         <style dangerouslySetInnerHTML={{ __html: themeCss }} />
-        <Navbar />
-        <main className="flex-1">{children}</main>
-        <Footer />
+        <div className="flex flex-1 flex-col">{children}</div>
       </body>
     </html>
   );
