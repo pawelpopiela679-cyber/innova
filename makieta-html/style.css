@@ -77,3 +77,43 @@ textarea.field { resize: none; padding-top: 0.8%; }
 .success-panel .emoji { font-size: 2.4rem; margin: 0 0 6px; }
 .success-panel h3 { margin: 0 0 6px; font-family: 'Baloo 2', sans-serif; color: #7d7a4a; }
 .success-panel p { margin: 0; color: #8a7f5c; font-size: .9rem; }
+
+/* Real weekly schedule — covers the fake illustrative table baked into
+   grafik.png and replaces it with the studio's actual confirmed grafik. */
+.grafik-cover {
+  position: absolute;
+  background: #f6f0dd;
+  border: 1.5px solid #24344a;
+  border-radius: 10px;
+  overflow: auto;
+  display: flex;
+  gap: 0.8%;
+  padding: 1.2%;
+}
+.grafik-day {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4%;
+}
+.grafik-day h4 {
+  margin: 0 0 2%;
+  text-align: center;
+  font-family: 'Baloo 2', sans-serif;
+  color: #24344a;
+  font-size: 1.3cqw;
+  border-bottom: 2px dashed #c9bd94;
+  padding-bottom: 6%;
+}
+.grafik-chip {
+  border-radius: 8px;
+  padding: 6% 8%;
+  font-size: 1.05cqw;
+  line-height: 1.35;
+  color: #24344a;
+}
+.grafik-chip b { display: block; font-size: 1.05cqw; }
+.grafik-chip .time { font-weight: 700; }
+.grafik-chip .loc { display: block; opacity: .75; font-size: .92cqw; }
+.grafik-empty { text-align: center; color: #a89b6f; font-size: 1cqw; padding-top: 20%; }
