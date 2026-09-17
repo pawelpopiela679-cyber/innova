@@ -6,6 +6,7 @@ $classTypes = db()->query("SELECT * FROM class_types WHERE key_name != 'OPEN_DAY
 $pageTitle = 'INNOVA — Pracownia kreatywno-edukacyjna';
 $notebookTheme = true;
 $notebookBare = true;
+$notebookActive = 'home';
 require __DIR__ . '/includes/layout_top.php';
 ?>
 <div class="nb-graphic-page" style="background-image:url('<?= e(url('assets/img/hero-notebook.png')) ?>'); aspect-ratio:700/1038;"></div>
