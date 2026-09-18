@@ -46,6 +46,24 @@ body {
   object-fit: cover;
   display: block;
 }
+/* The source mockup's spiral-binding illustration bleeds off the top-left
+   corner (designed for an edge-to-edge browser fill) — now that the page
+   sits on a "desk" as a framed card with rounded corners, that cut-off
+   ring reads as a rendering glitch. Patch just that corner with the
+   notebook's own page colour so the card edge looks intentional; nothing
+   else in the artwork is touched. */
+.frame::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 6%;
+  height: 12%;
+  background: #f3ecd8;
+  border-top-left-radius: 10px;
+  z-index: 5;
+  pointer-events: none;
+}
 .hot {
   position: absolute;
   display: block;
