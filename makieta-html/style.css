@@ -1,11 +1,27 @@
 * { box-sizing: border-box; }
-html, body { margin: 0; padding: 0; background: #efe4cf; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+html, body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
 a { color: inherit; }
+
+/* Desk the notebook rests on — warm wood tone + soft vignette so the
+   page reads as an object sitting on a surface, not a flat browser fill. */
+body {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4vh 3vw;
+  background-color: #6b4a30;
+  background-image:
+    radial-gradient(ellipse 90% 70% at 50% 8%, rgba(255,255,255,0.10), transparent 60%),
+    repeating-linear-gradient(100deg, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 2px, transparent 2px, transparent 26px),
+    linear-gradient(155deg, #7a5638 0%, #6b4a30 45%, #5a3c26 100%);
+  background-attachment: fixed;
+}
 
 /* Single-file makieta: all 7 "pages" live in one HTML file and are
    swapped with JS (no real page navigation, so it works everywhere —
    double-clicked locally, previewed in a chat/zip viewer, etc.). */
-.page { display: none; }
+.page { display: none; width: 100%; max-width: 1672px; }
 .page.active { display: block; }
 
 .frame {
@@ -15,6 +31,12 @@ a { color: inherit; }
   margin: 0 auto;
   aspect-ratio: 1672 / 941;
   overflow: hidden;
+  border-radius: 10px;
+  transform: rotate(-0.5deg);
+  box-shadow:
+    0 2px 0 rgba(0,0,0,0.08),
+    0 25px 60px -15px rgba(0,0,0,0.55),
+    0 10px 25px -8px rgba(0,0,0,0.45);
 }
 .frame > img.bg {
   position: absolute;
